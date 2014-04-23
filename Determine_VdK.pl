@@ -89,7 +89,7 @@ if ( ( defined $module_Norma ) and ( -e $module_Norma ) and ( defined $module_pf
 	$R->send(qq`id=merge(idsample, idTdata, by.x=1, by.y=1)`) ;
 	$R->send(qq`id\$batch=as.factor(id\$batch)`) ;
 	
-	$R->send(qq`ids=id[id\$typsample == "p" | id\$typsample == "s",]`) ;
+	$R->send(qq`ids=id[id\$sampleType == "pool" | id\$sampleType == "sample",]`) ;
 	$R->send(qq`nbid=dim(idsample)[2]`) ;
 	
 	### Facteur biologique 
