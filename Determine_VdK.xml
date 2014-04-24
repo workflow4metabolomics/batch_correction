@@ -76,7 +76,7 @@ Input files
 | 2 : Sample metadata file |   tabular  |
 +--------------------------+------------+
 
-Data Matrix file must contain the intensity values ​​of the ion.
+Data Matrix file must contain the intensity values of the ion.
 |
 
 Sample metadata file must have at least the three following columns : 
