@@ -1,4 +1,4 @@
-<tool id="Batch_correction" name="Batch_correction" version="2014-03-03">
+<tool id="Batch_correction" name="Batch_correction" version="2014-04-24">
 	<description>Correct analytical effects on intensities</description>
 	<command interpreter="perl">
        norma_VDK_or_Lowess.pl
@@ -83,12 +83,9 @@ Input files
 | 3 : Variable metadata file |   tabular  |
 +----------------------------+------------+
 
- |
- |
- 
+	| 
 Data Matrix file must contain the intensity values of the variable.
- |
- |
+	| 
 
 Sample metadata file must have at least the three following columns : 
 	* "batch" to identify the batches of analyses ; need at leat 3 pools for linear adjustment and 8 for lo(w)ess adjustment
