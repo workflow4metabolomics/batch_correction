@@ -111,7 +111,7 @@ out_preNormSummary.tabular
 	| 1 : standard deviation of QC-pools or samples = 0
 	| 2 : insufficient number of QC-pools within a batch (n=3 for linear, n=8 for lowess or loess)
 	| 3 : significant difference between QC-pools and samples means
-	| 4 : denominator =0 when on 1 pool per batch <> 0
+	| 4 : denominator =0 when on 1 pool per batch 0
 	| 5 : (linear regression only) the slopes ratio “QC-pools/samples” is lower than -0.2
 	|
 
