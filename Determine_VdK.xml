@@ -133,8 +133,8 @@ Soon see the corresponding "Page"
 
 
   </help>
-</tool>
-
+  
+  
 Input files
 ===========
 
@@ -209,3 +209,6 @@ out_graph_pdf.pdf
 
 .. image:: ./static/images/metabolomics/pdf_plotsituation.png
         :width: 800
+
+
+</tool>
