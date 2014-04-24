@@ -17,7 +17,7 @@ use FindBin ; ## Permet de localisez le repertoire du script perl d'origine
 ### Created : 26/09/2013
 ###########################################################################################################
 
-my ( $help, $samplefile, $ionfile, $ref_factor, $out_graph_pdf, $out_preNormSummary ) = ( undef, undef, undef, undef, undef, undef, undef, undef );
+my ( $help, $sampleMetadata, $dataMatrix, $ref_factor, $out_graph_pdf, $out_preNormSummary ) = ( undef, undef, undef, undef, undef, undef, undef, undef );
 my ( $module_Norma , $module_pfemR, $R_bin, $Confs) = ( undef, undef, undef, undef ) ;
 
 my ( $sep1, $sep2 ) = ( "tab", "tab" ) ;
@@ -27,10 +27,10 @@ my $Path = $FindBin::Bin ;
 #commande des options gere en ligne de commande
 GetOptions(
         "help|h:s"		=>\$help,  			## only help !
-        "samplefile:s"	=>\$samplefile,		## input data matrix with samples in rows and ions in columns
-        "ionfile:s"		=>\$ionfile,	 	## input with ions data (extract from xcms)
-        "sep1:s"		=>\$sep1,			## caractere sep in input samplefile
-        "sep2:s"		=>\$sep2,			## caractere sep in input ionfile
+        "sampleMetadata:s"	=>\$sampleMetadata,		## input data matrix with samples in rows and ions in columns
+        "dataMatrix:s"		=>\$dataMatrix,	 	## input with ions data (extract from xcms)
+        "sep1:s"		=>\$sep1,			## caractere sep in input sampleMetadata
+        "sep2:s"		=>\$sep2,			## caractere sep in input dataMatrix
         "ref_factor:s"	=>\$ref_factor,		## Ref factor for plotting
         "out_graph_pdf:s"=>\$out_graph_pdf,	## plot output
 		"out_preNormSummary:s"=>\$out_preNormSummary	## tabular bilan
@@ -72,12 +72,12 @@ if ( ( defined $module_Norma ) and ( -e $module_Norma ) and ( defined $module_pf
 	$R->send(qq`source("$module_Norma")`) ;
 
 	## Lecture du fichier metadata sample 
-	$R->send(qq`samplefile="$samplefile"`) ;
-	$R->send(qq`idsample=read.table(samplefile,header=T,sep="$sep1")`) ;
+	$R->send(qq`sampleMetadata="$sampleMetadata"`) ;
+	$R->send(qq`idsample=read.table(sampleMetadata,header=T,sep="$sep1")`) ;
 	$R->send(qq`idsample[[1]]=make.names(idsample[[1]])`) ;
 	
 	### Lecture du fichier de données format xcms (ions en lignes)
-	$R->send(qq`infic="$ionfile"`) ;
+	$R->send(qq`infic="$dataMatrix"`) ;
 	$R->send(qq`iddata=read.table(infic,header=T,sep="$sep2")`) ;
 	$R->send(qq`dimnames(iddata)[[1]]=iddata[[1]]`) ;
 	
@@ -179,14 +179,14 @@ sub help {
 	# Created : 26/09/2013 -- release XX/XX/20XX
 	USAGE :
 	        Determine_VdK.pl -help
-	        example : Determine_VdK.pl -samplefile MetadataSample_phenomenep_xcmsMF.txt -sep1 tabULATION -ionfile phenomenep_xcmsMF.txt -sep2 tabulation -ref_factor batch -out_graph_pdf out_graph_pdf.pdf -out_preNormSummary out_preNormSummary.txt 
+	        example : Determine_VdK.pl -sampleMetadata MetadataSample_phenomenep_xcmsMF.txt -sep1 tabULATION -dataMatrix phenomenep_xcmsMF.txt -sep2 tabulation -ref_factor batch -out_graph_pdf out_graph_pdf.pdf -out_preNormSummary out_preNormSummary.txt 
 	!!! ATTENTION !!! ce logiciel necessite :
 		# fonction de normalisation necessite en entree les 2 fichiers : ion frame avec les valeurs des ions et aussi samples frame avec
 		# 3 colonnes : 
 		# 	'batch' pour identifier les series d'analyses (entre 2 calibrations ou lavage de source) Il  faut at least 2 pools par batch
 		#	'injection' type integer contenant les ordres d'injection de tous les echantillons 
 		# 	'typsample' contenant le type d'echantillon: 'p' pour pool ou 's' pour sample
-		# les signaux (ions) doivent etre dans le fichier ionfile
+		# les signaux (ions) doivent etre dans le fichier dataMatrix
 		\n";
 		
     exit(1);
