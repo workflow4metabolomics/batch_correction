@@ -38,7 +38,7 @@
 
 .. class:: infomark
 
-**Authors** Franck Giacomoni and Marion Landi (for Perl) and Jean-Francois Martin and Melanie Petera (for R)
+**Authors** Franck Giacomoni and Marion Landi (for interface and wrapper) and Jean-Francois Martin and Melanie Petera (for R)
 
 ---------------------------------------------------
 
@@ -83,7 +83,7 @@ Input files
 | 3 : Variable metadata file |   tabular  |
 +----------------------------+------------+
 
-	| 
+
 Data Matrix file must contain the intensity values of the variable.
 	| 
 
