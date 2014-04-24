@@ -28,7 +28,7 @@
 
 .. class:: infomark
 
-**Authors** Franck Giacomoni and Marion Landi (for Perl) and Jean-Francois Martin and Melanie Petera (for R)
+**Authors** Franck Giacomoni and Marion Landi (for interface and wrapper) and Jean-Francois Martin and Melanie Petera (for R)
 
 ---------------------------------------------------
 
@@ -76,8 +76,9 @@ Input files
 | 2 : Sample metadata file |   tabular  |
 +--------------------------+------------+
 
-Data Matrix file must contain the intensity values of the ion.
-|
+
+Data Matrix file must contain the intensity values of the variable.
+	| 
 
 Sample metadata file must have at least the three following columns : 
 	* "batch" to identify the batches of analyses ; need at leat 3 pools for linear adjustment and 8 for lo(w)ess adjustment
