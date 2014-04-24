@@ -2,17 +2,17 @@
 	<description>Correct analytical effects on intensities</description>
 	<command interpreter="perl">
        norma_VDK_or_Lowess.pl
-	       -samplefile $samplefile -sep1 "tabular"
-	       -ionfile $ionfile -sep2 "tabular"
-	       -ionmeta $ionmeta -sep3 "tabular"
+	       -dataMatrix $dataMatrix -sep1 "tabular"
+	       -sampleMetadata $sampleMetadata -sep2 "tabular"
+	       -variableMetadata $variableMetadata -sep3 "tabular"
 	       -ref_factor $ref_factor -detail $detail -method $method
-	       -csv_output $csv_output -csv_output_for_simca $csv_output_for_simca -csv_output_metaion $csv_output_metaion
+	       -dataMatrix_out $dataMatrix_out -variable_for_simca $variable_for_simca -variableMetadata_out $variableMetadata_out
 	       -graph_output $graph_output  -rdata_output $rdata_output
 	</command>
 	<inputs>
-		<param name="samplefile" label="Metadata Samples file " format="tabular" type="data" help="must have at least the three following columns : 'batch' + 'injection' + 'typsample'"/>
-		<param name="ionmeta" label="Metadata Ions file " format="tabular" type="data" />
-		<param name="ionfile" label="Intensity Matrix file " format="tabular" type="data" />
+		<param name="dataMatrix" label="Data Matrix file " format="tabular" type="data" />
+		<param name="sampleMetadata" label="Sample metadata file " format="tabular" type="data" help="must have at least the three following columns : 'batch' + 'injectionOrder' + 'sampleType'"/>
+		<param name="variableMetadata" label="Variable metadata file " format="tabular" type="data" />
 		
 		<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor) ; if none, leave 'batch'" />
 		<param name="method" label="Type of regression model " type="select" help="Select between linear or non-linear (lowess or loess) which one to be used in Van der Kloet algorithm.">
@@ -28,11 +28,11 @@
 	</inputs>
 	
 	<outputs>
-		<data name="csv_output" label="${tool.name}_${method}_${ionfile.name}_tsv" format="tabular"/>
-		<data name="csv_output_for_simca" label="${tool.name}_${method}_result_for_simca_tsv" format="tabular"/>
-		<data name="csv_output_metaion" label="${tool.name}_${method}_${ionmeta.name}" format="tabular"/>
-		<data name="graph_output" label="${tool.name}_${method}_${detail}_plots" format="pdf"/>
-		<data name="rdata_output" label="${tool.name}_${method}_${detail}_rdata" format="rdata"/>
+		<data name="variable_for_simca" label="${tool.name}_${method}_result_for_simca_tsv" format="tabular"/>
+		<data name="dataMatrix_out" label="${tool.name}_${method}_${dataMatrix.name}" format="tabular"/>
+		<data name="variableMetadata_out" label="${tool.name}_${method}_${variableMetadata.name}" format="tabular"/>
+		<data name="graph_output" label="${tool.name}_${method}_${detail.name}_graph_pdf" format="pdf"/>
+		<data name="rdata_output" label="${tool.name}_${method}_rdata" format="rdata"/>
 	</outputs>
 	<help>
 
@@ -73,22 +73,28 @@ Workflow position
 Input files
 -----------
 
-+---------------------------+------------+
-| Parameter : num + label   |   Format   |
-+===========================+============+
-| 1 : Metadata Samples file |   tabular  |
-+---------------------------+------------+
-| 2 : Metadata Ions file    |   tabular  |
-+---------------------------+------------+
-| 3 : Intensity Matrix file |   tabular  |
-+---------------------------+------------+
++----------------------------+------------+
+| Parameter : num + label    |   Format   |
++============================+============+
+| 1 : Data Matrix file       |   tabular  |
++----------------------------+------------+
+| 2 : Sample metadata file   |   tabular  |
++----------------------------+------------+
+| 3 : Variable metadata file |   tabular  |
++----------------------------+------------+
 
-Metadata samples file must have at least the three following columns : 
-	* "batch" to identify the batches of analyses ; need at leat 3 QCpools for linear adjustment and 8 for lo(w)ess adjustment
-	* "injection" integer defining the injection order of all samples : QCpools and analysed samples
-	* "typsample" indicate if defining a samples with "s" or a QCpools "p"
+ |
+ |
+ 
+Data Matrix file must contain the intensity values of the variable.
+ |
+ |
 
-Intensity matrix file must contain the intensity values ​​of the ion
+Sample metadata file must have at least the three following columns : 
+	* "batch" to identify the batches of analyses ; need at leat 3 pools for linear adjustment and 8 for lo(w)ess adjustment
+	* "injectionOrder" integer defining the injection order of all samples : QC-pools and analysed samples
+	* "sampleType" indicate if defining a samples or a pool
+
 
 .. class:: warningmark
 
@@ -121,31 +127,31 @@ Level of details for plots
 Output files
 ------------
 
-Norma_rdata_$detail.rdata
+Batch_correction_$method_rdata.rdata
 	| binary data
 	| Download, open with R and send res
 	|
 
-Norma_plots_$detail.pdf
+Batch_correction_$method_$detail_graph_pdf.pdf
 	| plot output
 	| graphical view
 	|
 
-metadata_ions
+Batch_correction_$method_variableMetadata.tabular
 	| tsv output
-	| Identical to the Metadata Ions input file with x more columns (where x is the number of batches)
+	| Identical to the Variable metadata input file with x more columns (where x is the number of batches)
 	|
 
-Norma_result_for_simca.tabular
-	| tsv output
-	| tabulated for use by SIMCA
-	| same formatting as Metadata samples file + transposed to the formatting of Ions matrix file
-	|
-
-Norma_result.tabular
+Batch_correction_$method_dataMatrix.tabular
 	| tsv output
 	| tabulated for other uses
-	| same formatting as Ions matrix file
+	| same formatting as Data Matrix file
+	|
+
+Batch_correction_$method_result_for_simca_tsv.tabular
+	| tsv output
+	| tabulated for use by SIMCA
+	| same formatting as Sample metadata file + transposed to the formatting of Data Matrix file
 	|
 
 	
