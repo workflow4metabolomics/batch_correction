@@ -6,17 +6,17 @@
   </requirements>
   <command interpreter="perl">
     Determine_VdK.pl
-      -samplefile "$samplefile"
+      -sampleMetadata "$sampleMetadata"
       -sep1 "tabular"
-      -ionfile "$ionfile"
+      -dataMatrix "$dataMatrix"
       -sep2 "tabular"
       -ref_factor "$ref_factor"
       -out_graph_pdf "$out_graph_pdf"
       -out_preNormSummary "$out_preNormSummary"
   </command>
   <inputs>
-    <param name="samplefile" type="data" label="Metadata Samples file " help="must have at least the three following column : 'batch' + 'injection' + 'typsample'" format="tabular" />
-    <param name="ionfile" type="data" label="Intensity Matrix file " help="" format="tabular" />
+    <param name="dataMatrix" type="data" label="Data Matrix file " help="" format="tabular" />
+    <param name="sampleMetadata" type="data" label="Sample metadata file " help="must have at least the three following column : 'batch' + 'injectionOrder' + 'sampleType'" format="tabular" />
     <param name="ref_factor" type="text" label="Factor of interest " help="column name of factor of interest (often a biological factor) ; if none, leave 'batch'" value="batch" />
   </inputs>
   
@@ -68,20 +68,22 @@ Workflow position
 Input files
 -----------
 
-+---------------------------+------------+
-| Parameter : num + label   |   Format   |
-+===========================+============+
-| 1 : Metadata Samples file |   tabular  |
-+---------------------------+------------+
-| 2 : Intensity Matrix file |   tabular  |
-+---------------------------+------------+
++--------------------------+------------+
+| Parameter : num + label  |   Format   |
++==========================+============+
+| 1 : Data Matrix file     |   tabular  |
++--------------------------+------------+
+| 2 : Sample metadata file |   tabular  |
++--------------------------+------------+
 
-Metadata samples file must have at least the three following columns : 
-	* "batch" to identify the batches of analyses ; need at leat 3 QCpools for linear adjustment and 8 for lo(w)ess adjustment
-	* "injection" integer defining the injection order of all samples : QCpools and analysed samples
-	* "typsample" indicate if defining a samples with "s" or a QCpools "p"
+Data Matrix file must contain the intensity values ​​of the ion.
+|
 
-Intensity matrix file must contain the intensity values ​​of the ion.
+Sample metadata file must have at least the three following columns : 
+	* "batch" to identify the batches of analyses ; need at leat 3 pools for linear adjustment and 8 for lo(w)ess adjustment
+	* "injectionOrder" integer defining the injection order of all samples : QC-pools and analysed samples
+	* "sampleType" indicate if defining a samples or a pool
+
 
 .. class:: warningmark
 
@@ -130,10 +132,10 @@ Input files
 | **by checking the box "Convert spaces to tabs: YES"**
 
 Metadata_samples.txt
-	Model input Metadata Samples file::
+	Model input Sample metadata file::
 
-		samples idLIMS serie factor01 factor02 batch injection typsample
-		POOL1 POOL1 p p p 01_08_2011 1 p
+		samples idLIMS serie factor01 factor02 batch injectionOrder sampleType
+		POOL1 POOL1 pool p pool 01_08_2011 1 p
 		X12588 12588 3 validation 2 01_08_2011 2 s
 		X17736 17736 3 Q1 1 01_08_2011 3 s
 		X15432 15432 3 validation 1 01_08_2011 4 s
@@ -144,7 +146,7 @@ Metadata_samples.txt
 		X16172 16172 3 Q4 2 01_08_2011 9 s
 		X16392 16392 3 Q4 2 01_08_2011 10 s
 		X13875 13875 3 validation 2 01_08_2011 11 s
-		POOL2 POOL2 p p p 01_08_2011 12 p
+		POOL2 POOL2 pool p pool 01_08_2011 12 p
 		X13117 13117 3 Q4 2 01_08_2011 13 s
 		X13341 13341 3 Q1 2 01_08_2011 14 s
 		X16888 16888 3 Q4 1 01_08_2011 15 s
