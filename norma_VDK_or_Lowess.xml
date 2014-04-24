@@ -31,7 +31,7 @@
 		<data name="variable_for_simca" label="${tool.name}_${method}_result_for_simca_tsv" format="tabular"/>
 		<data name="dataMatrix_out" label="${tool.name}_${method}_${dataMatrix.name}" format="tabular"/>
 		<data name="variableMetadata_out" label="${tool.name}_${method}_${variableMetadata.name}" format="tabular"/>
-		<data name="graph_output" label="${tool.name}_${method}_${detail.name}_graph_pdf" format="pdf"/>
+		<data name="graph_output" label="${tool.name}_${method}_graph_pdf" format="pdf"/>
 		<data name="rdata_output" label="${tool.name}_${method}_rdata" format="rdata"/>
 	</outputs>
 	<help>
