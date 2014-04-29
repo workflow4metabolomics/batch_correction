@@ -8,8 +8,8 @@
 # Version 1.1 : 22-10-2013                                                                     #
 # Version 2 : 28-11-2013 (Filter according to factors' levels added)                           #
 # Version 3 : 13-03-2014 (CV ratio added)                                                      #
-# Version 4 : 14-04-2014 (Voc ajustment, extension of KW to all pvalues, new CV filter added)  #
-# Version 4.1 : 24-04-2014 (handling of double pool delation)                                  #
+# Version 4 : 14-04-2014 (Voc adjustment, extension of KW to all pvalues, new CV filter added) #
+# Version 4.1 : 24-04-2014 (handling of double pool deletion)                                  #
 #                                                                                              #
 #                                                                                              #
 # Input files : file_IONS.txt ; file_PROTOC.txt ; file_MetaDataIon.txt                         #
@@ -56,7 +56,7 @@ filter <- function(ion.file.in, meta.samp.file.in, meta.ion.file.in, sep1, sep2,
   # - testp : filtering according to p-values yes/no
   # | > pval : p-value limit for testp filter
   # | > pvar : p-values column number
-  # - POOL : pool delation yes/no
+  # - POOL : pool deletion yes/no
   # - FACT : filter according to factors yes/no
   # | > ls.fact : factors' list for filter
   
@@ -179,7 +179,7 @@ if(POOL){
                      "\nPools will not be removed.\n-------\n")
     }else{
   
-  # Pool delation in ion.data and meta.samp.data
+  # Pool deletion in ion.data and meta.samp.data
   tmp.samp <- which(colnames(ion.data)%in%meta.samp.data[which(meta.samp.data$sampleType=="pool"),1])
   ion.data <- ion.data[,-c(tmp.samp)]
   meta.samp.data <- meta.samp.data[which(meta.samp.data$sampleType!="pool"),]
