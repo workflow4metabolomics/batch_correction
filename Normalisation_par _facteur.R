@@ -15,20 +15,19 @@
 #                                                                                               #
 #################################################################################################
 
-
-# For dev
-rm(list=ls())
-setwd("J:/WorkSpace/ScriptR_divers/Galaxy")
-ion.file.in <- "DataExemple/NormVDK_mat_201_mz_IONS.txt"  #tab file
-meta.samp.file.in <- "DataExemple/NormVDK_mat_201_mz_PROTOCOLE.txt"  #tab file
-ion.file.out <- "DataExemple/NormVDK_mat_201_mz_IONS_norm.txt"  #tab file
-norm.type <- "weighted.means"
-norm.factor <- "centre"
-weight.factor <- "repondeur"
-graph.pdf.out <- paste("Norm_by_",norm.factor,"_plots.pdf",sep="")
-acp.pdf.out <- paste("Norm_by_",norm.factor,"_acp.pdf",sep="")
-###
-
+if(FALSE){
+	# For dev
+	rm(list=ls())
+	setwd("J:/WorkSpace/ScriptR_divers/Galaxy")
+	ion.file.in <- "DataExemple/NormVDK_mat_201_mz_IONS.txt"  #tab file
+	meta.samp.file.in <- "DataExemple/NormVDK_mat_201_mz_PROTOCOLE.txt"  #tab file
+	ion.file.out <- "DataExemple/NormVDK_mat_201_mz_IONS_norm.txt"  #tab file
+	norm.type <- "weighted.means"
+	norm.factor <- "centre"
+	weight.factor <- "repondeur"
+	graph.pdf.out <- paste("Norm_by_",norm.factor,"_plots.pdf",sep="")
+	acp.pdf.out <- paste("Norm_by_",norm.factor,"_acp.pdf",sep="")
+}
 
 # Parameters
 if(FALSE){
