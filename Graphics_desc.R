@@ -8,7 +8,7 @@
 #      quantitative variables, and it returns chosen plots in png format  #
 #      and a table with chosen statistics.                                #
 #                                                                         #
-# Version 1 (XX-05-2014) : display scatterplot, boxplot, histogramme,     #
+# Version 1 (XX-05-2014) : display scatterplot, boxplot, histogram,       #
 #      MA plot, density plot, pairs plot, and return a table of chosen    #
 #      statistics (quantiles, mean, variance, standard error of the mean) #
 ###########################################################################
