@@ -8,9 +8,12 @@ if(FALSE){
 	rdatafile <- "J:/WorkSpace/Galaxy17-[xset.group.retcor.group.fillPeaks.RData].rdata"
 	varmd.out <- "J:/WorkSpace/VariableMetadata.txt"
 	dm.out <- "J:/WorkSpace/DataMatrix.txt"
+	Perfwhm <- 0.6
+	Polarity <- "positive"
+	
 }
 
-extractionTemp <- function(rdatafile,nbSamp,varmd.out,dm.out){
+extractionTemp <- function(rdatafile,nbSamp,Perfwhm,Polarity,varmd.out,dm.out){
 # rdatafile = chemin et nom du Rdata
 # nbSamp = nb de samples (contient pool & sample & blank & tout autre type d'echantillon)
 # varmd.out = chemin et nom du fichier de sortie des variable metadata
@@ -27,10 +30,10 @@ xsetPnofill <- xset
 xsetP <- fillPeaks(xsetPnofill)
 ## puis CAMERA
 an <-xsAnnotate(xsetP)
-an <-groupFWHM(an, perfwhm = 0.6)
+an <-groupFWHM(an, perfwhm = Perfwhm)
 an <-findIsotopes(an, mzabs = 0.01)
 an <-groupCorr(an, cor_eic_th = 0.75)
-anP <-findAdducts(an, polarity="positive")
+anP <-findAdducts(an, polarity=Polarity)
 
 thelist <- getPeaklist(anP)
 
@@ -44,3 +47,6 @@ write.table(dm.tb, file=dm.out,sep="\t", row.names=F)
 
 
 }
+
+# Typical function call
+#extractionTemp(rdatafile,nbSamp,Perfwhm,Polarity,varmd.out,dm.out)
