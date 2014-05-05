@@ -47,3 +47,6 @@ write.table(dm.tb, file=dm.out,sep="\t", row.names=F)
 
 
 }
+
+# Typical function call
+#extractionTemp(rdatafile,nbSamp,Perfwhm,Polarity,varmd.out,dm.out)
