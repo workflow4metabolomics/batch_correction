@@ -41,10 +41,10 @@ thelist <- getPeaklist(anP)
 fin.var <- ncol(thelist) - 3 - nbSamp
 
 varmd.tb <- data.frame(thelist[,1:fin.var],thelist[,(ncol(thelist)-2):(ncol(thelist))])
-write.table(varmd.tb, file=varmd.out,sep="\t", row.names=F)
+write.table(varmd.tb, file=varmd.out,sep="\t", row.names=F, quote=FALSE)
 
 dm.tb <- data.frame(thelist[,1,drop=FALSE],thelist[,(fin.var+1):(ncol(thelist)-3)])
-write.table(dm.tb, file=dm.out,sep="\t", row.names=F)
+write.table(dm.tb, file=dm.out,sep="\t", row.names=F, quote=FALSE)
 
 
 }
