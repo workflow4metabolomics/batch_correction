@@ -9,6 +9,7 @@ if(FALSE){
 	varmd.out <- "J:/WorkSpace/VariableMetadata.txt"
 	dm.out <- "J:/WorkSpace/DataMatrix.txt"
 	Perfwhm <- 0.6
+	#Cor_eic_th <- 0.75
 	Polarity <- "positive"
 	
 }
@@ -32,7 +33,7 @@ xsetP <- fillPeaks(xsetPnofill)
 an <-xsAnnotate(xsetP)
 an <-groupFWHM(an, perfwhm = Perfwhm)
 an <-findIsotopes(an, mzabs = 0.01)
-an <-groupCorr(an, cor_eic_th = 0.75)
+#an <-groupCorr(an, cor_eic_th = Cor_eic_th)
 anP <-findAdducts(an, polarity=Polarity)
 
 thelist <- getPeaklist(anP)
@@ -40,10 +41,10 @@ thelist <- getPeaklist(anP)
 fin.var <- ncol(thelist) - 3 - nbSamp
 
 varmd.tb <- data.frame(thelist[,1:fin.var],thelist[,(ncol(thelist)-2):(ncol(thelist))])
-write.table(varmd.tb, file=varmd.out,sep="\t", row.names=F)
+write.table(varmd.tb, file=varmd.out,sep="\t", row.names=F, quote=FALSE)
 
 dm.tb <- data.frame(thelist[,1,drop=FALSE],thelist[,(fin.var+1):(ncol(thelist)-3)])
-write.table(dm.tb, file=dm.out,sep="\t", row.names=F)
+write.table(dm.tb, file=dm.out,sep="\t", row.names=F, quote=FALSE)
 
 
 }
