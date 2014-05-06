@@ -9,6 +9,7 @@ if(FALSE){
 	varmd.out <- "J:/WorkSpace/VariableMetadata.txt"
 	dm.out <- "J:/WorkSpace/DataMatrix.txt"
 	Perfwhm <- 0.6
+	#Cor_eic_th <- 0.75
 	Polarity <- "positive"
 	
 }
@@ -32,7 +33,7 @@ xsetP <- fillPeaks(xsetPnofill)
 an <-xsAnnotate(xsetP)
 an <-groupFWHM(an, perfwhm = Perfwhm)
 an <-findIsotopes(an, mzabs = 0.01)
-an <-groupCorr(an, cor_eic_th = 0.75)
+#an <-groupCorr(an, cor_eic_th = Cor_eic_th)
 anP <-findAdducts(an, polarity=Polarity)
 
 thelist <- getPeaklist(anP)
