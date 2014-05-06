@@ -38,6 +38,13 @@ anP <-findAdducts(an, polarity=Polarity)
 
 thelist <- getPeaklist(anP)
 
+# Addition of RT in minutes and Variable ID 
+thelist <- thelist[,c(4,1,4,(2:ncol(thelist)))]
+colnames(thelist)[c(1,3,6)] <- c("ions","rt","rtsec")
+thelist[,3] <- round(thelist[,6]/60,digits=1)
+if(Polarity=="positive"){imode <- "p"}else{imode <- "n"} 
+thelist[,1] <- paste(imode,round(thelist[,2],digits=2),"T",thelist[,3],sep="")
+
 fin.var <- ncol(thelist) - 3 - nbSamp
 
 varmd.tb <- data.frame(thelist[,1:fin.var],thelist[,(ncol(thelist)-2):(ncol(thelist))])
