@@ -1,5 +1,5 @@
 ## ****** Determine_VdK environnemnt : ****** ##
-# version janv 2013 M Landi / F Giacomoni
+# version avr 2014 M Landi / F Giacomoni
 
 ## --- PERL compilator / libraries : --- ##
 $ perl -v
@@ -48,9 +48,7 @@ R_PFEM_TB=/your/PFEM_R/package/path/toolbox/toolBox.R
 --
 
 ## --- XML HELP PART --- ##
-Copy the following image in ~/static/images/metabolomics : 
-pdf_plotsituation.png
-And the following image in ~/static/images/metabolomics/Workflow_position :
+Copy the following image in ~/static/images/metabolomics/Workflow_position :
 Determine_Van-der-Kloet.png
 --
 
