@@ -1,5 +1,5 @@
 ## ****** Norma_VdK_Lowess environnemnt : ****** ##
-# version janv 2013 M Landi / F Giacomoni
+# version avr 2014 M Landi / F Giacomoni
 
 ## --- PERL compilator / libraries : --- ##
 $ perl -v
@@ -48,10 +48,7 @@ R_PFEM_TB=/your/PFEM_R/package/path/toolbox/toolBox.R
 --
 
 ## --- XML HELP PART --- ##
-Copy the following images in ~/static/images/metabolomics : 
-Vdk_pdf1.png
-Vdk_pdf2.png
-And the following image in ~/static/images/metabolomics/Workflow_position :
+Copy the following images in ~/static/images/metabolomics/Workflow_position :
 Normalization_Van-der-Kloet.png
 --
 
