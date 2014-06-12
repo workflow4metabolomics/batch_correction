@@ -20,6 +20,7 @@
 # Version 2.00 Addition of loess function, correction indicator, plots ; modification of returned objects' format, some plots' displays and ok_norm ifelse format
 # Version 2.01 Correction for pools negative values earlier in norm_QCpool
 # Version 2.10 Script refreshing ; vocabulary adjustment ; span in parameters for lo(w)ess regression ; conditionning for third line ACP display ; order in loess display
+# Version 2.11 ok1 and ok2 permutation (ok_norm) ; conditional display of regression (plotsituation) ; grouping of linked lignes + conditioning (normX) ; conditioning for CVplot
 
 ok_norm=function(qcp,qci,spl,spi,method) {
   # Function used for one ion within one batch to determine whether or not batch correction is possible
@@ -33,9 +34,9 @@ ok_norm=function(qcp,qci,spl,spi,method) {
   
   ok=0
   if (method=="linear") {minQC=3} else {minQC=8}
-  if (sd(qcp)==0 | sd(spl)==0) { ok=1 
+  if (length(qcp)<minQC) { ok=2 
   } else {
-    if (length(qcp)<minQC) { ok=2 
+    if (sd(qcp)==0 | sd(spl)==0) { ok=1 
     } else {
     cvp= sd(qcp)/mean(qcp); cvs=sd(spl)/mean(spl)
     rttest=t.test(qcp,y=spl)
@@ -85,7 +86,7 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
             xb=data.frame(x[(x$batch==levels(x$batch)[b]),c(indtypsamp,indinject,p+nbid)])
             indpb = which(xb$sampleType=="pool")# QCpools subscripts in the current batch
             indsp = which(xb$sampleType=="sample")# samples subscripts in the current batch
-            indbt = which(xb$sampleType=="sample" | xb$sampleType=="pool")# indices de tous les samples d'un batch pools+samples
+            indbt = which(xb$sampleType=="sample" | xb$sampleType=="pool")# indices de tous les samples d'un batch pools+samples  
             normLinearTest=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="linear")
             normLoessTest=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="loess")
             normLowessTest=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="lowess")
@@ -93,6 +94,7 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
             pre_bilan[ p,3*b-2]=normLinearTest
             pre_bilan[ p,3*b-1]=normLoessTest
             pre_bilan[ p,3*b]=normLowessTest
+          if(length(indpb)>1){
             if(length(span)==0){span1<-1 ; span2<-2*length(indpool)/nbs}else{span1<-span ; span2<-span}
             resloess=loess(xb[indpb,3]~xb[indpb,2],span=span1,degree=2,family="gaussian",iterations=4,surface="direct") 
             resloessSample=loess(xb[indsp,3]~xb[indsp,2],span=2*length(indpool)/nbs,degree=2,family="gaussian",iterations=4,surface="direct") 
@@ -107,6 +109,7 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
             abline(lsfit(xb[indpb,2],xb[indpb,3]),col="blue")
             abline(lsfit(xb[indsp,2],xb[indsp,3]),lty=2)
             legend("topright",c("pools","samples"),lty=c(1,2),bty="n")
+          }
         }
 # series de plot avant et apres correction
 minval=min(x[p+nbid]);maxval=max(x[p+nbid])
@@ -136,15 +139,13 @@ normlowess=function (xb,detail="no",vref=1,b,span=NULL) {
   indsp = which(xb$sampleType=="sample") # samples of current batch subscripts
   indbt = which(xb$sampleType=="sample" | xb$sampleType=="pool");# batch subscripts of all samples and QC-pools
   labion=dimnames(xb)[[2]][3]
-  if(length(span)==0){span2<-2*length(indpb)/length(indsp)}else{span2<-span}
-  reslowess=lowess(xb[indpb,2],xb[indpb,3],f=span2) # lowess regression with QC-pools 
-  moypool=mean(xb[indpb,3]) ; if (moypool==0) moypool=1
-  moySample=mean(xb[indsp,3]);if (moySample==0) moySample=1
   newval=xb[[3]] # initialisation of corrected values = intial values
   ind <- 0 # initialisation of correction indicator
   normTodo=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="lowess")
   #cat("batch:",b," dim xb=",dim(xb)," ok=",normTodo,"\n")
   if (normTodo==0) {
+    if(length(span)==0){span2<-2*length(indpb)/length(indsp)}else{span2<-span}
+    reslowess=lowess(xb[indpb,2],xb[indpb,3],f=span2) # lowess regression with QC-pools 
     px=xb[indsp,2];  # vector of injectionOrder values only for samples  
     for(j in 1:length(indbt)) {	 
       if (xb$sampleType[j]=="pool") {
@@ -165,8 +166,12 @@ normlowess=function (xb,detail="no",vref=1,b,span=NULL) {
     }
     ind <- 1
   } else {# if ok_norm <> 0 , we perform a correction based on batch samples average
+    moySample=mean(xb[indsp,3]);if (moySample==0) moySample=1
     newval[indsp] = (vref*xb[indsp,3])/moySample
-    newval[indpb] = (vref*xb[indpb,3])/moypool
+    if(length(indpb)>0){
+      moypool=mean(xb[indpb,3]) ; if (moypool==0) moypool=1
+      newval[indpb] = (vref*xb[indpb,3])/moypool
+    }
   }
   newval <- list(norm.ion=newval,norm.ind=ind)
   return(newval)
@@ -180,8 +185,6 @@ normlinear <-function (xb,detail="no",vref=1,b) {
   indsp = which(xb$sampleType=="sample")# samples of current batch subscripts
   indbt = which(xb$sampleType=="sample" | xb$sampleType=="pool") # QCpools and samples of current batch subscripts
   labion=dimnames(xb)[[2]][3]
-  moypool=mean(xb[indpb,3]) ; if (moypool==0) moypool=1
-  moySample=mean(xb[indsp,3]); if (moySample==0) moySample=1
   newval=xb[[3]] # initialisation of corrected values = intial values	
   ind <- 0 # initialisation of correction indicator
   normTodo=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="linear")
@@ -203,8 +206,12 @@ normlinear <-function (xb,detail="no",vref=1,b) {
     newval = (vref*xb[indbt,3]) / ((pente * xb[indbt,2]) + ordori)
     ind <- 1
   } else {# if ok_norm<>0 , we perform a correction based on batch samples average.
+    moySample=mean(xb[indsp,3]); if (moySample==0) moySample=1
     newval[indsp] = (vref*xb[indsp,3])/moySample
-    newval[indpb] = (vref*xb[indpb,3])/moypool
+    if(length(indpb)>0){
+      moypool=mean(xb[indpb,3]) ; if (moypool==0) moypool=1
+      newval[indpb] = (vref*xb[indpb,3])/moypool
+    }
   }
   newval <- list(norm.ion=newval,norm.ind=ind)
   return(newval)
@@ -222,15 +229,13 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL) {
     indsp = which(xb$sampleType=="sample") # samples of current batch subscripts
     indbt = which(xb$sampleType=="sample" | xb$sampleType=="pool");# batch subscripts of all samples and QCpools
     labion=dimnames(xb)[[2]][3]
-    if(length(span)==0){span1<-1}else{span1<-span}
-    resloess=loess(xb[indpb,3]~xb[indpb,2],span=span1,degree=2,family="gaussian",iterations=4,surface="direct") # loess regression with QCpools 
-    moypool=mean(xb[indpb,3]) ; if (moypool==0) moypool=1
-    moySample=mean(xb[indsp,3]);if (moySample==0) moySample=1
     newval=xb[[3]] # initialisation of corrected values = intial values
     ind <- 0 # initialisation of correction indicator
     normTodo=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="loess")
     #cat("batch:",b," dim xb=",dim(xb)," ok=",normTodo,"\n")
     if (normTodo==0) { 
+        if(length(span)==0){span1<-1}else{span1<-span}
+        resloess=loess(xb[indpb,3]~xb[indpb,2],span=span1,degree=2,family="gaussian",iterations=4,surface="direct") # loess regression with QCpools 
         cor=predict(resloess,newdata=xb[,2])
 		    cor[cor<=0] <- 1 
         newval=(vref*xb[,3]) / cor 
@@ -244,8 +249,12 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL) {
         }
     } 
     if (ind==0) {# if ok_norm != 0 or if correction creates outliers, we perform a correction based on batch samples average
-        newval[indsp] = (vref*xb[indsp,3])/moySample
+      moySample=mean(xb[indsp,3]);if (moySample==0) moySample=1
+      newval[indsp] = (vref*xb[indsp,3])/moySample
+      if(length(indpb)>0){
+        moypool=mean(xb[indpb,3]) ; if (moypool==0) moypool=1
         newval[indpb] = (vref*xb[indpb,3])/moypool
+      }
     }
     newval <- list(norm.ion=newval,norm.ind=ind)
     return(newval)
@@ -347,8 +356,11 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
 			if(length(norm.ion)>0){acplight(Xn[,c(indtypsamp,indbatch,indtypsamp,indfact,norm.ion)],"uv",TRUE)}
 			par(mfrow=c(1,2),ask=F,cex=1.2) # Before/after boxplot
 			cvplot=cv[!is.na(cv[[1]])&!is.na(cv[[2]]),]
-			boxplot(cvplot[[1]],ylim=c(min(cvplot),max(cvplot)),main="CV avant");boxplot(cvplot[[2]],ylim=c(min(cvplot),max(cvplot)),main="CV apres")
-			dev.off()
+      if(nrow(cvplot)>0){
+			  boxplot(cvplot[[1]],ylim=c(min(cvplot),max(cvplot)),main="CV avant")
+        boxplot(cvplot[[2]],ylim=c(min(cvplot),max(cvplot)),main="CV apres")
+      }
+      dev.off()
 		}
 	}
   if (nbi<=3) {dev.off()}
