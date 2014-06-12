@@ -84,8 +84,9 @@ Input files
 +----------------------------+------------+
 
 
-Data Matrix file must contain the intensity values of the variable.
-	| 
+Data Matrix file must contain the intensity values of variables.
+	| First line must contain all the samples names
+	| First column must contain all the variables id
 
 Sample metadata file must have at least the three following columns : 
 	* "batch" to identify the batches of analyses ; need at leat 3 pools for linear adjustment and 8 for lo(w)ess adjustment
