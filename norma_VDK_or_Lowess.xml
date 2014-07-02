@@ -6,7 +6,7 @@
 	       -sampleMetadata $sampleMetadata -sep2 "tabular"
 	       -variableMetadata $variableMetadata -sep3 "tabular"
 	       -ref_factor $ref_factor -detail $detail -method $method
-	       -dataMatrix_out $dataMatrix_out -variable_for_simca $variable_for_simca -variableMetadata_out $variableMetadata_out
+	       -dataMatrix_out $dataMatrix_out -variable_for_simca $combinedResults -variableMetadata_out $variableMetadata_out
 	       -graph_output $graph_output  -rdata_output $rdata_output
 	</command>
 	<inputs>
@@ -28,7 +28,7 @@
 	</inputs>
 	
 	<outputs>
-		<data name="variable_for_simca" label="${tool.name}_${method}_result_for_simca_tsv" format="tabular"/>
+		<data name="combinedResults" label="${tool.name}_${method}_combined_results_tsv" format="tabular"/>
 		<data name="dataMatrix_out" label="${tool.name}_${method}_${dataMatrix.name}" format="tabular"/>
 		<data name="variableMetadata_out" label="${tool.name}_${method}_${variableMetadata.name}" format="tabular"/>
 		<data name="graph_output" label="${tool.name}_${method}_graph_pdf" format="pdf"/>
