@@ -28,10 +28,10 @@
 	</inputs>
 	
 	<outputs>
-		<data name="combinedResults" label="${tool.name}_${method}_combined_results_tsv" format="tabular"/>
+		<data name="combinedResults" label="${tool.name}_${method}_combined_results" format="tabular"/>
 		<data name="dataMatrix_out" label="${tool.name}_${method}_${dataMatrix.name}" format="tabular"/>
 		<data name="variableMetadata_out" label="${tool.name}_${method}_${variableMetadata.name}" format="tabular"/>
-		<data name="graph_output" label="${tool.name}_${method}_graph_pdf" format="pdf"/>
+		<data name="graph_output" label="${tool.name}_${method}_graph" format="pdf"/>
 		<data name="rdata_output" label="${tool.name}_${method}_rdata" format="rdata"/>
 	</outputs>
 	<help>
@@ -130,7 +130,7 @@ Batch_correction_$method_rdata.rdata
 	| Download, open with R and send res
 	|
 
-Batch_correction_$method_$detail_graph_pdf.pdf
+Batch_correction_$method_graph.pdf
 	| plot output
 	| graphical view
 	|
@@ -146,12 +146,11 @@ Batch_correction_$method_dataMatrix.tabular
 	| same formatting as Data Matrix file
 	|
 
-Batch_correction_$method_result_for_simca_tsv.tabular
+Batch_correction_$method_combined_results.tabular
 	| tsv output
 	| tabulated for use by SIMCA
 	| same formatting as Sample metadata file + transposed to the formatting of Data Matrix file
 	|
-
 	
 ---------------------------------------------------
 
