@@ -111,20 +111,29 @@ if ( ( defined $module_Norma ) and ( -e $module_Norma ) and ( defined $module_pf
 	$R->send(qq`ids=id[id\$sampleType == "pool" | id\$sampleType == "sample",]`) ;
 	$R->send(qq`nbid=dim(idsample)[2]`) ;
 	
-	## Verification au moins 2 pool et 2 sample (+ matching si echéant)
-#	wrng <- ""
-#	if((nrow(id)!=nrow(idsample)) || (nrow(id)!=nrow(idTdata))) {
-#	    wrng <- paste("Note : Sample meta-data table and Data matrix are not a perfect match.",
-#	                  "\nMake sure this is not due to errors in sample identifiers.\n\n\n")
-#	}
-#	if(length(which(id$sampleType == "pool"))<2){
-#	    stop(c("\n\nError : less than 2 pools specified in Sample meta-data.",
-#	           "\nMake sure this is not due to errors in sampleType coding.\n\n",wrng))
-#	}
-#	if(length(which(id$sampleType == "sample"))<2){
-#	    stop(c("\n\nError : less than 2 samples specified in Sample meta-data.",
-#	           "\nMake sure this is not due to errors in sampleType coding.\n\n",wrng))
-#	}
+	### Verification nb pool et nb sample - - - - -
+	#No perfect match
+	$R->send(qq`wrng <- ""`) ;
+	$R->send(qq`if((nrow(id)!=nrow(idsample)) || (nrow(id)!=nrow(idTdata))) {
+	    wrng <- paste("Warning: Sample meta-data table and Data matrix are not a perfect match.",
+	                  "\nMake sure this is not due to errors in sample identifiers.\n\n\n")
+	}`) ;
+	
+	# moins de 2 samples
+	$R->send(qq`if(length(which(ids\$sampleType == "sample"))<2){
+	    stop(c("\n\nError: less than 2 samples specified in Sample meta-data.",
+	           "\nMake sure this is not due to errors in sampleType coding.\n\n",wrng))
+	}`) ;
+	
+	# moins de 2 pools par batch pour tous les batchs
+	$R->send(qq`B <- rep(0,length(levels(ids\$batch)))`) ;
+	$R->send(qq`for(nbB in length(levels(ids\$batch))){
+	  B[nbB]<-length(which(ids[which(ids\$batch==(levels(ids\$batch)[nbB])),]\$sampleType == "pool"))
+	}`) ;
+	$R->send(qq`if(length(which(B>1))==0){
+	  stop(c("\n\nError: less than 2 pools specified in each batch in Sample meta-data.",
+	         "\nMake sure this is not due to errors in sampleType coding.\n\n",wrng))
+	}`) ;
 	
 	### Facteur biologique 
 	$R->send(qq`factbio="$ref_factor"`) ;
