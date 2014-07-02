@@ -1,4 +1,4 @@
-<tool id="Determine_batch_correction" name="Determine_batch_correction" version="2014-04-24">
+<tool id="Determine_BC" name="Determine_batch_correction" version="2014-04-24">
   <description>to choose between linear, lowess and loess methods</description>
   <parallelism method="basic"></parallelism>
   <requirements>
@@ -21,8 +21,8 @@
   </inputs>
   
   <outputs>
-    <data name="out_graph_pdf" label="${tool.name}_graph" format="pdf" ></data>
-    <data name="out_preNormSummary" label="${tool.name}_preNormSummary" format="tabular" ></data>
+    <data name="out_graph_pdf" label="${tool.id}_graph" format="pdf" ></data>
+    <data name="out_preNormSummary" label="${tool.id}_preNormSummary" format="tabular" ></data>
   </outputs>
   <help>
 
@@ -105,7 +105,7 @@ Factor of interest
 Output files
 ------------
 
-out_preNormSummary.tabular
+Determine_BC_preNormSummary.tabular
 	| tabular output
 	| results analysis
 	| 0 : no preliminary-condition problem
@@ -116,7 +116,7 @@ out_preNormSummary.tabular
 	| 5 : (linear regression only) the slopes ratio “QC-pools/samples” is lower than -0.2
 	|
 
-out_graph_pdf.pdf
+Determine_BC_graph.pdf
 	| plot output
 	| graphical view
 
