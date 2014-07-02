@@ -21,8 +21,8 @@
   </inputs>
   
   <outputs>
-    <data name="out_graph_pdf" label="${tool.name}_out_graph_pdf" format="pdf" ></data>
-    <data name="out_preNormSummary" label="${tool.name}_out_preNormSummary" format="tabular" ></data>
+    <data name="out_graph_pdf" label="${tool.name}_graph" format="pdf" ></data>
+    <data name="out_preNormSummary" label="${tool.name}_preNormSummary" format="tabular" ></data>
   </outputs>
   <help>
 
