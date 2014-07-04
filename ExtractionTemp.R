@@ -3,32 +3,29 @@
 
 
 if(FALSE){
-	nbSamp <- 36
-	#rdatafile <- "J:/WorkSpace/Galaxy12-[xset.group.retcor.group.RData].rdata"
-	rdatafile <- "J:/WorkSpace/Galaxy17-[xset.group.retcor.group.fillPeaks.RData].rdata"
-	varmd.out <- "J:/WorkSpace/VariableMetadata.txt"
-	dm.out <- "J:/WorkSpace/DataMatrix.txt"
-	Perfwhm <- 0.6
-	#Cor_eic_th <- 0.75
-	Polarity <- "positive"
-	
+  nbSamp <- 36
+  rdatafile <- "test/ressources/inputs/Galaxy15-[xset.group.retcor.group.fillpeaks.RData].rdata"
+  dm.out <- "test/ressources/outputs/DataMatrix.txt"
+  varmd.out <- "test/ressources/outputs/VariableMetadata.txt"
+  Perfwhm <- 0.6
+  #Cor_eic_th <- 0.75
+  Polarity <- "positive"
+  intval <- "maxo"
 }
 
-extractionTemp <- function(rdatafile,nbSamp,Perfwhm,Polarity,varmd.out,dm.out){
+extractionTemp <- function(rdatafile,nbSamp,Perfwhm,Polarity,varmd.out,dm.out,intval="maxo"){
 # rdatafile = chemin et nom du Rdata
 # nbSamp = nb de samples (contient pool & sample & blank & tout autre type d'echantillon)
 # varmd.out = chemin et nom du fichier de sortie des variable metadata
 # dm.out = chemin et nom du fichier de sortie de la data matrix
 
-load(rdatafile)
-
 library(xcms)
 library(CAMERA)
 
-xsetPnofill <- xset
+load(rdatafile)
 
-##...xcmsSet, group, retcorr,...puis la derniere étape fillPeaks
-xsetP <- fillPeaks(xsetPnofill)
+xsetP <- xset
+
 ## puis CAMERA
 an <-xsAnnotate(xsetP)
 an <-groupFWHM(an, perfwhm = Perfwhm)
@@ -46,6 +43,10 @@ if(Polarity=="positive"){imode <- "p"}else{imode <- "n"}
 thelist[,1] <- paste(imode,round(thelist[,2],digits=2),"T",thelist[,3],sep="")
 
 fin.var <- ncol(thelist) - 3 - nbSamp
+
+# Etape de groupval
+gint=groupval(xsetP,method="medret",value=intval,intensity=intval)
+thelist[,(fin.var+1):(ncol(thelist)-3)] <- gint
 
 varmd.tb <- data.frame(thelist[,1:fin.var],thelist[,(ncol(thelist)-2):(ncol(thelist))])
 write.table(varmd.tb, file=varmd.out,sep="\t", row.names=F, quote=FALSE)
