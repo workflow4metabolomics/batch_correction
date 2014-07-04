@@ -115,7 +115,7 @@ if(ploting){
   }
   
   if("MAplot" %in% graph.list){
-    if(min(Dataset[,-1])<0){stop("\n----\nError : MAplot only avaible for positive variables\n----")}
+    if(min(Dataset[,-1],na.rm=TRUE)<0){stop("\n----\nError : MAplot only avaible for positive variables\n----")}
     library(edgeR)
     for(ech in 2:(ncol(Dataset)-1)){
       for(ech2 in (ech+1):ncol(Dataset)){
