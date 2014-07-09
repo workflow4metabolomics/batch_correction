@@ -1,5 +1,5 @@
-## ****** Norma_VdK_Lowess environnemnt : ****** ##
-# version avr 2014 M Landi / F Giacomoni
+## ****** Norma_VdK_Lowess + Determine_VdK environnemnt : ****** ##
+# version jul 2014 M Landi / F Giacomoni
 
 ## --- PERL compilator / libraries : --- ##
 $ perl -v
@@ -28,10 +28,10 @@ R version 3.0.1 (2013-05-16) -- "Good Sport"
 Platform: x86_64-redhat-linux-gnu (64-bit)
 
 This script has two R dependencies availables in the "Tool Dependency Packages" category.
-The PFEM_R package is available on the ABIMS toolshed : /Tool Dependency Packages/pfem_r
+The PFEM_R package is available on the W4M toolshed : /Tool Dependency Packages/pfem_r
 This package can be deployed in /usr/local/share/R
 
-The Norma_VdK_Lowess tool need in the PFEM_R "tool" only the following files :
+The (Determine_)Batch_correction tool need in the PFEM_R "tool" only the following files :
 normalization/Normalisation_QCpool.r
 toolbox/toolBox.R
 -- 
@@ -50,6 +50,7 @@ R_PFEM_TB=/your/PFEM_R/package/path/toolbox/toolBox.R
 ## --- XML HELP PART --- ##
 Copy the following images in ~/static/images/metabolomics/Workflow_position :
 Normalization_Van-der-Kloet.png
+Determine_Van-der-Kloet.png
 --
 
 ## --- DATASETS --- ##
