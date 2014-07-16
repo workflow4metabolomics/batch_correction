@@ -21,6 +21,7 @@
 # Version 2.01 Correction for pools negative values earlier in norm_QCpool
 # Version 2.10 Script refreshing ; vocabulary adjustment ; span in parameters for lo(w)ess regression ; conditionning for third line ACP display ; order in loess display
 # Version 2.11 ok1 and ok2 permutation (ok_norm) ; conditional display of regression (plotsituation) ; grouping of linked lignes + conditioning (normX) ; conditioning for CVplot
+# Version 2.20 acplight function added from previous toolBox.R [# Version 1.01 "NA"-coding possibility added in acplight function]
 
 ok_norm=function(qcp,qci,spl,spi,method) {
   # Function used for one ion within one batch to determine whether or not batch correction is possible
@@ -372,4 +373,35 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
   names(res.norm) <- c("Ion.intensities","Metadata.ion","Metadata.samp")
   return(res.norm)
 }
+
+
+
+
+
+acplight <- function(ids, scaling="uv", indiv=FALSE,indcol=NULL) {
+	library(ade4); library(pcaMethods)
+  # fait une ACP sur ids sachant que la colonne 1 contient l'identificateur d'individu
+  # la colonne 2:nf contient les facteurs definissant la couleur des individus
+  for (i in 1:3) {
+    idss=ids[which(ids[,i+1]!="NA"),]
+    idss=data.frame(idss[idss[,i+1]!="",])
+    classe=as.factor(idss[[i+1]])
+    idsample=as.character(idss[[1]])
+    colour=1:length(levels(classe))
+    ions=as.matrix(idss[,5:dim(idss)[2]])
+    # choix du scaling : "uv","none","pareto"
+    object=prep(ions, scale=scaling, center=TRUE)
+    # ALGO: nipals,svdImpute, Bayesian, svd, probalistic=F
+    result <- pca(object, center=F, method="svd", nPcs=2)
+    # ADE4 : representation des ellipsoides des individus de chaque classe
+    s.class(result@scores, classe, cpoint = 1,xax=1,yax=2,col=colour,sub=sprintf("Scores - PCs %sx%s",1,2), possub="bottomright")
+    #s.label(result@loadings,label = ions, cpoint = 0, clabel=0.4, xax=1,yax=2,sub="Loadings",possub="bottomright")
+    if(i==1){resulti <- result}
+  }
+  if(indiv) {
+    colour <- rep("darkblue",length(resulti@loadings)) ; if(!is.null(indcol)) {colour[-c(indcol)] <- "red"}
+    plot(resulti@loadings,col=colour,main="Loadings",xaxt="n",yaxt="n",pch=20)
+    abline(h=0,v=0)}
+}
+
 
