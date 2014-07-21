@@ -20,7 +20,7 @@ use FindBin ; ## Permet de localisez le repertoire du script perl d'origine
 my ( $help, $sampleMetadata, $dataMatrix, $variableMetadata) = ( undef, undef, undef, undef, undef );
 my ( $ref_factor, $detail, $method ) = ( undef, undef, undef, undef );
 my ( $graph_output, $variable_for_simca, $dataMatrix_out, $variableMetadata_out, $rdata_output ) = ( undef, undef, undef, undef, undef, undef );
-my ( $module_Norma , $module_pfemR, $R_bin, $Confs) = ( undef, undef, undef, undef ) ;
+my ( $module_Norma , $R_bin, $Confs) = ( undef, undef, undef, undef ) ;
 
 my ( $sep1, $sep2, $sep3) = ( "tab", "tab", "tab" );
 
@@ -62,7 +62,7 @@ if ( ( defined $Confs->{'R_NORMA_TB'} ) and ( defined $Confs->{'R_BIN'} ) ) {
 }
 else { 	 die "Problem with R envt : $!\n" ; }
 
-if ( ( defined $module_Norma ) and ( -e $module_Norma ) and ( defined $module_pfemR ) and ( -e $module_pfemR ) ) {
+if ( ( defined $module_Norma ) and ( -e $module_Norma ) ) {
 	## Envt checking 
 	if 		($sep1 eq "tab"){  	$sep1 = '\t'; }
 	elsif 	($sep1 eq "tabular"){	$sep1 = '\t';	 }
@@ -155,7 +155,7 @@ if ( ( defined $module_Norma ) and ( -e $module_Norma ) and ( defined $module_pf
 	
 }
 else {
-	die "Absence of needed R modules ($module_Norma, $module_pfemR)\n";
+	die "Absence of needed R modules ($module_Norma)\n";
 }
 
 
