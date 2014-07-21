@@ -1,4 +1,4 @@
-<tool id="Batch_correction" name="Batch_correction" version="2014-04-24">
+<tool id="Batch_correction" name="Batch_correction" version="2014-07-17">
 	<description>Correct analytical effects on intensities</description>
 	<command interpreter="perl">
        norma_VDK_or_Lowess.pl

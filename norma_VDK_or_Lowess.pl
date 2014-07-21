@@ -56,9 +56,8 @@ foreach my $conf ( <$Path/*.cfg> ) {
 	$Confs = as_conf($conf) ;
 }
 
-if ( ( defined $Confs->{'R_NORMA_TB'} ) and ( defined $Confs->{'R_PFEM_TB'} ) and ( defined $Confs->{'R_BIN'} ) ) {
+if ( ( defined $Confs->{'R_NORMA_TB'} ) and ( defined $Confs->{'R_BIN'} ) ) {
 	$module_Norma = $Confs->{'R_NORMA_TB'} ;
-	$module_pfemR = $Confs->{'R_PFEM_TB'} ;
 	$R_bin = $Confs->{'R_BIN'} ;
 }
 else { 	 die "Problem with R envt : $!\n" ; }
@@ -83,7 +82,6 @@ if ( ( defined $module_Norma ) and ( -e $module_Norma ) and ( defined $module_pf
 	
 	# Ouverture du pont
 	$R->startR;
-	$R->send(qq`source("$module_pfemR")`) ;
 	$R->send(qq`source("$module_Norma")`) ;
 
 	## Lecture du fichier metadata sample 
