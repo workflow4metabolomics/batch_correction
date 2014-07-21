@@ -45,8 +45,8 @@ foreach my $conf ( <$Path/*.cfg> ) {
 }
 
 if ( ( defined $Confs->{'R_NORMA_TB'} ) and ( defined $Confs->{'R_BIN'} ) ) {
-	$module_Norma = $Confs->{'R_NORMA_TB'} ;
-	$R_bin = $Confs->{'R_BIN'} ;
+	$module_Norma = $Path.'/'.$Confs->{'R_NORMA_TB'} ;
+	$R_bin = $Path.'/'.$Confs->{'R_BIN'} ;
 }
 else { 	 die "Problem with R envt : $!\n" ; }
 
