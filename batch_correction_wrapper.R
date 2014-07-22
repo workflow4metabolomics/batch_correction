@@ -22,12 +22,12 @@ args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in co
 
 source_local <- function(fname){
 	argv <- commandArgs(trailingOnly = FALSE)
-	base_dir <- dirname(substring(argv[grep(--file=, argv)], 8))
-	source(paste(base_dir, fname, sep=/))
+	base_dir <- dirname(substring(argv[grep("--file"=, argv)], 8))
+	source(paste(base_dir, fname, sep="/"))
 }
 
 #Import the different functions
-source_local(Normalisation_QCpool.r)
+source_local("Normalisation_QCpool.r")
 
 
 ## Reading of Metadata Samples file
