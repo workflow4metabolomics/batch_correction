@@ -76,7 +76,7 @@ if(length(which(B>1))==0){
 ### Factor of interest 
 factbio=args$ref_factor
 
-if(args$analyse=='batch_correction') {
+if(args$analyse == "batch_correction") {
 	## Reading of Metadata Ions file
 	metaion=read.table(args$variableMetadata,header=T,sep='\t')
 	
