@@ -1,24 +1,7 @@
-## ****** Norma_VdK_Lowess + Determine_VdK environnemnt : ****** ##
-# version jul 2014 M Landi / F Giacomoni
+## ****** Determine_bc + batch_correction environnemnt : ****** ##
+# version sept 2014 M Landi / F Giacomoni
 
 ## --- PERL compilator / libraries : --- ##
-$ perl -v
-This is perl, v5.10.1 (*) built for x86_64-linux-thread-multi
-
-# libs CORE PERL : 
-use strict ;
-use warnings ;
-use Carp qw (cluck croak carp) ;
-use Data::Dumper ;
-use Getopt::Long ;
-use FindBin ;
-
-# libs CPAN PERL : 
-$ perl -e 'use Statistics::R'
-$ sudo perl -MCPAN -e shell
-cpan> install Statistics::R
-
-# libs pfem PERL : 
 NA
 --
 
@@ -29,6 +12,10 @@ Platform: x86_64-redhat-linux-gnu (64-bit)
 
 The dependent libs are :
 >install.packages("batch", dep=TRUE)
+>install.packages("ade4", dep=TRUE)
+
+>source("http://www.bioconductor.org/biocLite.R")
+>biocLite("pcaMethods")
 -- 
 
 ## --- Binary dependencies --- ##
@@ -41,8 +28,8 @@ NA
 
 ## --- XML HELP PART --- ##
 two tools - two images :
-Normalization_Van-der-Kloet.png
-Determine_Van-der-Kloet.png
+batch_correction.png
+determine_batch_correction.png
 --
 
 ## --- DATASETS --- ##
