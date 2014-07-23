@@ -379,7 +379,8 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
 
 
 acplight <- function(ids, scaling="uv", indiv=FALSE,indcol=NULL) {
-	library(ade4); library(pcaMethods)
+	suppressPackageStartupMessages(library(ade4))
+	suppressPackageStartupMessages(library(pcaMethods))
   # fait une ACP sur ids sachant que la colonne 1 contient l'identificateur d'individu
   # la colonne 2:nf contient les facteurs definissant la couleur des individus
   for (i in 1:3) {
