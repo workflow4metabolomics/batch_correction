@@ -36,6 +36,11 @@
 		<data name="graph_output" label="${tool.name}_${method}_graph" format="pdf"/>
 		<data name="rdata_output" label="${tool.name}_${method}_rdata" format="rdata"/>
 	</outputs>
+		
+	<stdio>
+		<exit_code range="1:" level="fatal" />
+	</stdio>	
+	
 	<help>
 
 .. class:: infomark

@@ -3,7 +3,7 @@
 ################################################################################################
 # batch_correction_wrapper                                                                     #
 #                                                                                              #
-# Author : Marion LANDI                                                                        #
+# Author : Marion LANDI / Jean-Francois MARTIN                                                 #
 # User : Galaxy                                                                                #
 # Original data : --                                                                           #
 # Starting date : 22-07-2014                                                                   #

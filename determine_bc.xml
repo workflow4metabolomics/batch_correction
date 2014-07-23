@@ -25,6 +25,11 @@
     <data name="out_graph_pdf" label="${tool.id}_graph" format="pdf" ></data>
     <data name="out_preNormSummary" label="${tool.id}_preNormSummary" format="tabular" ></data>
   </outputs>
+  	
+  <stdio>
+    <exit_code range="1:" level="fatal" />
+  </stdio>	
+	
   <help>
 
 .. class:: infomark
