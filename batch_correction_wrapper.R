@@ -77,6 +77,7 @@ if(length(which(B>1))==0){
 factbio=args$ref_factor
 
 if(args$analyse == "batch_correction") {
+	stop("args$analyse\n")
 	## Reading of Metadata Ions file
 	metaion=read.table(args$variableMetadata,header=T,sep='\t')
 	
@@ -94,6 +95,7 @@ if(args$analyse == "batch_correction") {
 	write.table(res[[1]], file=args$dataMatrix_out, sep = '\t', row.names=F, quote=F)
 	write.table(res[[2]], file=args$variableMetadata_out, sep = '\t', row.names=F, quote=F)
 }else{
+	stop("args$analyse\n")
 	## outputs
 	out_graph_pdf=args$out_graph_pdf
 	out_preNormSummary=args$out_preNormSummary
