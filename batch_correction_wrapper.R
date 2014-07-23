@@ -22,12 +22,12 @@ args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in co
 
 source_local <- function(fname){
 	argv <- commandArgs(trailingOnly = FALSE)
-	base_dir <- dirname(substring(argv[grep(--file=, argv)], 8))
-	source(paste(base_dir, fname, sep=/))
+	base_dir <- dirname(substring(argv[grep("--file=", argv)], 8))
+	source(paste(base_dir, fname, sep="/"))
 }
 
 #Import the different functions
-source_local(Normalisation_QCpool.r)
+source_local("Normalisation_QCpool.r")
 
 
 ## Reading of Metadata Samples file
@@ -76,7 +76,8 @@ if(length(which(B>1))==0){
 ### Factor of interest 
 factbio=args$ref_factor
 
-if(args$analyse=='batch_correction') {
+
+if(args$analyse == "batch_correction") {
 	## Reading of Metadata Ions file
 	metaion=read.table(args$variableMetadata,header=T,sep='\t')
 	
@@ -89,7 +90,7 @@ if(args$analyse=='batch_correction') {
 	outlog=args$graph_output
 	
 	## Launch
-	res = norm_QCpool(ids,nbid,outfic,outlog,factbio,metaion,detail,F,F,method)`);
+	res = norm_QCpool(ids,nbid,outfic,outlog,factbio,metaion,detail,F,F,method)
 	save(res, file=args$rdata_output)
 	write.table(res[[1]], file=args$dataMatrix_out, sep = '\t', row.names=F, quote=F)
 	write.table(res[[2]], file=args$variableMetadata_out, sep = '\t', row.names=F, quote=F)
