@@ -8,6 +8,11 @@
 	       sampleMetadata "$sampleMetadata"
 	       variableMetadata "$variableMetadata"
 	       ref_factor "$ref_factor" detail "$detail" method "$method"
+	       #if str($advance.option ) == 'show':
+	         span $advance.span
+	       #else:
+	         span "NULL"
+	       #end if
 	       dataMatrix_out "$dataMatrix_out" variable_for_simca "$combinedResults" variableMetadata_out "$variableMetadata_out"
 	       graph_output "$graph_output"  rdata_output "$rdata_output"
 	</command>
@@ -27,6 +32,15 @@
 			<option value="plot">standard</option>
 			<option value="reg">complete</option>
 		</param>
+	    <conditional name="advance">
+	        <param name="option" type="select" label="Advanced options">
+	            <option value="show">show</option>
+	            <option value="hide" selected="true">hide</option>
+	        </param>
+	        <when value="show">
+	            <param name="span" type="float" value="0.2" label="span" help=""/>
+	        </when>
+	    </conditional>
 	</inputs>
 	
 	<outputs>

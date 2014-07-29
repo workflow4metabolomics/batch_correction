@@ -90,7 +90,7 @@ if(args$analyse == "batch_correction") {
 	outlog=args$graph_output
 	
 	## Launch
-	res = norm_QCpool(ids,nbid,outfic,outlog,factbio,metaion,detail,F,F,method)
+	res = norm_QCpool(ids,nbid,outfic,outlog,factbio,metaion,detail,F,F,method,args$span)
 	save(res, file=args$rdata_output)
 	write.table(res[[1]], file=args$dataMatrix_out, sep = '\t', row.names=F, quote=F)
 	write.table(res[[2]], file=args$variableMetadata_out, sep = '\t', row.names=F, quote=F)
@@ -100,7 +100,7 @@ if(args$analyse == "batch_correction") {
 	out_preNormSummary=args$out_preNormSummary
 	
 	## Launch
-	plotsituation(ids,nbid,out_graph_pdf,out_preNormSummary,factbio)
+	plotsituation(ids,nbid,out_graph_pdf,out_preNormSummary,factbio,args$span)
 }
 
 rm(args)

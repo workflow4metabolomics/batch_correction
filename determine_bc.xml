@@ -12,6 +12,11 @@
       sampleMetadata "$sampleMetadata"
       dataMatrix "$dataMatrix"
       ref_factor "$ref_factor"
+      #if str($advance.option ) == 'show':
+        span $advance.span
+      #else:
+        span "NULL"
+      #end if
       out_graph_pdf "$out_graph_pdf"
       out_preNormSummary "$out_preNormSummary"
   </command>
@@ -19,6 +24,15 @@
     <param name="dataMatrix" type="data" label="Data Matrix file " help="" format="tabular" />
     <param name="sampleMetadata" type="data" label="Sample metadata file " help="must have at least the three following column : 'batch' + 'injectionOrder' + 'sampleType'" format="tabular" />
     <param name="ref_factor" type="text" label="Factor of interest " help="column name of factor of interest (often a biological factor) ; if none, leave 'batch'" value="batch" />
+    <conditional name="advance">
+        <param name="option" type="select" label="Advanced options">
+            <option value="show">show</option>
+            <option value="hide" selected="true">hide</option>
+        </param>
+        <when value="show">
+            <param name="span" type="float" value="0.2" label="span" help=""/>
+        </when>
+    </conditional>
   </inputs>
   
   <outputs>
