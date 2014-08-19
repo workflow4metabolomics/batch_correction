@@ -22,7 +22,7 @@
 # Version 2.10 Script refreshing ; vocabulary adjustment ; span in parameters for lo(w)ess regression ; conditionning for third line ACP display ; order in loess display
 # Version 2.11 ok1 and ok2 permutation (ok_norm) ; conditional display of regression (plotsituation) ; grouping of linked lignes + conditioning (normX) ; conditioning for CVplot
 # Version 2.20 acplight function added from previous toolBox.R [# Version 1.01 "NA"-coding possibility added in acplight function]
-# Version 2.30 addition of suppressWarnings() for known and controlled warnings ; suppression of one useless "cat" message ; change in Rdata names. 
+# Version 2.30 addition of suppressWarnings() for known and controlled warnings ; suppression of one useless "cat" message ; change in Rdata names ; 'batch(es)' in cat
 
 ok_norm=function(qcp,qci,spl,spi,method) {
   # Function used for one ion within one batch to determine whether or not batch correction is possible
@@ -294,7 +294,7 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
 	dimnames(cv)[[2]]=c("avant","apres")
 	if (detail!="reg" && detail!="plot" && detail!="no") {detail="no"}
 	pdf(outlog,width=27,height=20)
-	cat(nbi," ions ",nbb," batches \n")
+	cat(nbi," ions ",nbb," batch(es) \n")
 	if (detail=="plot") {par (mfrow=c(4,4),ask=F,cex=1.5)}
   res.ind <- matrix(NA,ncol=nbb,nrow=nbi,dimnames=list(dimnames(x)[[2]][-c(1:nbid)],paste("norm.b",1:nbb,sep="")))
 	for (p in 1:nbi) {# for each ion
@@ -392,7 +392,7 @@ acplight <- function(ids, scaling="uv", indiv=FALSE,indcol=NULL) {
     ions=as.matrix(idss[,5:dim(idss)[2]])
     # choix du scaling : "uv","none","pareto"
     object=suppressWarnings(prep(ions, scale=scaling, center=TRUE))
-	if(length(which(apply(ions,2,var)==0))>0){cat("\n Warning : there are",length(which(apply(ions,2,var)==0)),"constant ions.\n")}
+	if(i=1){if(length(which(apply(ions,2,var)==0))>0){cat("Warning : there are",length(which(apply(ions,2,var)==0)),"constant ions.\n")}}
     # ALGO: nipals,svdImpute, Bayesian, svd, probalistic=F
     result <- pca(object, center=F, method="svd", nPcs=2)
     # ADE4 : representation des ellipsoides des individus de chaque classe
