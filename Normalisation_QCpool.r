@@ -115,7 +115,7 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
 # series de plot avant et apres correction
 minval=min(x[p+nbid]);maxval=max(x[p+nbid])
 plot( x$injectionOrder, x[,p+nbid],col=x$batch,ylim=c(minval,maxval),ylab=labion,main=paste("avant correction CV pools=",round(cv[p,1],2)))
-plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs avant")
+suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs avant"))
     }
 dev.off()
 pre_bilan=data.frame(pre_bilan)
@@ -333,8 +333,8 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
               points(x$injectionOrder[indpool],x[indpool,p+nbid],col="maroon",pch=".",cex=2)
 		  	plot(Xn$injectionOrder,Xn[,p+nbid],col=x$batch,ylab="",ylim=c(minval,maxval),main=paste("apres correction CV pools=",round(cv[p,2],2)))
               points(Xn$injectionOrder[indpool],Xn[indpool,p+nbid],col="maroon",pch=".",cex=2)
-		  	plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs avant")
-		  	plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs apres")
+		  	suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs avant"))
+		  	suppressWarnings(plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs apres"))
 		}
 	}
 	cat("end of correction \n")
@@ -391,7 +391,8 @@ acplight <- function(ids, scaling="uv", indiv=FALSE,indcol=NULL) {
     colour=1:length(levels(classe))
     ions=as.matrix(idss[,5:dim(idss)[2]])
     # choix du scaling : "uv","none","pareto"
-    object=prep(ions, scale=scaling, center=TRUE)
+    object=suppressWarnings(prep(ions, scale=scaling, center=TRUE))
+	if(length(which(apply(ions,2,var)==0))>0){cat("\n Warning : there are",length(which(apply(ions,2,var)==0)),"constant ions.\n")}
     # ALGO: nipals,svdImpute, Bayesian, svd, probalistic=F
     result <- pca(object, center=F, method="svd", nPcs=2)
     # ADE4 : representation des ellipsoides des individus de chaque classe
