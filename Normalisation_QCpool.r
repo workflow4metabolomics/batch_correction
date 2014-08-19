@@ -58,7 +58,7 @@ ok_norm=function(qcp,qci,spl,spi,method) {
   ok_norm=ok
 }
 
-plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNormSummary.txt",fact="batch",span=NULL) {
+plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNormSummary.txt",fact="batch",span="none") {
     #	Check for all ions in every batch if linear or lo(w)ess correction is possible.
     #	Use ok_norm function and create a file (PreNormSummary.txt) with the error code.
     #	Also create a pdf file with plots of linear and lo(w)ess regression lines.
@@ -96,7 +96,7 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
             pre_bilan[ p,3*b-1]=normLoessTest
             pre_bilan[ p,3*b]=normLowessTest
           if(length(indpb)>1){
-            if(length(span)==0){span1<-1 ; span2<-2*length(indpool)/nbs}else{span1<-span ; span2<-span}
+            if(span=="none"){span1<-1 ; span2<-2*length(indpool)/nbs}else{span1<-span ; span2<-span}
             resloess=loess(xb[indpb,3]~xb[indpb,2],span=span1,degree=2,family="gaussian",iterations=4,surface="direct") 
             resloessSample=loess(xb[indsp,3]~xb[indsp,2],span=2*length(indpool)/nbs,degree=2,family="gaussian",iterations=4,surface="direct") 
             reslowess=lowess(xb[indpb,2],xb[indpb,3],f=span2)
@@ -263,7 +263,7 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL) {
 
 
 
-norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", NormMoyPool=F, NormInt=F, method="linear",span=NULL)
+norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", NormMoyPool=F, NormInt=F, method="linear",span="none")
 {
 	# Correction applying linear or lowess correction function on all ions for every batch of a dataframe.
   # x : dataframe with ions in column and samples' metadata
