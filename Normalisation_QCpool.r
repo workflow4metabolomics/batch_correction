@@ -22,6 +22,7 @@
 # Version 2.10 Script refreshing ; vocabulary adjustment ; span in parameters for lo(w)ess regression ; conditionning for third line ACP display ; order in loess display
 # Version 2.11 ok1 and ok2 permutation (ok_norm) ; conditional display of regression (plotsituation) ; grouping of linked lignes + conditioning (normX) ; conditioning for CVplot
 # Version 2.20 acplight function added from previous toolBox.R [# Version 1.01 "NA"-coding possibility added in acplight function]
+# Version 2.30 addition of suppressWarnings() for known and controlled warnings ; suppression of one useless "cat" message ; change in Rdata names. 
 
 ok_norm=function(qcp,qci,spl,spi,method) {
   # Function used for one ion within one batch to determine whether or not batch correction is possible
@@ -337,7 +338,6 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
 		  	suppressWarnings(plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs apres"))
 		}
 	}
-	cat("end of correction \n")
   ### Replacement of post correction negative values by 0
 	Xnn=Xn
 	valNulle=0
@@ -370,7 +370,7 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
   Xr=t(Xr) ; Xr <- data.frame(ions=rownames(Xr),Xr)
   
   res.norm[[1]] <- Xr ; res.norm[[2]] <- data.frame(metaion,res.ind) ; res.norm[[3]] <- x[,c(1:nbid)]
-  names(res.norm) <- c("Ion.intensities","Metadata.ion","Metadata.samp")
+  names(res.norm) <- c("dataMatrix","variableMetadata","sampleMetadata")
   return(res.norm)
 }
 
