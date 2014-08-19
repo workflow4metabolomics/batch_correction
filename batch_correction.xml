@@ -12,7 +12,7 @@
 	       #if str($span_condition.method) == 'linear':
 	         span "NULL"
 	       #else:
-	         span "${span_condition.span]"
+	         span "${span_condition.span}"
 	       #end if
 	       dataMatrix_out "$dataMatrix_out" variable_for_simca "$combinedResults" variableMetadata_out "$variableMetadata_out"
 	       graph_output "$graph_output"  rdata_output "$rdata_output"
