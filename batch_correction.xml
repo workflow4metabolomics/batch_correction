@@ -10,7 +10,7 @@
 	       ref_factor "$ref_factor" detail "$detail"
 	       method "${span_condition.method}"
 	       #if str($span_condition.method) == 'linear':
-	         span "NULL"
+	         span "none"
 	       #else:
 	         span "${span_condition.span}"
 	       #end if
