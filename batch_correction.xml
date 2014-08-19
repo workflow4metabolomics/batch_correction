@@ -46,11 +46,11 @@
 	</inputs>
 	
 	<outputs>
-		<data name="combinedResults" label="${tool.name}_${method}_combined_results" format="tabular"/>
-		<data name="dataMatrix_out" label="${tool.name}_${method}_${dataMatrix.name}" format="tabular"/>
-		<data name="variableMetadata_out" label="${tool.name}_${method}_${variableMetadata.name}" format="tabular"/>
-		<data name="graph_output" label="${tool.name}_${method}_graph" format="pdf"/>
-		<data name="rdata_output" label="${tool.name}_${method}_rdata" format="rdata"/>
+		<data name="combinedResults" label="${tool.name}_${span_condition.method}_combined_results" format="tabular"/>
+		<data name="dataMatrix_out" label="${tool.name}_${span_condition.method}_${dataMatrix.name}" format="tabular"/>
+		<data name="variableMetadata_out" label="${tool.name}_${span_condition.method}_${variableMetadata.name}" format="tabular"/>
+		<data name="graph_output" label="${tool.name}_${span_condition.method}_graph" format="pdf"/>
+		<data name="rdata_output" label="${tool.name}_${span_condition.method}_rdata" format="rdata"/>
 	</outputs>
 		
 	<stdio>
