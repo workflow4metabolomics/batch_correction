@@ -8,11 +8,11 @@
 	       sampleMetadata "$sampleMetadata"
 	       variableMetadata "$variableMetadata"
 	       ref_factor "$ref_factor" detail "$detail"
-	       method "${advance.method}"
-	       #if str($advance.method) == 'linear':
+	       method "${span_condition.method}"
+	       #if str($span_condition.method) == 'linear':
 	         span "NULL"
 	       #else:
-	         span $advance.span
+	         span "${span_condition.span]"
 	       #end if
 	       dataMatrix_out "$dataMatrix_out" variable_for_simca "$combinedResults" variableMetadata_out "$variableMetadata_out"
 	       graph_output "$graph_output"  rdata_output "$rdata_output"
@@ -24,7 +24,7 @@
 		
 		<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor) ; if none, leave 'batch'" />
 		
-		<conditional name="advance">
+		<conditional name="span_condition">
 	        <param name="method" label="Type of regression model " type="select" help="Select between linear or non-linear (lowess or loess) which one to be used in Van der Kloet algorithm.">
 				<option value="linear">linear</option>
 				<option value="lowess">lowess</option>
