@@ -22,6 +22,7 @@
 # Version 2.10 Script refreshing ; vocabulary adjustment ; span in parameters for lo(w)ess regression ; conditionning for third line ACP display ; order in loess display
 # Version 2.11 ok1 and ok2 permutation (ok_norm) ; conditional display of regression (plotsituation) ; grouping of linked lignes + conditioning (normX) ; conditioning for CVplot
 # Version 2.20 acplight function added from previous toolBox.R [# Version 1.01 "NA"-coding possibility added in acplight function]
+# Version 2.30 addition of suppressWarnings() for known and controlled warnings ; suppression of one useless "cat" message ; change in Rdata names. 
 
 ok_norm=function(qcp,qci,spl,spi,method) {
   # Function used for one ion within one batch to determine whether or not batch correction is possible
@@ -58,7 +59,7 @@ ok_norm=function(qcp,qci,spl,spi,method) {
   ok_norm=ok
 }
 
-plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNormSummary.txt",fact="batch",span=NULL) {
+plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNormSummary.txt",fact="batch",span="none") {
     #	Check for all ions in every batch if linear or lo(w)ess correction is possible.
     #	Use ok_norm function and create a file (PreNormSummary.txt) with the error code.
     #	Also create a pdf file with plots of linear and lo(w)ess regression lines.
@@ -96,7 +97,7 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
             pre_bilan[ p,3*b-1]=normLoessTest
             pre_bilan[ p,3*b]=normLowessTest
           if(length(indpb)>1){
-            if(length(span)==0){span1<-1 ; span2<-2*length(indpool)/nbs}else{span1<-span ; span2<-span}
+            if(span=="none"){span1<-1 ; span2<-2*length(indpool)/nbs}else{span1<-span ; span2<-span}
             resloess=loess(xb[indpb,3]~xb[indpb,2],span=span1,degree=2,family="gaussian",iterations=4,surface="direct") 
             resloessSample=loess(xb[indsp,3]~xb[indsp,2],span=2*length(indpool)/nbs,degree=2,family="gaussian",iterations=4,surface="direct") 
             reslowess=lowess(xb[indpb,2],xb[indpb,3],f=span2)
@@ -115,7 +116,7 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
 # series de plot avant et apres correction
 minval=min(x[p+nbid]);maxval=max(x[p+nbid])
 plot( x$injectionOrder, x[,p+nbid],col=x$batch,ylim=c(minval,maxval),ylab=labion,main=paste("avant correction CV pools=",round(cv[p,1],2)))
-plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs avant")
+suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs avant"))
     }
 dev.off()
 pre_bilan=data.frame(pre_bilan)
@@ -263,7 +264,7 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL) {
 
 
 
-norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", NormMoyPool=F, NormInt=F, method="linear",span=NULL)
+norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", NormMoyPool=F, NormInt=F, method="linear",span="none")
 {
 	# Correction applying linear or lowess correction function on all ions for every batch of a dataframe.
   # x : dataframe with ions in column and samples' metadata
@@ -333,11 +334,10 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
               points(x$injectionOrder[indpool],x[indpool,p+nbid],col="maroon",pch=".",cex=2)
 		  	plot(Xn$injectionOrder,Xn[,p+nbid],col=x$batch,ylab="",ylim=c(minval,maxval),main=paste("apres correction CV pools=",round(cv[p,2],2)))
               points(Xn$injectionOrder[indpool],Xn[indpool,p+nbid],col="maroon",pch=".",cex=2)
-		  	plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs avant")
-		  	plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs apres")
+		  	suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs avant"))
+		  	suppressWarnings(plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs apres"))
 		}
 	}
-	cat("end of correction \n")
   ### Replacement of post correction negative values by 0
 	Xnn=Xn
 	valNulle=0
@@ -370,7 +370,7 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
   Xr=t(Xr) ; Xr <- data.frame(ions=rownames(Xr),Xr)
   
   res.norm[[1]] <- Xr ; res.norm[[2]] <- data.frame(metaion,res.ind) ; res.norm[[3]] <- x[,c(1:nbid)]
-  names(res.norm) <- c("Ion.intensities","Metadata.ion","Metadata.samp")
+  names(res.norm) <- c("dataMatrix","variableMetadata","sampleMetadata")
   return(res.norm)
 }
 
@@ -391,7 +391,8 @@ acplight <- function(ids, scaling="uv", indiv=FALSE,indcol=NULL) {
     colour=1:length(levels(classe))
     ions=as.matrix(idss[,5:dim(idss)[2]])
     # choix du scaling : "uv","none","pareto"
-    object=prep(ions, scale=scaling, center=TRUE)
+    object=suppressWarnings(prep(ions, scale=scaling, center=TRUE))
+	if(length(which(apply(ions,2,var)==0))>0){cat("\n Warning : there are",length(which(apply(ions,2,var)==0)),"constant ions.\n")}
     # ALGO: nipals,svdImpute, Bayesian, svd, probalistic=F
     result <- pca(object, center=F, method="svd", nPcs=2)
     # ADE4 : representation des ellipsoides des individus de chaque classe
