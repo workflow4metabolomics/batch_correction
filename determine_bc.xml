@@ -30,7 +30,7 @@
             <option value="hide" selected="true">hide</option>
         </param>
         <when value="show">
-            <param name="span" type="float" value="0.2" label="span" help=""/>
+            <param name="span" type="float" value="0.85" label="span" help=""/>
         </when>
     </conditional>
   </inputs>
