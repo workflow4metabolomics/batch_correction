@@ -25,12 +25,12 @@
     <param name="sampleMetadata" type="data" label="Sample metadata file " help="must have at least the three following column : 'batch' + 'injectionOrder' + 'sampleType'" format="tabular" />
     <param name="ref_factor" type="text" label="Factor of interest " help="column name of factor of interest (often a biological factor) ; if none, leave 'batch'" value="batch" />
     <conditional name="advance">
-        <param name="option" type="select" label="Advanced options">
+        <param name="option" type="select" label="Advanced options" help="should only be put at 'show' if you have good understanding of the span parameter and are willing to adjust it">
             <option value="show">show</option>
             <option value="hide" selected="true">hide</option>
         </param>
         <when value="show">
-            <param name="span" type="float" value="0.85" label="span" help=""/>
+            <param name="span" type="float" value="0.85" label="span" help="default is 1 for loess regression and is two times the ratio between number of pools and number of samples for lowess regression."/>
         </when>
     </conditional>
   </inputs>
@@ -118,7 +118,17 @@ Parameters
 Factor of interest
 	| factor name (column header) that will be used as a categorical variable for plots and PCA.
 	| (often a biological factor ; if none, leave “batch”)
-	| This factor does not affect correction calculation. 
+	| This factor does not affect correction calculation.
+	|
+
+Advanced options
+	| should only be put at "show" if you have good understanding of the span parameter and are willing to adjust it.
+	|
+
+Span
+	| when advanced option is at "hide" (not default)
+	| default is 1 for loess regression and is two times the ratio between number of pools and number of samples for lowess regression.
+	|
 
 
 ------------

@@ -31,10 +31,10 @@
 				<option value="loess">loess</option>
 			</param>
 	        <when value="lowess">
-	            <param name="span" type="float" value="0.85" label="span" help="must be less than or equal to 1"/>
+	            <param name="span" type="float" value="0.85" label="span" help="it is a advanced option. Must be less than or equal to 1"/>
 	        </when>
 	        <when value="loess">
-	            <param name="span" type="float" value="1" label="span" help="must be strictly greater than 0"/>
+	            <param name="span" type="float" value="1" label="span" help="it is a advanced option. Must be strictly greater than 0"/>
 	        </when>
 	    </conditional>
 		
@@ -135,6 +135,11 @@ Factor of interest
 Type of regression model :
 	| To choose between *linear*, *lowess* and *loess* regression.
 	| Define which model type should be used in Van der Kloet correction algorithm concerning QC-pools regression.
+	|
+
+Span
+	| it is a advanced option, only appears for *lo(w)ess*
+	| default is 1 for loess regression and is two times the ratio between number of pools and number of samples for lowess regression.
 	|
 
 Level of details for plots
