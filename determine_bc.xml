@@ -30,7 +30,7 @@
             <option value="hide" selected="true">hide</option>
         </param>
         <when value="show">
-            <param name="span" type="float" value="0.85" label="span" help="default is 1 for loess regression and is two times the ratio between number of pools and number of samples for lowess regression."/>
+            <param name="span" type="float" value="0.85" label="span" help="applies for lowess and loess regression"/>
         </when>
     </conditional>
   </inputs>
@@ -126,9 +126,11 @@ Advanced options
 	|
 
 Span
-	| when advanced option is at "hide" (not default)
+	| when advanced option is at "hide" (default)
 	| default is 1 for loess regression and is two times the ratio between number of pools and number of samples for lowess regression.
 	|
+	| when advanced option is at "show" : 
+	| filled value used for lowess and loess regression.
 
 
 ------------

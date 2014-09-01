@@ -139,7 +139,6 @@ Type of regression model :
 
 Span
 	| it is a advanced option, only appears for *lo(w)ess*
-	| default is 1 for loess regression and is two times the ratio between number of pools and number of samples for lowess regression.
 	|
 
 Level of details for plots
