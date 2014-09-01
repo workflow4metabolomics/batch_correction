@@ -239,7 +239,7 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL) {
         if(length(span)==0){span1<-1}else{span1<-span}
         resloess=loess(xb[indpb,3]~xb[indpb,2],span=span1,degree=2,family="gaussian",iterations=4,surface="direct") # loess regression with QCpools 
         cor=predict(resloess,newdata=xb[,2])
-		    cor[cor<=0] <- 1 
+		    cor[cor<=1] <- 1 
         newval=(vref*xb[,3]) / cor 
         if(length(which(newval>3*(quantile(newval)[4])))>0){newval <- xb[,3]} # no modification of initial value
         else {ind <- 1} # confirmation of correction
@@ -392,7 +392,7 @@ acplight <- function(ids, scaling="uv", indiv=FALSE,indcol=NULL) {
     ions=as.matrix(idss[,5:dim(idss)[2]])
     # choix du scaling : "uv","none","pareto"
     object=suppressWarnings(prep(ions, scale=scaling, center=TRUE))
-	if(i=1){if(length(which(apply(ions,2,var)==0))>0){cat("Warning : there are",length(which(apply(ions,2,var)==0)),"constant ions.\n")}}
+	if(i==1){if(length(which(apply(ions,2,var)==0))>0){cat("Warning : there are",length(which(apply(ions,2,var)==0)),"constant ions.\n")}}
     # ALGO: nipals,svdImpute, Bayesian, svd, probalistic=F
     result <- pca(object, center=F, method="svd", nPcs=2)
     # ADE4 : representation des ellipsoides des individus de chaque classe
