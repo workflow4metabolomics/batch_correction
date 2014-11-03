@@ -76,7 +76,7 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
     nbb=length(levels(x$batch)) # Number of batch = number of levels of "batch" comlumn (factor)
     nbs=length(x$sampleType[x$sampleType=="sample"])# Number of samples = number of rows with "sample" value in sampleType
     pdf(outfic,width=27,height=20)
-    cat(nbi," ions ",nbb," batches \n")
+    cat(nbi," ions ",nbb," batch(es) \n")
     cv=data.frame(matrix(0,nrow=nbi,ncol=2))# initialisation de la dataset qui contiendra les CV avant et apres correction
     pre_bilan=matrix(0,nrow=nbi,ncol=3*nbb) # dataset of ok_norm function results	    
     for (p in 1:nbi) {# for each ion

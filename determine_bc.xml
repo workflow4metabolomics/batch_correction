@@ -98,12 +98,15 @@ Input files
 
 
 Data Matrix file must contain the intensity values of the variable.
+	| First line must contain all the samples names
+	| First column must contain all the variables id
 	| 
 
-Sample metadata file must have at least the three following columns : 
-	* "batch" to identify the batches of analyses ; need at leat 3 pools for linear adjustment and 8 for lo(w)ess adjustment
-	* "injectionOrder" integer defining the injection order of all samples : QC-pools and analysed samples
-	* "sampleType" indicate if defining a samples or a pool
+Sample metadata file must contain at least the three following columns: 
+	| "batch" to identify the batches of analyses
+	| "injectionOrder" integer defining the injection order of all samples (QC-pools as well as analysed samples)
+	| "sampleType" indicates if defining a sample with "sample" or a QC-pool with "pool"; each batch needs
+	| at least 3 QC-pools for intra-batch linear adjustment and 8 for lo(w)ess adjustment
 
 
 .. class:: warningmark
