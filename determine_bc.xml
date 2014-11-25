@@ -22,15 +22,15 @@
   </command>
   <inputs>
     <param name="dataMatrix" type="data" label="Data Matrix file " help="" format="tabular" />
-    <param name="sampleMetadata" type="data" label="Sample metadata file " help="must have at least the three following column : 'batch' + 'injectionOrder' + 'sampleType'" format="tabular" />
-    <param name="ref_factor" type="text" label="Factor of interest " help="column name of factor of interest (often a biological factor) ; if none, leave 'batch'" value="batch" />
+    <param name="sampleMetadata" type="data" label="Sample metadata file " help="must contain at least the three following columns: 'batch' + 'injectionOrder' + 'sampleType'" format="tabular" />
+    <param name="ref_factor" type="text" label="Factor of interest " help="column name of the factor of interest (often a biological factor); if none, leave 'batch'" value="batch" />
     <conditional name="advance">
         <param name="option" type="select" label="Advanced options" help="should only be put at 'show' if you have good understanding of the span parameter and are willing to adjust it">
             <option value="show">show</option>
             <option value="hide" selected="true">hide</option>
         </param>
         <when value="show">
-            <param name="span" type="float" value="0.85" label="span" help="applies for lowess and loess regression"/>
+            <param name="span" type="float" value="0.85" label="span" help="applied to lowess and loess regression"/>
         </when>
     </conditional>
   </inputs>
@@ -66,14 +66,14 @@ Determine_batch_correction
 Description
 -----------
 
-| Allow to choose between linear or non-linear (lowess or loess) function using Quality control pooled samples (QC-pools)
-| with correction algorithm as mentioned by Van Der Kloet (J Prot Res 2009)
+| Allows to choose between linear or non-linear (lowess or loess) functions for batch correction
+| using quality control pooled samples (QC-pools) with correction algorithm as mentioned by Van Der Kloet (J Prot Res 2009).
 | 
-| Warning : this module does not deliver which choice to make in model type ;
+| Warning : this module does *not* deliver which choice should be made in model type;
 | it only provides tools to help users to determine which choice may be appropriate, based on their own expertise.
 | 
-| This tool is meant to be used prior to using the Batch_correction tool to help make a choice in parameters,
-| but it is not a requirement and thus can be avoid.
+| This tool is meant to be used prior to the Batch_correction tool to help make a choice in parameters,
+| but it is not a requirement and thus can be avoided.
 
 
 -----------------
@@ -88,24 +88,24 @@ Workflow position
 Input files
 -----------
 
-+--------------------------+------------+
-| Parameter : num + label  |   Format   |
-+==========================+============+
-| 1 : Data Matrix file     |   tabular  |
-+--------------------------+------------+
-| 2 : Sample metadata file |   tabular  |
-+--------------------------+------------+
++--------------------------+-----------+
+| Parameter : num + label  |   Format  |
++==========================+===========+
+| 1 : Data Matrix file     |   tabular |
++--------------------------+-----------+
+| 2 : Sample metadata file |   tabular |
++--------------------------+-----------+
 
 
-Data Matrix file must contain the intensity values of the variable.
-	| First line must contain all the samples names
-	| First column must contain all the variables id
+Data Matrix file must contain the intensity values of the variables.
+	| First line must contain all the samples' names
+	| First column must contain all the variables' ID
 	| 
 
 Sample metadata file must contain at least the three following columns: 
 	| "batch" to identify the batches of analyses
-	| "injectionOrder" integer defining the injection order of all samples (QC-pools as well as analysed samples)
-	| "sampleType" indicates if defining a sample with "sample" or a QC-pool with "pool"; each batch needs
+	| "injectionOrder" (integers) defining the injection order of all samples (QC-pools as well as analysed samples)
+	| "sampleType" indicating if a sample ("sample") or a QC-pool ("pool"); each batch needs
 	| at least 3 QC-pools for intra-batch linear adjustment and 8 for lo(w)ess adjustment
 
 
@@ -119,8 +119,8 @@ Parameters
 ----------
 
 Factor of interest
-	| factor name (column header) that will be used as a categorical variable for plots and PCA.
-	| (often a biological factor ; if none, leave “batch”)
+	| name of the factor (column header) that will be used as a categorical variable for plots.
+	| (often a biological factor ; if none, leave “batch”).
 	| This factor does not affect correction calculation.
 	|
 
@@ -129,11 +129,10 @@ Advanced options
 	|
 
 Span
-	| when advanced option is at "hide" (default)
+	| - when advanced option is at "hide" (default)
 	| default is 1 for loess regression and is two times the ratio between number of pools and number of samples for lowess regression.
-	|
-	| when advanced option is at "show" : 
-	| filled value used for lowess and loess regression.
+	| - when advanced option is at "show" : 
+	| filled value is used for lowess and loess regression.
 
 
 ------------
@@ -142,7 +141,7 @@ Output files
 
 Determine_BC_preNormSummary.tabular
 	| tabular output
-	| results analysis
+	| Meaning of results of diagnosis analysis
 	| 0 : no preliminary-condition problem
 	| 1 : standard deviation of QC-pools or samples = 0
 	| 2 : insufficient number of QC-pools within a batch (n=3 for linear, n=8 for lowess or loess)
@@ -152,8 +151,8 @@ Determine_BC_preNormSummary.tabular
 	|
 
 Determine_BC_graph.pdf
-	| plot output
-	| graphical view
+	| graphical output
+	| One page per ion. Plots regression curves for all methods allowed and plot.design results regarding the factor of interest. 
 
 	
 ---------------------------------------------------

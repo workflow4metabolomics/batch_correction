@@ -19,13 +19,13 @@
 	</command>
 	<inputs>
 		<param name="dataMatrix" label="Data Matrix file " format="tabular" type="data" />
-		<param name="sampleMetadata" label="Sample metadata file " format="tabular" type="data" help="must have at least the three following columns : 'batch' + 'injectionOrder' + 'sampleType'"/>
+		<param name="sampleMetadata" label="Sample metadata file " format="tabular" type="data" help="must contain at least the three following columns: 'batch' + 'injectionOrder' + 'sampleType'"/>
 		<param name="variableMetadata" label="Variable metadata file " format="tabular" type="data" />
 		
-		<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor) ; if none, leave 'batch'" />
+		<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor); if none, leave 'batch'" />
 		
 		<conditional name="span_condition">
-	        <param name="method" label="Type of regression model " type="select" help="Select between linear or non-linear (lowess or loess) which one to be used in Van der Kloet algorithm.">
+	        <param name="method" label="Type of regression model " type="select" help="To select between linear or non-linear (lowess or loess) methods to be used in Van der Kloet algorithm.">
 				<option value="linear">linear</option>
 				<option value="lowess">lowess</option>
 				<option value="loess">loess</option>
@@ -79,7 +79,7 @@ Batch_correction
 Description
 -----------
 
-| Correction of analytical effects inter and intra batch on intensities using quality control pooled samples (QC-pools)
+| Correction of inter and intra batch analytical effects on intensities using quality control pooled samples (QC-pools)
 | according to the algorithm mentioned by Van der Kloet (J Prot Res 2009).
 
  
@@ -108,13 +108,14 @@ Input files
 
 
 Data Matrix file must contain the intensity values of variables.
-	| First line must contain all the samples names
-	| First column must contain all the variables id
+	| First line must contain all the samples' names
+	| First column must contain all the variables' ID
+	| 
 
 Sample metadata file must contain at least the three following columns: 
 	| "batch" to identify the batches of analyses
-	| "injectionOrder" integer defining the injection order of all samples (QC-pools as well as analysed samples)
-	| "sampleType" indicates if defining a sample with "sample" or a QC-pool with "pool"; each batch needs
+	| "injectionOrder" (integers) defining the injection order of all samples (QC-pools as well as analysed samples)
+	| "sampleType" indicating if a sample ("sample") or a QC-pool ("pool"); each batch needs
 	| at least 3 QC-pools for intra-batch linear adjustment and 8 for lo(w)ess adjustment
 
 
@@ -128,7 +129,7 @@ Parameters
 ----------
 
 Factor of interest
-	| factor name (column header) that will be used as a categorical variable for plots and PCA.
+	| name of the factor (column header) that will be used as a categorical variable for plots and PCA.
 	| (often a biological factor ; if none, leave “batch”)
 	| This factor does not affect correction calculation.
 	| 
@@ -139,13 +140,13 @@ Type of regression model :
 	|
 
 Span
-	| it is a advanced option, only appears for *lo(w)ess*
+	| It is an advanced option, only appears for *lo(w)ess*
 	|
 
 Level of details for plots
 	| *basic*: PCA + CV boxplot (before and after correction)
-	| *standard*: 'basic' plots + before/after-correction plots of intensities over injection order and design effects for each ion
-	| *complete*: 'standard' plots + QC-pools regression plots per batch with samples intensities over injection order
+	| *standard*: 'basic' plots + before/after-correction plots of intensities over injection order, and design effects for each ion
+	| *complete*: 'standard' plots + QC-pool regression plots per batch with samples' intensities over injection order
 	|
 
 
@@ -159,8 +160,8 @@ Batch_correction_$method_rdata.rdata
 	|
 
 Batch_correction_$method_graph.pdf
-	| plot output
-	| graphical view
+	| graphical output
+	| Content depends on level of details chosen
 	|
 
 Batch_correction_$method_variableMetadata.tabular
@@ -169,15 +170,14 @@ Batch_correction_$method_variableMetadata.tabular
 	|
 
 Batch_correction_$method_dataMatrix.tabular
-	| tsv output
-	| tabulated for other uses
-	| same formatting as Data Matrix file
+	| tsv output (tabulated)
+	| Same formatting as Data Matrix file; contains corrected intensities
 	|
 
 Batch_correction_$method_combined_results.tabular
-	| tsv output
-	| tabulated for use by SIMCA
-	| same formatting as Sample metadata file + transposed to the formatting of Data Matrix file
+	| tsv output (tabulated)
+	| Suitable format for use by SIMCA
+	| Same formatting as Sample metadata file, concatenated with the transposed Data Matrix file of corrected intensities
 	|
 	
 ---------------------------------------------------
