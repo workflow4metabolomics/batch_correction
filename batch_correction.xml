@@ -1,4 +1,4 @@
-<tool id="Batch_correction" name="Batch_correction" version="2014-09-18">
+<tool id="Batch_correction" name="Batch_correction" version="2014-12-11">
 	<description>Correct analytical effects on intensities</description>
 	
 	<command interpreter="Rscript">

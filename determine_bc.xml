@@ -1,4 +1,4 @@
-<tool id="Determine_BC" name="Determine_batch_correction" version="2014-09-18">
+<tool id="Determine_BC" name="Determine_batch_correction" version="2014-12-11">
   <description>to choose between linear, lowess and loess methods</description>
   
   <parallelism method="basic"></parallelism>
