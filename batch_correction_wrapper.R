@@ -3,16 +3,16 @@
 ################################################################################################
 # batch_correction_wrapper                                                                     #
 #                                                                                              #
-# Author : Marion LANDI / Jean-Francois MARTIN                                                 #
+# Author : Marion LANDI / Jean-Francois MARTIN / Melanie Petera                                #
 # User : Galaxy                                                                                #
 # Original data : --                                                                           #
 # Starting date : 22-07-2014                                                                   #
 # Version 1 : 22-07-2014                                                                       #
-# Version 2 :                                                                        #
+# Version 2 : 08-12-2014                                                                       #
 #                                                                                              #
 #                                                                                              #
-# Input files : dataMatrix.txt ; sampleMetadata.txt                                            #
-# Output files : graph_output.pdf                                                              #
+# Input files : dataMatrix.txt ; sampleMetadata.txt ; variableMetadata.txt (for DBC)           #
+# Output files : graph_output.pdf ; corrected table ; diagnostic table                         #
 #                                                                                              #
 ################################################################################################
 
@@ -30,12 +30,20 @@ source_local <- function(fname){
 source_local("Normalisation_QCpool.r")
 
 
-## Reading of Metadata Samples file
+## Reading of input files
 idsample=read.table(args$sampleMetadata,header=T,sep='\t')
-idsample[[1]]=make.names(idsample[[1]])
-	
-### Reading the data file XCMS size (Ions in lines)
 iddata=read.table(args$dataMatrix,header=T,sep='\t')
+
+### Table match check 
+if(length(which(colnames(iddata)[-1]%in%idsample[,1]))!=(dim(iddata)[2]-1) ||
+     length(which(idsample[,1]%in%colnames(iddata)[-1]))!=dim(idsample)[1]){
+  stop("\nData matrix and sample metadata do not match regarding sample identifiers.\n",
+       "Please check your data.\nNote: identifiers must not begin by a number.")
+}
+
+
+### Formating
+idsample[[1]]=make.names(idsample[[1]])
 dimnames(iddata)[[1]]=iddata[[1]]
 
 ### Transposition of ions data
@@ -80,6 +88,12 @@ factbio=args$ref_factor
 if(args$analyse == "batch_correction") {
 	## Reading of Metadata Ions file
 	metaion=read.table(args$variableMetadata,header=T,sep='\t')
+	## Table match check
+	if(length(which(iddata[,1]%in%metaion[,1]))!=dim(iddata)[1] ||
+       length(which(metaion[,1]%in%iddata[,1]))!=dim(metaion)[1]){
+    stop("\nData matrix and variable metadata do not match regarding variable identifiers.\n",
+         "Please check your data.")
+    }
 	
 	## variables
 	detail=args$detail
