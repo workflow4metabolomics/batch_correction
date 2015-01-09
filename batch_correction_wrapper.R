@@ -9,6 +9,7 @@
 # Starting date : 22-07-2014                                                                   #
 # Version 1 : 22-07-2014                                                                       #
 # Version 2 : 08-12-2014                                                                       #
+# Version 2.1 : 09-01-2015 modification in Error message of sample matching                    #
 #                                                                                              #
 #                                                                                              #
 # Input files : dataMatrix.txt ; sampleMetadata.txt ; variableMetadata.txt (for DBC)           #
@@ -38,7 +39,8 @@ iddata=read.table(args$dataMatrix,header=T,sep='\t')
 if(length(which(colnames(iddata)[-1]%in%idsample[,1]))!=(dim(iddata)[2]-1) ||
      length(which(idsample[,1]%in%colnames(iddata)[-1]))!=dim(idsample)[1]){
   stop("\nData matrix and sample metadata do not match regarding sample identifiers.\n",
-       "Please check your data.\nNote: identifiers must not begin by a number.")
+       "Please check your data (including check of special characters in identifiers).\n",
+	   "Note: data must not contain duplication in samples' identifiers.")
 }
 
 
