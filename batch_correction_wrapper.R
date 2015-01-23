@@ -29,6 +29,7 @@ source_local <- function(fname){
 
 #Import the different functions
 source_local("Normalisation_QCpool.r")
+source_local("RcheckLibrary.R")
 
 
 ## Reading of input files
@@ -36,12 +37,16 @@ idsample=read.table(args$sampleMetadata,header=T,sep='\t')
 iddata=read.table(args$dataMatrix,header=T,sep='\t')
 
 ### Table match check 
-if(length(which(colnames(iddata)[-1]%in%idsample[,1]))!=(dim(iddata)[2]-1) ||
-     length(which(idsample[,1]%in%colnames(iddata)[-1]))!=dim(idsample)[1]){
-  stop("\nData matrix and sample metadata do not match regarding sample identifiers.\n",
-       "Please check your data (including check of special characters in identifiers).\n",
-	   "Note: data must not contain duplication in samples' identifiers.")
-}
+#if(length(which(colnames(iddata)[-1]%in%idsample[,1]))!=(dim(iddata)[2]-1) ||
+#     length(which(idsample[,1]%in%colnames(iddata)[-1]))!=dim(idsample)[1]){
+#  stop("\nData matrix and sample metadata do not match regarding sample identifiers.\n",
+#       "Please check your data (including check of special characters in identifiers).\n",
+#	   "Note: data must not contain duplication in samples' identifiers.")
+#}
+
+### Table match check 
+table.check <- match2(iddata,idsample,"sample")
+
 
 
 ### Formating
@@ -60,17 +65,11 @@ ids=id[id$sampleType == 'pool' | id$sampleType == 'sample',]
 nbid=dim(idsample)[2]
 	
 ### Checking the number of sample and pool
-#No perfect match
-wrng <- ""
-if((nrow(id)!=nrow(idsample)) || (nrow(id)!=nrow(idTdata))) {
-	wrng <- paste("Warning: Sample meta-data table and Data matrix are not a perfect match.",
-	              "\nMake sure this is not due to errors in sample identifiers.\n\n\n")
-}
 	
 # least 2 samples
 if(length(which(ids$sampleType == "sample"))<2){
-	stop(c("\n\nError: less than 2 samples specified in Sample meta-data.",
-	       "\nMake sure this is not due to errors in sampleType coding.\n\n",wrng))
+	table.check <- c(table.check,"\nError: less than 2 samples specified in Sample meta-data.",
+	       "\nMake sure this is not due to errors in sampleType coding.\n")
 }
 	
 # least 2 pools per batch for all batchs
@@ -79,8 +78,8 @@ for(nbB in length(levels(ids$batch))){
 	B[nbB]<-length(which(ids[which(ids$batch==(levels(ids$batch)[nbB])),]$sampleType == "pool"))
 }
 if(length(which(B>1))==0){
-	stop(c("\n\nError: less than 2 pools specified in each batch in Sample meta-data.",
-	       "\nMake sure this is not due to errors in sampleType coding.\n\n",wrng))
+	table.check <- c(table.check,"\nError: less than 2 pools specified in each batch in Sample meta-data.",
+	       "\nMake sure this is not due to errors in sampleType coding.\n")
 }
 	
 ### Factor of interest 
@@ -90,12 +89,9 @@ factbio=args$ref_factor
 if(args$analyse == "batch_correction") {
 	## Reading of Metadata Ions file
 	metaion=read.table(args$variableMetadata,header=T,sep='\t')
-	## Table match check
-	if(length(which(iddata[,1]%in%metaion[,1]))!=dim(iddata)[1] ||
-       length(which(metaion[,1]%in%iddata[,1]))!=dim(metaion)[1]){
-    stop("\nData matrix and variable metadata do not match regarding variable identifiers.\n",
-         "Please check your data.")
-    }
+	## Table match check 
+	table.check <- c(table.check,match2(iddata,metaion,"variable"))
+	check.err(table.check)
 	
 	## variables
 	detail=args$detail
@@ -111,6 +107,9 @@ if(args$analyse == "batch_correction") {
 	write.table(res[[1]], file=args$dataMatrix_out, sep = '\t', row.names=F, quote=F)
 	write.table(res[[2]], file=args$variableMetadata_out, sep = '\t', row.names=F, quote=F)
 }else{
+	## error check
+	check.err(table.check)
+	
 	## outputs
 	out_graph_pdf=args$out_graph_pdf
 	out_preNormSummary=args$out_preNormSummary
