@@ -36,14 +36,6 @@ idsample=read.table(args$sampleMetadata,header=T,sep='\t')
 iddata=read.table(args$dataMatrix,header=T,sep='\t')
 
 ### Table match check 
-#if(length(which(colnames(iddata)[-1]%in%idsample[,1]))!=(dim(iddata)[2]-1) ||
-#     length(which(idsample[,1]%in%colnames(iddata)[-1]))!=dim(idsample)[1]){
-#  stop("\nData matrix and sample metadata do not match regarding sample identifiers.\n",
-#       "Please check your data (including check of special characters in identifiers).\n",
-#	   "Note: data must not contain duplication in samples' identifiers.")
-#}
-
-### Table match check 
 table.check <- match2(iddata,idsample,"sample")
 
 
