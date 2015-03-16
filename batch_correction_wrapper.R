@@ -3,17 +3,17 @@
 ################################################################################################
 # batch_correction_wrapper                                                                     #
 #                                                                                              #
-# Author : Marion LANDI / Jean-Francois MARTIN / Melanie Petera                                #
-# User : Galaxy                                                                                #
-# Original data : --                                                                           #
-# Starting date : 22-07-2014                                                                   #
-# Version 1 : 22-07-2014                                                                       #
-# Version 2 : 08-12-2014                                                                       #
-# Version 2.1 : 09-01-2015 modification in Error message of sample matching                    #
+# Author: Marion LANDI / Jean-Francois MARTIN / Melanie Petera                                 #
+# User: Galaxy                                                                                 #
+# Original data: --                                                                            #
+# Starting date: 22-07-2014                                                                    #
+# Version 1: 22-07-2014                                                                        #
+# Version 2: 08-12-2014                                                                        #
+# Version 2.1: 09-01-2015 modification in Error message of sample matching                     #
 #                                                                                              #
 #                                                                                              #
-# Input files : dataMatrix.txt ; sampleMetadata.txt ; variableMetadata.txt (for DBC)           #
-# Output files : graph_output.pdf ; corrected table ; diagnostic table                         #
+# Input files: dataMatrix.txt ; sampleMetadata.txt ; variableMetadata.txt (for DBC)            #
+# Output files: graph_output.pdf ; corrected table ; diagnostic table                          #
 #                                                                                              #
 ################################################################################################
 
