@@ -21,12 +21,11 @@
 library(batch) #necessary for parseCommandArgs function
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
 
-source_local <- function(fname){
+source_local <- function(...){
 	argv <- commandArgs(trailingOnly = FALSE)
 	base_dir <- dirname(substring(argv[grep("--file=", argv)], 8))
-	source(paste(base_dir, fname, sep="/"))
+	for(i in 1:length(list(...))){source(paste(base_dir, list(...)[[i]], sep="/"))}
 }
-
 #Import the different functions
 source_local("Normalisation_QCpool.r")
 source_local("RcheckLibrary.R")
