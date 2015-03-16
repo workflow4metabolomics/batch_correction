@@ -10,6 +10,7 @@
 # Version 1: 22-07-2014                                                                        #
 # Version 2: 08-12-2014                                                                        #
 # Version 2.1: 09-01-2015 modification in Error message of sample matching                     #
+# Version 2.2: 16-03-2015 inclusion of miniTools' functions for special characters             #
 #                                                                                              #
 #                                                                                              #
 # Input files: dataMatrix.txt ; sampleMetadata.txt ; variableMetadata.txt (for DBC)            #
@@ -27,8 +28,7 @@ source_local <- function(...){
 	for(i in 1:length(list(...))){source(paste(base_dir, list(...)[[i]], sep="/"))}
 }
 #Import the different functions
-source_local("Normalisation_QCpool.r")
-source_local("RcheckLibrary.R")
+source_local("Normalisation_QCpool.r","RcheckLibrary.R","miniTools.R")
 
 
 ## Reading of input files
@@ -38,7 +38,9 @@ iddata=read.table(args$dataMatrix,header=T,sep='\t')
 ### Table match check 
 table.check <- match2(iddata,idsample,"sample")
 
-
+### StockID
+samp.id <- stockID(iddata,idsample,"sample")
+iddata<-samp.id$dataMatrix ; idsample<-samp.id$Metadata ; samp.id<-samp.id$id.match
 
 ### Formating
 idsample[[1]]=make.names(idsample[[1]])
@@ -95,7 +97,7 @@ if(args$analyse == "batch_correction") {
 	## Launch
 	res = norm_QCpool(ids,nbid,outfic,outlog,factbio,metaion,detail,F,F,method,args$span)
 	save(res, file=args$rdata_output)
-	write.table(res[[1]], file=args$dataMatrix_out, sep = '\t', row.names=F, quote=F)
+	write.table(reproduceID(res[[1]],res[[3]],"sample",samp.id)$dataMatrix, file=args$dataMatrix_out, sep = '\t', row.names=F, quote=F)
 	write.table(res[[2]], file=args$variableMetadata_out, sep = '\t', row.names=F, quote=F)
 }else{
 	## error check
