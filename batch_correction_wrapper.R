@@ -3,17 +3,18 @@
 ################################################################################################
 # batch_correction_wrapper                                                                     #
 #                                                                                              #
-# Author : Marion LANDI / Jean-Francois MARTIN / Melanie Petera                                #
-# User : Galaxy                                                                                #
-# Original data : --                                                                           #
-# Starting date : 22-07-2014                                                                   #
-# Version 1 : 22-07-2014                                                                       #
-# Version 2 : 08-12-2014                                                                       #
-# Version 2.1 : 09-01-2015 modification in Error message of sample matching                    #
+# Author: Marion LANDI / Jean-Francois MARTIN / Melanie Petera                                 #
+# User: Galaxy                                                                                 #
+# Original data: --                                                                            #
+# Starting date: 22-07-2014                                                                    #
+# Version 1: 22-07-2014                                                                        #
+# Version 2: 08-12-2014                                                                        #
+# Version 2.1: 09-01-2015 modification in Error message of sample matching                     #
+# Version 2.2: 16-03-2015 inclusion of miniTools' functions for special characters             #
 #                                                                                              #
 #                                                                                              #
-# Input files : dataMatrix.txt ; sampleMetadata.txt ; variableMetadata.txt (for DBC)           #
-# Output files : graph_output.pdf ; corrected table ; diagnostic table                         #
+# Input files: dataMatrix.txt ; sampleMetadata.txt ; variableMetadata.txt (for DBC)            #
+# Output files: graph_output.pdf ; corrected table ; diagnostic table                          #
 #                                                                                              #
 ################################################################################################
 
@@ -21,15 +22,13 @@
 library(batch) #necessary for parseCommandArgs function
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
 
-source_local <- function(fname){
+source_local <- function(...){
 	argv <- commandArgs(trailingOnly = FALSE)
 	base_dir <- dirname(substring(argv[grep("--file=", argv)], 8))
-	source(paste(base_dir, fname, sep="/"))
+	for(i in 1:length(list(...))){source(paste(base_dir, list(...)[[i]], sep="/"))}
 }
-
 #Import the different functions
-source_local("Normalisation_QCpool.r")
-source_local("RcheckLibrary.R")
+source_local("Normalisation_QCpool.r","RcheckLibrary.R","miniTools.R")
 
 
 ## Reading of input files
@@ -37,17 +36,11 @@ idsample=read.table(args$sampleMetadata,header=T,sep='\t')
 iddata=read.table(args$dataMatrix,header=T,sep='\t')
 
 ### Table match check 
-#if(length(which(colnames(iddata)[-1]%in%idsample[,1]))!=(dim(iddata)[2]-1) ||
-#     length(which(idsample[,1]%in%colnames(iddata)[-1]))!=dim(idsample)[1]){
-#  stop("\nData matrix and sample metadata do not match regarding sample identifiers.\n",
-#       "Please check your data (including check of special characters in identifiers).\n",
-#	   "Note: data must not contain duplication in samples' identifiers.")
-#}
-
-### Table match check 
 table.check <- match2(iddata,idsample,"sample")
 
-
+### StockID
+samp.id <- stockID(iddata,idsample,"sample")
+iddata<-samp.id$dataMatrix ; idsample<-samp.id$Metadata ; samp.id<-samp.id$id.match
 
 ### Formating
 idsample[[1]]=make.names(idsample[[1]])
@@ -104,7 +97,7 @@ if(args$analyse == "batch_correction") {
 	## Launch
 	res = norm_QCpool(ids,nbid,outfic,outlog,factbio,metaion,detail,F,F,method,args$span)
 	save(res, file=args$rdata_output)
-	write.table(res[[1]], file=args$dataMatrix_out, sep = '\t', row.names=F, quote=F)
+	write.table(reproduceID(res[[1]],res[[3]],"sample",samp.id)$dataMatrix, file=args$dataMatrix_out, sep = '\t', row.names=F, quote=F)
 	write.table(res[[2]], file=args$variableMetadata_out, sep = '\t', row.names=F, quote=F)
 }else{
 	## error check
