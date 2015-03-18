@@ -36,8 +36,8 @@
   </inputs>
   
   <outputs>
-    <data name="out_graph_pdf" label="${tool.id}_graph" format="pdf" ></data>
-    <data name="out_preNormSummary" label="${tool.id}_preNormSummary" format="tabular" ></data>
+    <data name="out_graph_pdf" label="Determine_BC_graph" format="pdf" ></data>
+    <data name="out_preNormSummary" label="Determine_BC_preNormSummary" format="tabular" ></data>
   </outputs>
   	
   <stdio>
