@@ -1,5 +1,5 @@
 ## ****** Determine_bc + batch_correction environnemnt : ****** ##
-# version sept 2014 M Landi / F Giacomoni
+# version December 2014 M Landi / F Giacomoni / M Petera
 
 ## --- PERL compilator / libraries : --- ##
 NA
@@ -37,5 +37,5 @@ No data set ! waiting for galaxy pages
 --
 
 ## --- ??? COMMENTS ??? --- ##
-NA
+!WARNING! : Two tools in the same directory !
 --
