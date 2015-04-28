@@ -149,8 +149,7 @@ Description
 Workflow position
 -----------------
 
-
-.. image:: ./static/images/batch_correction.png
+.. image:: batch_correction.png
         :width: 800
 
 
@@ -557,7 +556,7 @@ Figure output
 | You should obtain with this very simplified dataset the following figure:
 |
 
-.. image:: ./static/images/batchCorrection_workingExampleImage.png
+.. image:: batchCorrection_workingExampleImage.png
         :width: 600
 
 
