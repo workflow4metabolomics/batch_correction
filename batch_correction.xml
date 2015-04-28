@@ -99,7 +99,20 @@
 
 .. class:: infomark
 
-**Authors** Franck Giacomoni and Marion Landi (for interface and wrapper) and Jean-Francois Martin, Melanie Petera and Etienne Thevenot (for R)
+**Authors**
+  | Jean-Francois Martin - PF MetaToul-AXIOM ; INRA ; MetaboHUB (for original version of this tool and overall development of the R script)
+
+.. class:: infomark
+
+**Contributors**
+  | Melanie Petera - PFEM ; INRA ; MetaboHUB (for R wrapper and R script improvement)
+  | Etienne Thevenot - LIST/LADIS ; CEA ; MetaboHUB (for R script and wrapper concerning "all loess pool" and "all loess sample" methods)
+
+.. class:: infomark
+
+**Wrapping**
+  | Marion Landi - FLAME ; PFEM ; INRA ; MetaboHUB (for xml interface and R wrapper)
+  | Franck Giacomoni - PFEM ; INRA ; MetaboHUB (for xml interface and R wrapper)
 
 ---------------------------------------------------
 
