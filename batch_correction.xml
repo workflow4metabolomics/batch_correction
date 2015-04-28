@@ -117,19 +117,11 @@ Batch_correction
 Description
 -----------
 
-| **Instrumental drift** and **offset differences** between batches have been described in **LC-MS** experiments when the number of samples is large and/or multiple batches of acquisition are needed. Recently a normalization strategy relying on the measurements of a **pooled** (or QC) sample injected periodically has been described : For each variable, a **regression model** is fitted to the values of the **pool** and subsequently used to adjust the intensities of the samples of interest (van der Kloet et al, 2009; Dunn et al, 2011). The regression models can be either **linear** or **loess** (ie locally polynomial). In the case of a loess fit, the **span** parameter between 0 and 1 controls the smoothing (the higher the smoother; higher values are prefered to avoid overfitting; Cleveland et al, 1997).
+| **Instrumental drift** and **offset differences** between batches have been described in **LC-MS** experiments when the number of samples is large and/or multiple batches of acquisition are needed.
+| Recently a normalization strategy relying on the measurements of a **pooled** (or QC) sample injected periodically has been described: for each variable, a **regression model** is fitted to the values of the **pool** and subsequently used to adjust the intensities of the samples of interest (van der Kloet et al, 2009; Dunn et al, 2011).
 |
 | The current tool implements **two strategies** which differ in the way the regression model is applied to the variables (either depending on variable quality metrics, or 'loess' model for all variables) and also in the generated figure.
 |
-| **option 1** (**linear**, **lowess**, and **loess** methods): before the normalization of each variable, some quality metrics are computed (see the "Determine Batch Correction" module); depending on the result, the variable can be normalized or not, with either the **linear**, **lowess** or **loess** model.
-|
-| **option 2** (**all_loess_pool** and **all_loess_sample**) each variable is normalized by using the 'loess' model; in the case **all_loess_pool** is chosen and the number of pool observations is below 5, the linear method is used (for all variables) and a warning is generated; if the pool intensities are not representative of the samples (which can be viewed on the figure where both trends are shown), the **all_loess_sample** enables using the sample intensities (instead of the pool intensities) as the reference for the loess curve. In all cases, 1) **negative predicted values are set to NA**, and 2) the **median intensity of the reference observations** (either 'pool' or 'sample') is used as the scaling factor after the initial intensities have been divided by the loess predictions.
-|
-| References
-|   Cleveland et al, 1997. In Statistical Models in S; Chambers JM. and Hastie TJ. Ed.; Chapman et Hall: London; pp. 309-376
-|   `Dunn et al, 2011. Procedures for large-scale metabolic profiling of serum and plasma using gas chromatography and liquid chromatography coupled to mass spectrometry. Nature Protocols, 6:1060-1083 &lt;http://dx.doi.org/10.1038/nprot.2011.335&gt;`_
-|   `van der Kloet et al, 2009. "Analytical error reduction using single point calibration for accurate and precise metabolomic phenotyping." Journal of Proteome Research p5132-5141 &lt;http://www.ncbi.nlm.nih.gov/pubmed/19754161&gt;`_ 
-
 
 
 -----------------
@@ -165,37 +157,47 @@ Sample metadata file must contain at least the three following columns:
 	| "batch" to identify the batches of analyses
 	| "injectionOrder" (integers) defining the injection order of all samples (QC-pools as well as analysed samples)
 	| "sampleType" indicating if a sample ("sample") or a QC-pool ("pool"); each batch needs
-	| at least 3 QC-pools for intra-batch linear adjustment and 8 for lo(w)ess adjustment (5 for **all_loess_** methods)
+	| at least 3 QC-pools for intra-batch linear adjustment and 8 for lo(w)ess adjustment (5 for **all loess** methods)
 
 
 .. class:: warningmark
 
-MISSING DATA are allowed only with the **all_loess_** methods
+MISSING DATA are allowed only with the **all loess** methods
 
 
 ----------
 Parameters
 ----------
 
-Factor of interest
-	| name of the factor (column header) that will be used as a categorical variable for plots and PCA.
-	| (often a biological factor ; if none, leave “batch”)
-	| This factor does not affect correction calculation. Note: This factor is not used by the *all_loess_* methods
-	| 
-
-Type of regression model :
-	| To choose between *linear*, *lowess*, *loess*, *all_loess_pool*, and *all_loess_sample* strategies (see the 'Description' session above)
+Type of regression model
+	| To choose between *linear*, *lowess*, *loess*, *all loess pool*, and *all loess sample* strategies
+	| **- Option 1** (**linear**, **lowess**, and **loess** methods): before the normalisation of each variable, some quality metrics are computed (see the "Determine Batch Correction" module); depending on the result, the variable can be normalized or not, with either the **linear**, **lowess** or **loess** model.
+	| **- Option 2** (**all loess pool** and **all loess sample**): each variable is normalized by using the 'loess' model;
+	| in the case **all loess pool** is chosen and the number of pool observations is below 5, the linear method is used (for all variables) and a warning is generated;
+	| if the pool intensities are not representative of the samples (which can be viewed on the figure where both trends are shown), the case **all loess sample** enables using the sample intensities (instead of the pool intensities) as the reference for the loess curve.
+	| In all "option 2" cases: the **median intensity of the reference observations** (either 'pool' or 'sample') is used as the scaling factor after the initial intensities have been divided by the loess predictions.
 	|
 
 Span
-	| Smoothing parameter (advanced option for *lo(w)ess* and *all_loess_* methods
+	| Smoothing parameter, advanced option for *lo(w)ess* and *all loess* methods
+	| In case of a loess fit, the **span** parameter (between 0 and 1) controls the smoothing
+	| (the higher the smoother; higher values are prefered to avoid overfitting; Cleveland et al, 1997).
 	|
 
+Factor of interest
+	| available for regression model *linear*, *lowess* and *loess*
+	| Name of the factor (column header) in Sample metadata file that will be used as a categorical variable for plots and PCA.
+	| (often a biological factor ; if none, leave “batch”)
+	| This factor does not affect correction calculation.
+	| 
+
 Level of details for plots
+	| available for regression model *linear*, *lowess* and *loess*
 	| *basic*: PCA + CV boxplot (before and after correction)
 	| *standard*: 'basic' plots + before/after-correction plots of intensities over injection order, and design effects for each ion
 	| *complete*: 'standard' plots + QC-pool regression plots per batch with samples' intensities over injection order
-	| This factor is not used by the *all_loess_* methods where a unique figure is generated showing the sum of intensities along injection order, and the first 4 PCA scores.
+	| This factor is not used by the *all loess* methods where a unique figure is generated showing the sum of intensities along injection order, and the first 4 PCA scores.
+	| 
 
 
 ------------
