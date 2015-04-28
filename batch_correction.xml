@@ -40,35 +40,47 @@
 		<param name="sampleMetadata" label="Sample metadata file " format="tabular" type="data" help="must contain at least the three following columns: 'batch' + 'injectionOrder' + 'sampleType'"/>
 		<param name="variableMetadata" label="Variable metadata file " format="tabular" type="data" />
 		
-		<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor); if none, leave 'batch'" />
-		
 		<conditional name="span_condition">
-	        <param name="method" label="Type of regression model " type="select" help="To select between linear or non-linear (lowess or loess) methods to be used in Van der Kloet algorithm.">
+			<param name="method" label="Type of regression model " type="select" help="To select between linear or non-linear (lowess or loess) methods to be used in Van der Kloet algorithm ; when using loess, you can choose to use pools or samples to model batch effect.">
 				<option value="linear">linear</option>
 				<option value="lowess">lowess</option>
 				<option value="loess">loess</option>
-				<option value="all_loess_pool">all_loess_pool</option>
-				<option value="all_loess_sample">all_loess_sample</option>
+				<option value="all_loess_pool">all loess pool</option>
+				<option value="all_loess_sample">all loess sample</option>
 			</param>
-	        <when value="lowess">
-	            <param name="span" type="float" value="0.85" label="span" help="it is a advanced option. Must be less than or equal to 1"/>
-	        </when>
-	        <when value="loess">
-	            <param name="span" type="float" value="1" label="span" help="it is a advanced option. Must be strictly greater than 0"/>
+			<when value="linear">
+				<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor); if none, leave 'batch'" />
+				<param name="detail" label="Level of details for plots " type="select" help="Amount of plots in the pdf file output. See Help section for more details.">
+					<option value="no">basic</option>
+					<option value="plot">standard</option>
+					<option value="reg">complete</option>
+				</param>
+			</when>
+			<when value="lowess">
+				<param name="span" type="float" value="0.85" label="span" help="it is a advanced option. Must be less than or equal to 1"/>
+				<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor); if none, leave 'batch'" />
+				<param name="detail" label="Level of details for plots " type="select" help="Amount of plots in the pdf file output. See Help section for more details.">
+					<option value="no">basic</option>
+					<option value="plot">standard</option>
+					<option value="reg">complete</option>
+				</param>
+			</when>
+			<when value="loess">
+				<param name="span" type="float" value="1" label="span" help="it is a advanced option. Must be strictly greater than 0"/>
+				<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor); if none, leave 'batch'" />
+				<param name="detail" label="Level of details for plots " type="select" help="Amount of plots in the pdf file output. See Help section for more details.">
+					<option value="no">basic</option>
+					<option value="plot">standard</option>
+					<option value="reg">complete</option>
+				</param>
 			</when>
 			<when value="all_loess_pool">
-	            <param name="span" type="float" value="1" label="span" help="smoothing parameter; must be > 0"/>
+				<param name="span" type="float" value="1" label="span" help="smoothing parameter; must be > 0"/>
 			</when>
 			<when value="all_loess_sample">
-	            <param name="span" type="float" value="1" label="span" help="smoothing parameter; must be > 0"/>
-	        </when>
-	    </conditional>
-		
-		<param name="detail" label="Level of details for plots " type="select" help="Amount of plots in the pdf file output. See Help section for more details.">
-			<option value="no">basic</option>
-			<option value="plot">standard</option>
-			<option value="reg">complete</option>
-		</param>
+				<param name="span" type="float" value="1" label="span" help="smoothing parameter; must be > 0"/>
+			</when>
+		</conditional>
 	</inputs>
 	
 	<outputs>
