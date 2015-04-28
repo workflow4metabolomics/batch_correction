@@ -2,20 +2,38 @@
 	<description>Corrects intensities for signal drift and batch-effects</description>
 	
 	<command interpreter="Rscript">
-       batch_correction_wrapper.R
-           analyse "batch_correction"
-	       dataMatrix "$dataMatrix"
-	       sampleMetadata "$sampleMetadata"
-	       variableMetadata "$variableMetadata"
-	       ref_factor "$ref_factor" detail "$detail"
-	       method "${span_condition.method}"
-	       #if str($span_condition.method) == 'linear':
-	         span "none"
-	       #else:
-	         span "${span_condition.span}"
-	       #end if
-	       dataMatrix_out "$dataMatrix_out" variable_for_simca "$combinedResults" variableMetadata_out "$variableMetadata_out"
-	       graph_output "$graph_output"  rdata_output "$rdata_output"
+		#if str($span_condition.method) == 'all_loess_pool':
+			batch_correction_all_loess_wrapper.R
+				dataMatrix "$dataMatrix"
+				sampleMetadata "$sampleMetadata"
+				variableMetadata "$variableMetadata"
+				method "all_loess_pool"
+				span "${span_condition.span}"
+				
+		#elif str($span_condition.method) == 'all_loess_sample':
+			batch_correction_all_loess_wrapper.R
+				dataMatrix "$dataMatrix"
+				sampleMetadata "$sampleMetadata"
+				variableMetadata "$variableMetadata"
+				method "all_loess_sample"
+				span "${span_condition.span}"
+		#else:
+			batch_correction_wrapper.R
+				analyse "batch_correction"
+				dataMatrix "$dataMatrix"
+				sampleMetadata "$sampleMetadata"
+				variableMetadata "$variableMetadata"
+				method "${span_condition.method}"
+				#if str($span_condition.method) == 'linear':
+					span "none"
+				#else:
+					span "${span_condition.span}"
+				#end if
+				ref_factor "${span_condition.ref_factor}"
+				detail "${span_condition.detail}"
+		#end if
+		dataMatrix_out "$dataMatrix_out" variable_for_simca "$combinedResults" variableMetadata_out "$variableMetadata_out"
+		graph_output "$graph_output"  rdata_output "$rdata_output"
 	</command>
 	<inputs>
 		<param name="dataMatrix" label="Data Matrix file " format="tabular" type="data" />
