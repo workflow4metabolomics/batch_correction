@@ -110,6 +110,15 @@ plotBatchF <- function(datMN, samDF.arg) {
 
     pcaMN <- datMN
 
+    nasVarVl <- apply(pcaMN, 2, function(colVn)
+                      all(is.na(colVn)))
+    if(sum(nasVarVl)) {
+        pcaMN <- pcaMN[, !nasVarVl]
+        cat("\nWarning: ",
+            sum(nasVarVl),
+            " variables from the ", tolower(maiC), " dataMatrix table are all NA\n", sep = "")
+    }
+
     pcaLs <- ropF(pcaMN, ncpN=4, ploVc="none", vrbC="none")
     tMN <- pcaLs[["tMN"]]
     vRelVn <- pcaLs[["mdlDF"]][, "R2X"]
