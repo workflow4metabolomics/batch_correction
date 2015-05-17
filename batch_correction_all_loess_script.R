@@ -110,15 +110,6 @@ plotBatchF <- function(datMN, samDF.arg) {
 
     pcaMN <- datMN
 
-    nasVarVl <- apply(pcaMN, 2, function(colVn)
-                      all(is.na(colVn)))
-    if(sum(nasVarVl)) {
-        pcaMN <- pcaMN[, !nasVarVl]
-        cat("\nWarning: ",
-            sum(nasVarVl),
-            " variables from the ", tolower(maiC), " dataMatrix table are all NA\n", sep = "")
-    }
-
     pcaLs <- ropF(pcaMN, ncpN=4, ploVc="none", vrbC="none")
     tMN <- pcaLs[["tMN"]]
     vRelVn <- pcaLs[["mdlDF"]][, "R2X"]
@@ -223,9 +214,9 @@ shiftBatchCorrectF <- function(rawMN.arg,
 
     ## computing median off all pools (or samples) for each variable
 
-    refMedVn <- apply(rawMN.arg[samDF.arg[, "sampleType"] == refC.arg, ],
+    refMeaVn <- apply(rawMN.arg[samDF.arg[, "sampleType"] == refC.arg, ],
                       2,
-                      median)
+                      function(feaRefVn) mean(feaRefVn, na.rm = TRUE))
 
     ## splitting data and sample metadata from each batch
 
@@ -292,7 +283,7 @@ shiftBatchCorrectF <- function(rawMN.arg,
 
     cat("\n")
 
-    nrmMN <- sweep(nrmMN, MARGIN = 2, STATS = refMedVn, FUN = "*")
+    nrmMN <- sweep(nrmMN, MARGIN = 2, STATS = refMeaVn, FUN = "*")
 
     return(nrmMN)
 
