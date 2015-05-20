@@ -42,6 +42,16 @@ table.check <- match2(iddata,idsample,"sample")
 samp.id <- stockID(iddata,idsample,"sample")
 iddata<-samp.id$dataMatrix ; idsample<-samp.id$Metadata ; samp.id<-samp.id$id.match
 
+### Checking mandatory variables
+mand.check <- ""
+for(mandcol in c("sampleType","injectionOrder","batch")){
+  if(!(mandcol%in%colnames(idsample))){
+    mand.check <- c(mand.check,"\nError: no '",mandcol,"' column in sample metadata.\n",
+                    "Note: table must include this exact column name (it is case-sensitive).\n")
+  }
+}
+if(length(mand.check)>1){check.err(paste(table.check,mand.check,sep=""))}
+
 ### Formating
 idsample[[1]]=make.names(idsample[[1]])
 dimnames(iddata)[[1]]=iddata[[1]]
