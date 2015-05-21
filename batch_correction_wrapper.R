@@ -42,6 +42,16 @@ table.check <- match2(iddata,idsample,"sample")
 samp.id <- stockID(iddata,idsample,"sample")
 iddata<-samp.id$dataMatrix ; idsample<-samp.id$Metadata ; samp.id<-samp.id$id.match
 
+### Checking mandatory variables
+mand.check <- ""
+for(mandcol in c("sampleType","injectionOrder","batch")){
+  if(!(mandcol%in%colnames(idsample))){
+    mand.check <- c(mand.check,"\nError: no '",mandcol,"' column in sample metadata.\n",
+                    "Note: table must include this exact column name (it is case-sensitive).\n")
+  }
+}
+if(length(mand.check)>1){check.err(paste(table.check,mand.check,sep=""))}
+
 ### Formating
 idsample[[1]]=make.names(idsample[[1]])
 dimnames(iddata)[[1]]=iddata[[1]]
@@ -61,7 +71,7 @@ nbid=dim(idsample)[2]
 	
 # least 2 samples
 if(length(which(ids$sampleType == "sample"))<2){
-	table.check <- c(table.check,"\nError: less than 2 samples specified in Sample meta-data.",
+	table.check <- c(table.check,"\nError: less than 2 samples specified in sample metadata.",
 	       "\nMake sure this is not due to errors in sampleType coding.\n")
 }
 	
@@ -71,7 +81,7 @@ for(nbB in length(levels(ids$batch))){
 	B[nbB]<-length(which(ids[which(ids$batch==(levels(ids$batch)[nbB])),]$sampleType == "pool"))
 }
 if(length(which(B>1))==0){
-	table.check <- c(table.check,"\nError: less than 2 pools specified in each batch in Sample meta-data.",
+	table.check <- c(table.check,"\nError: less than 2 pools specified in each batch in sample metadata.",
 	       "\nMake sure this is not due to errors in sampleType coding.\n")
 }
 	
