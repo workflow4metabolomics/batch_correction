@@ -214,9 +214,9 @@ shiftBatchCorrectF <- function(rawMN.arg,
 
     ## computing median off all pools (or samples) for each variable
 
-    refMedVn <- apply(rawMN.arg[samDF.arg[, "sampleType"] == refC.arg, ],
+    refMeaVn <- apply(rawMN.arg[samDF.arg[, "sampleType"] == refC.arg, ],
                       2,
-                      median)
+                      function(feaRefVn) mean(feaRefVn, na.rm = TRUE))
 
     ## splitting data and sample metadata from each batch
 
@@ -283,7 +283,7 @@ shiftBatchCorrectF <- function(rawMN.arg,
 
     cat("\n")
 
-    nrmMN <- sweep(nrmMN, MARGIN = 2, STATS = refMedVn, FUN = "*")
+    nrmMN <- sweep(nrmMN, MARGIN = 2, STATS = refMeaVn, FUN = "*")
 
     return(nrmMN)
 
