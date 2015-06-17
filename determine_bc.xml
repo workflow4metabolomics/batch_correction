@@ -1,11 +1,6 @@
 <tool id="Determine_BC" name="Determine_batch_correction" version="2014-12-11">
   <description>to choose between linear, lowess and loess methods</description>
   
-  <parallelism method="basic"></parallelism>
-  <requirements>
-    <requirement type="package">Determine_VdK.pl</requirement>
-  </requirements>
-  
   <command interpreter="Rscript">
     batch_correction_wrapper.R
       analyse "determine_bc"
