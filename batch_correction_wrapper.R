@@ -101,11 +101,10 @@ if(args$analyse == "batch_correction") {
 	method=args$method
 	
 	## outputs
-	outfic=args$variable_for_simca
 	outlog=args$graph_output
 	
 	## Launch
-	res = norm_QCpool(ids,nbid,outfic,outlog,factbio,metaion,detail,F,F,method,args$span)
+	res = norm_QCpool(ids,nbid,outlog,factbio,metaion,detail,F,F,method,args$span)
 	save(res, file=args$rdata_output)
 	write.table(reproduceID(res[[1]],res[[3]],"sample",samp.id)$dataMatrix, file=args$dataMatrix_out, sep = '\t', row.names=F, quote=F)
 	write.table(res[[2]], file=args$variableMetadata_out, sep = '\t', row.names=F, quote=F)

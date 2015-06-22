@@ -46,7 +46,6 @@ if(rssVsGalL) { ## for running with R outside the Galaxy environment during deve
                list(dataMatrix_out = file.path(exaDirOutC, paste(argLs[["method"]], "dataMatrix.tsv", sep="_")),
 
                     variableMetadata_out = file.path(exaDirOutC, paste(argLs[["method"]], "variableMetadata.tsv", sep="_")),
-                    variable_for_simca = file.path(exaDirOutC, paste(argLs[["method"]], "combined_results.tsv", sep="_")),
                     graph_output = file.path(exaDirOutC, paste(argLs[["method"]],"graph.pdf", sep="_")),
                     rdata_output = file.path(exaDirOutC, paste(argLs[["method"]], "rdata.rdata", sep="_"))))
 
@@ -248,14 +247,6 @@ write.table(varDF,
             row.names = FALSE,
             sep = "\t")
 
-simDF <- cbind.data.frame(samDF, as.data.frame(datMN)) ## for compatibility
-simDF <- cbind.data.frame(names = rownames(simDF),
-                          simDF)
-write.table(simDF,
-            file = argLs[["variable_for_simca"]],
-            quote = FALSE,
-            row.names = FALSE,
-            sep = "\t")
 
 res <- list(dataMatrix_raw = rawMN,
             dataMatrix_normalized = nrmMN,

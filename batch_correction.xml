@@ -32,7 +32,7 @@
 				ref_factor "${span_condition.ref_factor}"
 				detail "${span_condition.detail}"
 		#end if
-		dataMatrix_out "$dataMatrix_out" variable_for_simca "$combinedResults" variableMetadata_out "$variableMetadata_out"
+		dataMatrix_out "$dataMatrix_out" variableMetadata_out "$variableMetadata_out"
 		graph_output "$graph_output"  rdata_output "$rdata_output"
 	</command>
 	<inputs>
@@ -84,7 +84,6 @@
 	</inputs>
 	
 	<outputs>
-		<data name="combinedResults" label="${tool.name}_${span_condition.method}_combined_results" format="tabular"/>
 		<data name="dataMatrix_out" label="${tool.name}_${span_condition.method}_${dataMatrix.name}" format="tabular"/>
 		<data name="variableMetadata_out" label="${tool.name}_${span_condition.method}_${variableMetadata.name}" format="tabular"/>
 		<data name="graph_output" label="${tool.name}_${span_condition.method}_graph" format="pdf"/>
@@ -244,11 +243,6 @@ Batch_correction_$method_dataMatrix.tabular
 	| Same formatting as Data Matrix file; contains corrected intensities
 	|
 
-Batch_correction_$method_combined_results.tabular
-	| tsv output (tabulated)
-	| Suitable format for use by SIMCA
-	| Same formatting as Sample metadata file, concatenated with the transposed Data Matrix file of corrected intensities
-	|
 	
 ---------------------------------------------------
 
