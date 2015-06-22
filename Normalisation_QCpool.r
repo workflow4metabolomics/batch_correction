@@ -264,12 +264,11 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL) {
 
 
 
-norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", NormMoyPool=F, NormInt=F, method="linear",span="none")
+norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPool=F, NormInt=F, method="linear",span="none")
 {
 	# Correction applying linear or lowess correction function on all ions for every batch of a dataframe.
   # x : dataframe with ions in column and samples' metadata
   # nbid: number of samples description columns (id and factors) with at least : "batch","injectionOrder","sampleType"
-  #	outfic: result corrected intensity file 
   #	outlog: name of regression plots and PCA pdf file
   #	fact : factor to be used as categorical variable for plots and PCA.  
   # metaion : dataframe of ions' metadata
@@ -346,7 +345,6 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
 	  Xnn[[i]]=replace(Xn[[i]],cneg,valNulle)
 	}
   Xn=Xnn
-  write.table(Xn,file=outfic,sep="\t",row.names=F,quote=F)
 
 	if (detail=="reg" || detail=="plot" || detail=="no") {
 		if (nbi > 3) {
