@@ -241,9 +241,9 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL) {
         cor=predict(resloess,newdata=xb[,2])
 		    cor[cor<=1] <- 1 
         newval=(vref*xb[,3]) / cor 
-        if(length(which(newval>3*(quantile(newval)[4])))>0){newval <- xb[,3]} # no modification of initial value
-        else {ind <- 1} # confirmation of correction
-        if (detail=="reg") { # plot
+        if(length(which(newval>3*(quantile(newval)[4])))>0){ # in this case no modification of initial value
+			newval <- xb[,3]} else {ind <- 1} # confirmation of correction
+        if ((detail=="reg")&(ind==1)) { # plot
             liminf=min(xb[indbt,3]);limsup=max(xb[indbt,3])
             plot(xb[indsp,2],xb[indsp,3],pch=16,main=paste(labion,"batch ",b),ylab="intensity",xlab="injection order",ylim=c(liminf,limsup))
             points(xb[indpb,2], xb[indpb,3],pch=5)
