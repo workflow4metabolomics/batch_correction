@@ -11,6 +11,7 @@
 # Version 2: 08-12-2014                                                                        #
 # Version 2.1: 09-01-2015 modification in Error message of sample matching                     #
 # Version 2.2: 16-03-2015 inclusion of miniTools' functions for special characters             #
+# Version 2.90: 18-08-2015 new parameter valnull                                               #
 #                                                                                              #
 #                                                                                              #
 # Input files: dataMatrix.txt ; sampleMetadata.txt ; variableMetadata.txt (for DBC)            #
@@ -104,7 +105,7 @@ if(args$analyse == "batch_correction") {
 	outlog=args$graph_output
 	
 	## Launch
-	res = norm_QCpool(ids,nbid,outlog,factbio,metaion,detail,F,F,method,args$span)
+	res = norm_QCpool(ids,nbid,outlog,factbio,metaion,detail,F,F,method,args$span,args$valnull)
 	save(res, file=args$rdata_output)
 	write.table(reproduceID(res[[1]],res[[3]],"sample",samp.id)$dataMatrix, file=args$dataMatrix_out, sep = '\t', row.names=F, quote=F)
 	write.table(res[[2]], file=args$variableMetadata_out, sep = '\t', row.names=F, quote=F)
