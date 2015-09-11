@@ -110,9 +110,9 @@ plotBatchF <- function(datMN, samDF.arg) {
 
     pcaMN <- datMN
 
-    pcaLs <- ropF(pcaMN, ncpN=4, ploVc="none", vrbC="none")
-    tMN <- pcaLs[["tMN"]]
-    vRelVn <- pcaLs[["mdlDF"]][, "R2X"]
+    pcaLs <- opls(pcaMN, predI = 4, printL = FALSE, plotL = FALSE)
+    tMN <- pcaLs[["scoreMN"]]
+    vRelVn <- pcaLs[["modelDF"]][, "R2X"]
 
     n <- nrow(tMN)
     hotN <- 2 * (n - 1) * (n^2 - 1) / (n^2 * (n - 2))
