@@ -43,13 +43,26 @@
 
 .. class:: infomark
 
-**Authors** Franck Giacomoni and Marion Landi (for interface and wrapper) and Jean-Francois Martin and Melanie Petera (for R)
+**Authors**
+  | Jean-Francois Martin - PF MetaToul-AXIOM ; INRA ; MetaboHUB (for original version of this tool and overall development of the R script)
+
+.. class:: infomark
+
+**Contributors**
+  | Melanie Petera - PFEM ; INRA ; MetaboHUB (for R wrapper and R script improvement)
+
+.. class:: infomark
+
+**Wrapping**
+  | Marion Landi - FLAME ; PFEM ; INRA ; MetaboHUB (for xml interface and R wrapper)
+  | Franck Giacomoni - PFEM ; INRA ; MetaboHUB (for xml interface and R wrapper)
 
 ---------------------------------------------------
 
 .. class:: infomark
 
-**Please cite** If you use this tool, please cite `F.M. van der Kloet, I. Bobeldijk, E.R. Verheij, R.H. Jellema. (2009). "Analytical error reduction using single point calibration for accurate and precise metabolomic phenotyping." Journal of Proteome Research p5132-5141 &lt;http://www.ncbi.nlm.nih.gov/pubmed/19754161&gt;`_
+**Please cite** If you use this tool, please cite:
+  | `F.M. van der Kloet, I. Bobeldijk, E.R. Verheij, R.H. Jellema. (2009). "Analytical error reduction using single point calibration for accurate and precise metabolomic phenotyping." Journal of Proteome Research p5132-5141 &lt;http://www.ncbi.nlm.nih.gov/pubmed/19754161&gt;`_
 
 ---------------------------------------------------
 
@@ -159,11 +172,20 @@ Working example
 
 .. class:: warningmark
 
-Soon see the corresponding "Page"
+Refer to the corresponding "W4M HowTo" page:
+ | `Format Data For Postprocessing &lt;http://web11.sb-roscoff.fr/download/w4m/howto/w4m_HowToFormatDataForPostprocessing_v02.pdf&gt;`_
+ | `Perform Drift And Batch Correction &lt;http://web11.sb-roscoff.fr/download/w4m/howto/w4m_HowToPerformDriftAndBatchCorrection_v02.pdf&gt;`_
+ |
+ |
+
 
 
   </help>
-  
+      <!-- [RECOMMANDED] All citations associated to this tool (main citation given above and other references). Can be extracted from the history panel -->
+    <citations>
+        <!-- [HELP] As DOI or BibTex entry -->
+        <citation type="doi">10.1021/pr900499r</citation>
+    </citations>
   
 Input files
 ===========
