@@ -23,6 +23,7 @@
 # Version 2.11 ok1 and ok2 permutation (ok_norm) ; conditional display of regression (plotsituation) ; grouping of linked lignes + conditioning (normX) ; conditioning for CVplot
 # Version 2.20 acplight function added from previous toolBox.R [# Version 1.01 "NA"-coding possibility added in acplight function]
 # Version 2.30 addition of suppressWarnings() for known and controlled warnings ; suppression of one useless "cat" message ; change in Rdata names ; 'batch(es)' in cat
+# Version 2.90 change in handling of generated negative and Inf values
 
 ok_norm=function(qcp,qci,spl,spi,method) {
   # Function used for one ion within one batch to determine whether or not batch correction is possible
@@ -179,10 +180,13 @@ normlowess=function (xb,detail="no",vref=1,b,span=NULL) {
   return(newval)
 }
 
-normlinear <-function (xb,detail="no",vref=1,b) {
-  # Correction function applied to 1 ion in 1 batch. Use a linear regression computed on QC-pools in order to correct samples intensity values
-  #	xb : dataframe with ions in columns and samples in rows ; x is a result of concatenation of samples metadata file and ions file 
-  # nbid : number of samples description columns (id and factors) with at least : "batch","injectionOrder","sampleType"
+normlinear <- function (xb,detail="no",vref=1,b,valneg=0) {
+  # Correction function applied to 1 ion in 1 batch.
+  # Use a linear regression computed on QC-pools in order to correct samples intensity values
+  # xb: dataframe with ions in columns and samples in rows; x is a result of concatenation of sample metadata file and ion file 
+  # nbid: number of sample description columns (id and factors) with at least "batch", "injectionOrder" and "sampleType"
+  # b: which batch it is
+  # valneg: to determine what to do with generated negative and Inf values
   indpb = which(xb$sampleType=="pool")# pools subscripts of current batch
   indsp = which(xb$sampleType=="sample")# samples of current batch subscripts
   indbt = which(xb$sampleType=="sample" | xb$sampleType=="pool") # QCpools and samples of current batch subscripts
@@ -190,8 +194,8 @@ normlinear <-function (xb,detail="no",vref=1,b) {
   newval=xb[[3]] # initialisation of corrected values = intial values	
   ind <- 0 # initialisation of correction indicator
   normTodo=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="linear")
-  #cat("batch:",b," ok=",normTodo,"\n")
   if (normTodo==0) {
+    ind <- 1
     reslsfit=lsfit(xb[indpb,2],xb[indpb,3])       # linear regression for QCpools 
     reslsfitSample=lsfit(xb[indsp,2],xb[indsp,3]) # linear regression for samples
     ordori=reslsfit$coefficients[1]
@@ -204,10 +208,25 @@ normlinear <-function (xb,detail="no",vref=1,b) {
       abline(reslsfit)
       abline(reslsfitSample,lty=2)
     }
-    # correction avec remise a l'echelle de la valeur de l'ion (valref)
-    newval = (vref*xb[indbt,3]) / ((pente * xb[indbt,2]) + ordori)
-    ind <- 1
-  } else {# if ok_norm<>0 , we perform a correction based on batch samples average.
+    # correction with rescaling of ion global intensity (vref)
+    newval = (vref*xb[indbt,3]) / (pente * (xb[indbt,2]) + ordori)
+	newval[which((pente * (xb[indbt,2]) + ordori)<1)] <- -1 # to handle cases where 0<denominator<1
+	# handling if any negative values (or null denominators)
+	if(length(which((newval==Inf)|(newval<0)))!=0){
+	  toajust <- which((newval==Inf)|(newval<0))
+	  if(valneg=="NA"){
+	    newval[toajust] <- NA
+	  } else {
+	    newval[toajust] <- vref * (xb[indbt,3][toajust]) / mean(xb[indbt,3])
+    ### Other possibility
+	##  if(pente>0){ # slope orientation
+	##    newval[toajust]<-(vref*(xb[indbt,3][toajust]))/(pente*ceiling(-ordori/pente+1.00001)+ordori)
+	##  }else{
+	##    newval[toajust]<-(vref*(xb[indbt,3][toajust]))/(pente*floor(-ordori/pente-1.00001)+ordori)
+	##  }
+	  }
+	}
+  } else {# if ok_norm!=0 , we perform a correction based on batch samples average.
     moySample=mean(xb[indsp,3]); if (moySample==0) moySample=1
     newval[indsp] = (vref*xb[indsp,3])/moySample
     if(length(indpb)>0){
@@ -241,9 +260,9 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL) {
         cor=predict(resloess,newdata=xb[,2])
 		    cor[cor<=1] <- 1 
         newval=(vref*xb[,3]) / cor 
-        if(length(which(newval>3*(quantile(newval)[4])))>0){newval <- xb[,3]} # no modification of initial value
-        else {ind <- 1} # confirmation of correction
-        if (detail=="reg") { # plot
+        if(length(which(newval>3*(quantile(newval)[4])))>0){ # in this case no modification of initial value
+			newval <- xb[,3]} else {ind <- 1} # confirmation of correction
+        if ((detail=="reg")&(ind==1)) { # plot
             liminf=min(xb[indbt,3]);limsup=max(xb[indbt,3])
             plot(xb[indsp,2],xb[indsp,3],pch=16,main=paste(labion,"batch ",b),ylab="intensity",xlab="injection order",ylim=c(liminf,limsup))
             points(xb[indpb,2], xb[indpb,3],pch=5)
@@ -264,20 +283,21 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL) {
 
 
 
-norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", NormMoyPool=F, NormInt=F, method="linear",span="none")
+norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPool=F, NormInt=F, method="linear",span="none",valNull="0")
 {
-	# Correction applying linear or lowess correction function on all ions for every batch of a dataframe.
-  # x : dataframe with ions in column and samples' metadata
-  # nbid: number of samples description columns (id and factors) with at least : "batch","injectionOrder","sampleType"
-  #	outfic: result corrected intensity file 
-  #	outlog: name of regression plots and PCA pdf file
-  #	fact : factor to be used as categorical variable for plots and PCA.  
-  # metaion : dataframe of ions' metadata
-  # detail : level of detail in the outlog file. detail="no" ACP+histogram of CV before and after correction.
-  #     detail="plot" with plot for all batch before and after correction. detail="reg" with added plots with regression lines for all batches.
-  # NormMoyPool : not used
-  # NormInt : not used
-  # method : regression method to be used to correct : "linear" oo "lowess" oo "loess"
+  ### Correction applying linear or lo(w)ess correction function on all ions for every batch of a dataframe.
+  # x: dataframe with ions in column and samples' metadata
+  # nbid: number of sample description columns (id and factors) with at least "batch", "injectionOrder", "sampleType"
+  # outlog: name of regression plots and PCA pdf file
+  # fact: factor to be used as categorical variable for plots  
+  # metaion: dataframe of ions' metadata
+  # detail: level of detail in the outlog file. detail="no" ACP + boxplot of CV before and after correction.
+  #          detail="plot" with plot for all batch before and after correction.
+  #          detail="reg" with added plots with regression lines for all batches.
+  # NormMoyPool: not used
+  # NormInt: not used
+  # method: regression method to be used to correct : "linear" or "lowess" or "loess"
+  # valNull: to determine what to do with negatively estimated intensities
 	indfact		=which(dimnames(x)[[2]]==fact)
 	indtypsamp=which(dimnames(x)[[2]]=="sampleType")
 	indbatch	=which(dimnames(x)[[2]]=="batch")
@@ -308,7 +328,7 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
       indbt = which(x$batch==levels(x$batch)[b] & (x$sampleType=="pool" | x$sampleType=="sample")) # subscripts of all samples
       # cat(dimnames(x)[[2]][p+nbid]," indsp:",length(indsp)," indpb=",length(indpb)," indbt=",length(indbt)," ")
 			sub=data.frame(x[(x$batch==levels(x$batch)[b]),c(indtypsamp,indinject,p+nbid)])
-			if (method=="linear") { res.norm = normlinear(sub,detail,valref[p],b)
+			if (method=="linear") { res.norm = normlinear(sub,detail,valref[p],b,valNull)
 			} else { if (method=="loess"){ res.norm <- normloess(sub,detail,valref[p],b,span)
 			  } else { if (method=="lowess"){ res.norm <- normlowess(sub,detail,valref[p],b,span)
           } else {stop("\n--\nNo valid 'method' argument supplied.\nMust be 'linear','loess' or 'lowess'.\n--\n")}
@@ -326,10 +346,10 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
 #			}
 		}	
 		Xn[indpool,p+nbid][Xn[indpool,p+nbid]<0] <- 0
-		pools2=Xn[indpool,p+nbid]; cv[p,2]=sd(pools2)/mean(pools2)# CV apres correction
+		pools2=Xn[indpool,p+nbid]; cv[p,2]=sd(pools2,na.rm=TRUE)/mean(pools2,na.rm=TRUE)# CV apres correction
 		if (detail=="reg" || detail=="plot" ) {
 		  	# plot before and after correction
-		  	minval=min(cbind(x[p+nbid],Xn[p+nbid]));maxval=max(cbind(x[p+nbid],Xn[p+nbid]))
+		  	minval=min(cbind(x[p+nbid],Xn[p+nbid]),na.rm=TRUE);maxval=max(cbind(x[p+nbid],Xn[p+nbid]),na.rm=TRUE)
 		  	plot( x$injectionOrder, x[,p+nbid],col=x$batch,ylab=labion,ylim=c(minval,maxval),main=paste("avant correction CV pools=",round(cv[p,1],2)))
               points(x$injectionOrder[indpool],x[indpool,p+nbid],col="maroon",pch=".",cex=2)
 		  	plot(Xn$injectionOrder,Xn[,p+nbid],col=x$batch,ylab="",ylim=c(minval,maxval),main=paste("apres correction CV pools=",round(cv[p,2],2)))
@@ -338,15 +358,13 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
 		  	suppressWarnings(plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs apres"))
 		}
 	}
-  ### Replacement of post correction negative values by 0
+  ### Replacement of post correction negative values by chosen value
 	Xnn=Xn
-	valNulle=0
 	for (i in c((nbid+1):dim(Xn)[2])) {
 	  cneg=which(Xn[[i]]<0)
-	  Xnn[[i]]=replace(Xn[[i]],cneg,valNulle)
+	  Xnn[[i]]=replace(Xn[[i]],cneg,as.numeric(valNull))
 	}
   Xn=Xnn
-  write.table(Xn,file=outfic,sep="\t",row.names=F,quote=F)
 
 	if (detail=="reg" || detail=="plot" || detail=="no") {
 		if (nbi > 3) {
@@ -381,8 +399,9 @@ norm_QCpool <- function (x, nbid, outfic, outlog, fact, metaion, detail="no", No
 acplight <- function(ids, scaling="uv", indiv=FALSE,indcol=NULL) {
 	suppressPackageStartupMessages(library(ade4))
 	suppressPackageStartupMessages(library(pcaMethods))
-  # fait une ACP sur ids sachant que la colonne 1 contient l'identificateur d'individu
-  # la colonne 2:nf contient les facteurs definissant la couleur des individus
+  # Make a PCA and plot scores and loadings.
+  # First column must contain samples' identifiers.
+  # Columns 2 to 4 contain factors to colour the plots. 
   for (i in 1:3) {
     idss=ids[which(ids[,i+1]!="NA"),]
     idss=data.frame(idss[idss[,i+1]!="",])
@@ -390,12 +409,15 @@ acplight <- function(ids, scaling="uv", indiv=FALSE,indcol=NULL) {
     idsample=as.character(idss[[1]])
     colour=1:length(levels(classe))
     ions=as.matrix(idss[,5:dim(idss)[2]])
-    # choix du scaling : "uv","none","pareto"
+	# Removing ions containing NA (not compatible with standard PCA)
+	ions=t(na.omit(t(ions)))
+	if(i==1){if(ncol(ions)!=(ncol(idss)-4)){cat("Note:",(ncol(idss)-4)-ncol(ions),"ions were ignored for PCA display due to NA in intensities.\n")}}
+    # Scaling choice: "uv","none","pareto"
     object=suppressWarnings(prep(ions, scale=scaling, center=TRUE))
-	if(i==1){if(length(which(apply(ions,2,var)==0))>0){cat("Warning : there are",length(which(apply(ions,2,var)==0)),"constant ions.\n")}}
+	if(i==1){if(length(which(apply(ions,2,var)==0))>0){cat("Warning: there are",length(which(apply(ions,2,var)==0)),"constant ions.\n")}}
     # ALGO: nipals,svdImpute, Bayesian, svd, probalistic=F
     result <- pca(object, center=F, method="svd", nPcs=2)
-    # ADE4 : representation des ellipsoides des individus de chaque classe
+    # ADE4 : to plot samples' ellipsoid for each class
     s.class(result@scores, classe, cpoint = 1,xax=1,yax=2,col=colour,sub=sprintf("Scores - PCs %sx%s",1,2), possub="bottomright")
     #s.label(result@loadings,label = ions, cpoint = 0, clabel=0.4, xax=1,yax=2,sub="Loadings",possub="bottomright")
     if(i==1){resulti <- result}

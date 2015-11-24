@@ -29,10 +29,11 @@
 				#else:
 					span "${span_condition.span}"
 				#end if
+				valnull "${span_condition.valnull}"
 				ref_factor "${span_condition.ref_factor}"
 				detail "${span_condition.detail}"
 		#end if
-		dataMatrix_out "$dataMatrix_out" variable_for_simca "$combinedResults" variableMetadata_out "$variableMetadata_out"
+		dataMatrix_out "$dataMatrix_out" variableMetadata_out "$variableMetadata_out"
 		graph_output "$graph_output"  rdata_output "$rdata_output"
 	</command>
 	<inputs>
@@ -49,6 +50,10 @@
 				<option value="all_loess_sample">all loess sample</option>
 			</param>
 			<when value="linear">
+				<param name="valnull" label="Null values" type="select" display="radio" help="What to do of generated negative or infinite values">
+					<option value="0">consider it as a null intensity</option>
+					<option value="NA">consider it as a missing value</option>
+				</param>
 				<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor); if none, leave 'batch'" />
 				<param name="detail" label="Level of details for plots " type="select" help="Amount of plots in the pdf file output. See Help section for more details.">
 					<option value="no">basic</option>
@@ -58,6 +63,10 @@
 			</when>
 			<when value="lowess">
 				<param name="span" type="float" value="0.85" label="span" help="it is a advanced option. Must be less than or equal to 1"/>
+				<param name="valnull" label="Null values" type="select" display="radio" help="What to do of generated negative or infinite values">
+					<option value="0">consider it as a null intensity</option>
+					<option value="NA">consider it as a missing value</option>
+				</param>
 				<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor); if none, leave 'batch'" />
 				<param name="detail" label="Level of details for plots " type="select" help="Amount of plots in the pdf file output. See Help section for more details.">
 					<option value="no">basic</option>
@@ -67,6 +76,10 @@
 			</when>
 			<when value="loess">
 				<param name="span" type="float" value="1" label="span" help="it is a advanced option. Must be strictly greater than 0"/>
+				<param name="valnull" label="Null values" type="select" display="radio" help="What to do of generated negative or infinite values">
+					<option value="0">consider it as a null intensity</option>
+					<option value="NA">consider it as a missing value</option>
+				</param>
 				<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor); if none, leave 'batch'" />
 				<param name="detail" label="Level of details for plots " type="select" help="Amount of plots in the pdf file output. See Help section for more details.">
 					<option value="no">basic</option>
@@ -84,7 +97,6 @@
 	</inputs>
 	
 	<outputs>
-		<data name="combinedResults" label="${tool.name}_${span_condition.method}_combined_results" format="tabular"/>
 		<data name="dataMatrix_out" label="${tool.name}_${span_condition.method}_${dataMatrix.name}" format="tabular"/>
 		<data name="variableMetadata_out" label="${tool.name}_${span_condition.method}_${variableMetadata.name}" format="tabular"/>
 		<data name="graph_output" label="${tool.name}_${span_condition.method}_graph" format="pdf"/>
@@ -204,10 +216,19 @@ Span
 	| (the higher the smoother; higher values are prefered to avoid overfitting; Cleveland et al, 1997).
 	|
 
+Null values
+	| available for regression model *linear*, *lowess* and *loess*
+	| Controls what is done regarding negative or infinite values that can be generated during regression estimation. 
+	| *consider it as a missing value* will switch concerned intensities to NA;
+	| this option implies that concerned ions will not be considered in PCA display. 
+	| *consider it as a null intensity* will switch concerned intensities to 0 for lo(w)ess
+	| or correct them by the batch mean instead of regression estimate for linear. 
+	| 
+
 Factor of interest
 	| available for regression model *linear*, *lowess* and *loess*
 	| Name of the factor (column header) in Sample metadata file that will be used as a categorical variable for plots and PCA.
-	| (often a biological factor ; if none, leave “batch”)
+	| (often a biological factor ; if none, leave "batch")
 	| This factor does not affect correction calculation.
 	| 
 
@@ -244,11 +265,6 @@ Batch_correction_$method_dataMatrix.tabular
 	| Same formatting as Data Matrix file; contains corrected intensities
 	|
 
-Batch_correction_$method_combined_results.tabular
-	| tsv output (tabulated)
-	| Suitable format for use by SIMCA
-	| Same formatting as Sample metadata file, concatenated with the transposed Data Matrix file of corrected intensities
-	|
 	
 ---------------------------------------------------
 
