@@ -53,6 +53,7 @@
 				<param name="valnull" label="Null values" type="select" display="radio" help="What to do of generated negative or infinite values">
 					<option value="0">consider it as a null intensity</option>
 					<option value="NA">consider it as a missing value</option>
+				</param>
 				<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor); if none, leave 'batch'" />
 				<param name="detail" label="Level of details for plots " type="select" help="Amount of plots in the pdf file output. See Help section for more details.">
 					<option value="no">basic</option>
@@ -65,6 +66,7 @@
 				<param name="valnull" label="Null values" type="select" display="radio" help="What to do of generated negative or infinite values">
 					<option value="0">consider it as a null intensity</option>
 					<option value="NA">consider it as a missing value</option>
+				</param>
 				<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor); if none, leave 'batch'" />
 				<param name="detail" label="Level of details for plots " type="select" help="Amount of plots in the pdf file output. See Help section for more details.">
 					<option value="no">basic</option>
@@ -77,6 +79,7 @@
 				<param name="valnull" label="Null values" type="select" display="radio" help="What to do of generated negative or infinite values">
 					<option value="0">consider it as a null intensity</option>
 					<option value="NA">consider it as a missing value</option>
+				</param>
 				<param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="column name of factor of interest (often a biological factor); if none, leave 'batch'" />
 				<param name="detail" label="Level of details for plots " type="select" help="Amount of plots in the pdf file output. See Help section for more details.">
 					<option value="no">basic</option>
@@ -225,7 +228,7 @@ Null values
 Factor of interest
 	| available for regression model *linear*, *lowess* and *loess*
 	| Name of the factor (column header) in Sample metadata file that will be used as a categorical variable for plots and PCA.
-	| (often a biological factor ; if none, leave “batch”)
+	| (often a biological factor ; if none, leave "batch")
 	| This factor does not affect correction calculation.
 	| 
 
