@@ -23,7 +23,7 @@ loessF <- function(datVn, qcaVi, preVi, spnN, vrbL=FALSE) {
 
 } ## loessF
 
-plotBatchF <- function(datMN, samDF.arg) {
+plotBatchF <- function(datMN, samDF.arg, spnN.arg) {
 
     maiC <- switch(gsub("MN", "", deparse(substitute(datMN))),
                    raw = "Raw",
@@ -92,14 +92,13 @@ plotBatchF <- function(datMN, samDF.arg) {
                               grep("pool", samDF.arg[, "sampleType"]))
         batSamVi <- intersect(batSeqVi,
                               grep("sample", samDF.arg[, "sampleType"]))
-
+        if(length(batPooVi))
+            lines(batSeqVi,
+                  loessF(sumVn, batPooVi, batSeqVi, spnN=spnN.arg),
+                  col = colVc["pool"])
         lines(batSeqVi,
-              loessF(sumVn, batSamVi, batSeqVi, spnN=spnN),
+              loessF(sumVn, batSamVi, batSeqVi, spnN=spnN.arg),
               col = colVc["sample"])
-
-        lines(batSeqVi,
-              loessF(sumVn, batPooVi, batSeqVi, spnN=spnN),
-              col = colVc["pool"])
 
     }
 
@@ -110,9 +109,9 @@ plotBatchF <- function(datMN, samDF.arg) {
 
     pcaMN <- datMN
 
-    pcaLs <- ropF(pcaMN, ncpN=4, ploVc="none", vrbC="none")
-    tMN <- pcaLs[["tMN"]]
-    vRelVn <- pcaLs[["mdlDF"]][, "R2X"]
+    pcaLs <- opls(pcaMN, predI = 4, printL = FALSE, plotL = FALSE)
+    tMN <- pcaLs[["scoreMN"]]
+    vRelVn <- pcaLs[["modelDF"]][, "R2X"]
 
     n <- nrow(tMN)
     hotN <- 2 * (n - 1) * (n^2 - 1) / (n^2 * (n - 2))
@@ -208,7 +207,8 @@ plotBatchF <- function(datMN, samDF.arg) {
 
 shiftBatchCorrectF <- function(rawMN.arg,
                                samDF.arg,
-                               refC.arg) {
+                               refC.arg,
+                               spnN.arg) {
 
     cat("\nReference observations are: ", refC.arg, "\n")
 
@@ -268,7 +268,7 @@ shiftBatchCorrectF <- function(rawMN.arg,
 
         batLoeMN <- apply(batRawMN,
                           2,
-                          function(rawVn) loessF(rawVn, batRefVi, batAllVi, spnN=spnN, vrbL=TRUE))
+                          function(rawVn) loessF(rawVn, batRefVi, batAllVi, spnN=spnN.arg, vrbL=TRUE))
 
         ## normalization
 

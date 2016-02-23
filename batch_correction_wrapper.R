@@ -38,6 +38,7 @@ iddata=read.table(args$dataMatrix,header=T,sep='\t',check.names=FALSE)
 
 ### Table match check 
 table.check <- match2(iddata,idsample,"sample")
+if(length(table.check)>1){check.err(table.check)}
 
 ### StockID
 samp.id <- stockID(iddata,idsample,"sample")
@@ -51,7 +52,7 @@ for(mandcol in c("sampleType","injectionOrder","batch")){
                     "Note: table must include this exact column name (it is case-sensitive).\n")
   }
 }
-if(length(mand.check)>1){check.err(paste(table.check,mand.check,sep=""))}
+if(length(mand.check)>1){check.err(mand.check)}
 
 ### Formating
 idsample[[1]]=make.names(idsample[[1]])
