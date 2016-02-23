@@ -159,14 +159,6 @@ write.table(varDF,
             row.names = FALSE,
             sep = "\t")
 
-simDF <- cbind.data.frame(samDF, as.data.frame(datMN)) ## for compatibility
-simDF <- cbind.data.frame(names = rownames(simDF),
-                          simDF)
-write.table(simDF,
-            file = argVc["variable_for_simca"],
-            quote = FALSE,
-            row.names = FALSE,
-            sep = "\t")
 
 res <- list(dataMatrix_raw = rawMN,
             dataMatrix_normalized = nrmMN,
