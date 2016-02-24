@@ -52,7 +52,12 @@ for(mandcol in c("sampleType","injectionOrder","batch")){
                     "Note: table must include this exact column name (it is case-sensitive).\n")
   }
 }
-if(length(mand.check)>1){check.err(mand.check)}
+if(length(mand.check)>1){
+  mand.check <- c(mand.check,"\nFor more information, see the help section or:",
+                  "\n http://workflow4metabolomics.org/sites/",
+                  "workflow4metabolomics.org/files/files/MS_data_processing.pdf\n")
+  check.err(mand.check)
+}
 
 ### Formating
 idsample[[1]]=make.names(idsample[[1]])
