@@ -24,6 +24,7 @@
 # Version 2.20 acplight function added from previous toolBox.R [# Version 1.01 "NA"-coding possibility added in acplight function]
 # Version 2.30 addition of suppressWarnings() for known and controlled warnings ; suppression of one useless "cat" message ; change in Rdata names ; 'batch(es)' in cat
 # Version 2.90 change in handling of generated negative and Inf values
+# Version 2.91 Plot improvement
 
 ok_norm=function(qcp,qci,spl,spi,method) {
   # Function used for one ion within one batch to determine whether or not batch correction is possible
@@ -76,15 +77,15 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
     nbi=lastIon-nbid # Number of ions = total number of columns - number of identifying columns
     nbb=length(levels(x$batch)) # Number of batch = number of levels of "batch" comlumn (factor)
     nbs=length(x$sampleType[x$sampleType=="sample"])# Number of samples = number of rows with "sample" value in sampleType
-    pdf(outfic,width=27,height=20)
+    pdf(outfic,width=27,height=7*ceiling((nbb+2)/3))
     cat(nbi," ions ",nbb," batch(es) \n")
-    cv=data.frame(matrix(0,nrow=nbi,ncol=2))# initialisation de la dataset qui contiendra les CV avant et apres correction
+    cv=data.frame(matrix(0,nrow=nbi,ncol=2))# initialisation de la dataset qui contiendra les CV
     pre_bilan=matrix(0,nrow=nbi,ncol=3*nbb) # dataset of ok_norm function results	    
     for (p in 1:nbi) {# for each ion
-        par (mfrow=c(3,nbb),ask=F,cex=1.2)
+        par (mfrow=c(ceiling((nbb+2)/3),3),ask=F,cex=1.2)
         labion=dimnames(x)[[2]][p+nbid]
         indpool=which(x$sampleType=="pool") # QCpools subscripts in x 
-        pools1=x[indpool,p+nbid]; 
+        pools1=x[indpool,p+nbid]; cv[p,1]=sd(pools1)/mean(pools1)# CV before correction
         for (b in 1:nbb) {# for each batch...
             xb=data.frame(x[(x$batch==levels(x$batch)[b]),c(indtypsamp,indinject,p+nbid)])
             indpb = which(xb$sampleType=="pool")# QCpools subscripts in the current batch
@@ -106,18 +107,20 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
             liminf=min(xb[indbt,3]);limsup=max(xb[indbt,3])
             plot(xb[indsp,2],xb[indsp,3],pch=16, main=paste(labion,"batch ",b),ylab="intensity",xlab="injection order",ylim=c(liminf,limsup))
             points(xb[indpb,2], xb[indpb,3],pch=5)
-            points(cbind(resloess$x,resloess$fitted)[order(resloess$x),],type="l",col="orange")
-            points(cbind(resloessSample$x,resloessSample$fitted)[order(resloessSample$x),],type="l",col="green",lty=2)
-            points(reslowess,type="l",col="red"); points(reslowessSample,type="l",col="cyan",lty=2)
+            points(cbind(resloess$x,resloess$fitted)[order(resloess$x),],type="l",col="green3")
+            points(cbind(resloessSample$x,resloessSample$fitted)[order(resloessSample$x),],type="l",col="green3",lty=2)
+            points(reslowess,type="l",col="red"); points(reslowessSample,type="l",col="red",lty=2)
             abline(lsfit(xb[indpb,2],xb[indpb,3]),col="blue")
-            abline(lsfit(xb[indsp,2],xb[indsp,3]),lty=2)
-            legend("topright",c("pools","samples"),lty=c(1,2),bty="n")
+            abline(lsfit(xb[indsp,2],xb[indsp,3]),lty=2,col="blue")
+            legend("topleft",c("pools","samples"),lty=c(1,2),bty="n")
+            legend("topright",c("linear","lowess","loess"),lty=1,col=c("blue","red","green3"),bty="n")
           }
         }
 # series de plot avant et apres correction
 minval=min(x[p+nbid]);maxval=max(x[p+nbid])
-plot( x$injectionOrder, x[,p+nbid],col=x$batch,ylim=c(minval,maxval),ylab=labion,main=paste("avant correction CV pools=",round(cv[p,1],2)))
-suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs avant"))
+plot( x$injectionOrder, x[,p+nbid],col=x$batch,ylim=c(minval,maxval),ylab=labion,
+      main=paste0("before correction (CV for pools = ",round(cv[p,1],2),")"))
+suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect before correction"))
     }
 dev.off()
 pre_bilan=data.frame(pre_bilan)
@@ -315,11 +318,11 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
 	if (detail!="reg" && detail!="plot" && detail!="no") {detail="no"}
 	pdf(outlog,width=27,height=20)
 	cat(nbi," ions ",nbb," batch(es) \n")
-	if (detail=="plot") {par (mfrow=c(4,4),ask=F,cex=1.5)}
+	if (detail=="plot") {if(nbb<6){par(mfrow=c(3,3),ask=F,cex=1.5)}else{par(mfrow=c(4,4),ask=F,cex=1.5)}}
   res.ind <- matrix(NA,ncol=nbb,nrow=nbi,dimnames=list(dimnames(x)[[2]][-c(1:nbid)],paste("norm.b",1:nbb,sep="")))
 	for (p in 1:nbi) {# for each ion
 	  labion=dimnames(x)[[2]][p+nbid]
-        if (detail == "reg") {par (mfrow=c(4,4),ask=F,cex=1.5)}
+        if (detail == "reg") {if(nbb<6){par(mfrow=c(3,3),ask=F,cex=1.5)}else{par(mfrow=c(4,4),ask=F,cex=1.5)}}
 		indpool=which(x$sampleType=="pool")# QCpools subscripts in all batches
 		pools1=x[indpool,p+nbid]; cv[p,1]=sd(pools1)/mean(pools1)# CV before correction
 		for (b in 1:nbb) {# for every batch
@@ -350,12 +353,14 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
 		if (detail=="reg" || detail=="plot" ) {
 		  	# plot before and after correction
 		  	minval=min(cbind(x[p+nbid],Xn[p+nbid]),na.rm=TRUE);maxval=max(cbind(x[p+nbid],Xn[p+nbid]),na.rm=TRUE)
-		  	plot( x$injectionOrder, x[,p+nbid],col=x$batch,ylab=labion,ylim=c(minval,maxval),main=paste("avant correction CV pools=",round(cv[p,1],2)))
+		  	plot( x$injectionOrder, x[,p+nbid],col=x$batch,ylab=labion,ylim=c(minval,maxval),
+              main=paste0("before correction (CV for pools = ",round(cv[p,1],2),")"))
               points(x$injectionOrder[indpool],x[indpool,p+nbid],col="maroon",pch=".",cex=2)
-		  	plot(Xn$injectionOrder,Xn[,p+nbid],col=x$batch,ylab="",ylim=c(minval,maxval),main=paste("apres correction CV pools=",round(cv[p,2],2)))
+		  	plot(Xn$injectionOrder,Xn[,p+nbid],col=x$batch,ylab="",ylim=c(minval,maxval),
+             main=paste0("after correction (CV for pools = ",round(cv[p,2],2),")"))
               points(Xn$injectionOrder[indpool],Xn[indpool,p+nbid],col="maroon",pch=".",cex=2)
-		  	suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs avant"))
-		  	suppressWarnings(plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="effet sur facteurs apres"))
+		  	suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect before correction"))
+		  	suppressWarnings(plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect after correction"))
 		}
 	}
   ### Replacement of post correction negative values by chosen value
@@ -376,8 +381,8 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
 			par(mfrow=c(1,2),ask=F,cex=1.2) # Before/after boxplot
 			cvplot=cv[!is.na(cv[[1]])&!is.na(cv[[2]]),]
       if(nrow(cvplot)>0){
-			  boxplot(cvplot[[1]],ylim=c(min(cvplot),max(cvplot)),main="CV avant")
-        boxplot(cvplot[[2]],ylim=c(min(cvplot),max(cvplot)),main="CV apres")
+			  boxplot(cvplot[[1]],ylim=c(min(cvplot),max(cvplot)),main="CV before correction")
+        boxplot(cvplot[[2]],ylim=c(min(cvplot),max(cvplot)),main="CV after correction")
       }
       dev.off()
 		}
@@ -424,7 +429,8 @@ acplight <- function(ids, scaling="uv", indiv=FALSE,indcol=NULL) {
   }
   if(indiv) {
     colour <- rep("darkblue",length(resulti@loadings)) ; if(!is.null(indcol)) {colour[-c(indcol)] <- "red"}
-    plot(resulti@loadings,col=colour,main="Loadings",xaxt="n",yaxt="n",pch=20)
+    plot(resulti@loadings,col=colour,main="Loadings",xaxt="n",yaxt="n",pch=20,
+         xlab=bquote(PC1-R^2==.(resulti@R2[1])),ylab=bquote(PC2 - R^2 == .(resulti@R2[2])))
     abline(h=0,v=0)}
 }
 
