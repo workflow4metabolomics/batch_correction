@@ -12,6 +12,7 @@
 # Version 2.1: 09-01-2015 modification in Error message of sample matching                     #
 # Version 2.2: 16-03-2015 inclusion of miniTools' functions for special characters             #
 # Version 2.90: 18-08-2015 new parameter valnull                                               #
+# Version 2.91: 25-08-2016 error message improvment                                            #
 #                                                                                              #
 #                                                                                              #
 # Input files: dataMatrix.txt ; sampleMetadata.txt ; variableMetadata.txt (for DBC)            #
