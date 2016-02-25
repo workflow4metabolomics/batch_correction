@@ -12,6 +12,7 @@
 # Version 2.1: 09-01-2015 modification in Error message of sample matching                     #
 # Version 2.2: 16-03-2015 inclusion of miniTools' functions for special characters             #
 # Version 2.90: 18-08-2015 new parameter valnull                                               #
+# Version 2.91: 25-08-2016 error message improvment                                            #
 #                                                                                              #
 #                                                                                              #
 # Input files: dataMatrix.txt ; sampleMetadata.txt ; variableMetadata.txt (for DBC)            #
@@ -52,7 +53,12 @@ for(mandcol in c("sampleType","injectionOrder","batch")){
                     "Note: table must include this exact column name (it is case-sensitive).\n")
   }
 }
-if(length(mand.check)>1){check.err(mand.check)}
+if(length(mand.check)>1){
+  mand.check <- c(mand.check,"\nFor more information, see the help section or:",
+                  "\n http://workflow4metabolomics.org/sites/",
+                  "workflow4metabolomics.org/files/files/MS_data_processing.pdf\n")
+  check.err(mand.check)
+}
 
 ### Formating
 idsample[[1]]=make.names(idsample[[1]])
