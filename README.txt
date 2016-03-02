@@ -1,5 +1,5 @@
 ## ****** Determine_bc + batch_correction environnemnt : ****** ##
-# version December 2014 M Landi / F Giacomoni / M Petera
+# version January 2016 M Landi / F Giacomoni / M Petera / E Thevenot
 
 ## --- PERL compilator / libraries : --- ##
 NA
@@ -7,7 +7,7 @@ NA
 
 ## --- R bin and Packages : --- ##
 $ R --version
-R version 3.0.1 (2013-05-16) -- "Good Sport"
+R version 3.2.3 (2015-12-10) -- "Wooden Christmas-Tree"
 Platform: x86_64-redhat-linux-gnu (64-bit)
 
 The dependent libs are :
@@ -16,6 +16,7 @@ The dependent libs are :
 
 >source("http://www.bioconductor.org/biocLite.R")
 >biocLite("pcaMethods")
+>biocLite("ropls")
 -- 
 
 ## --- Binary dependencies --- ##
@@ -38,4 +39,11 @@ No data set ! waiting for galaxy pages
 
 ## --- ??? COMMENTS ??? --- ##
 !WARNING! : Two tools in the same directory !
+--
+
+## --- Changelog/News --- ##
+Version 2.0.3:
+- Update: plot layout improvement
+- Update: suppression of combined table for simca
+- Improvement: addition of a new parameter "Null values"
 --
