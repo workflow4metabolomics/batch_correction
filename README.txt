@@ -40,3 +40,10 @@ No data set ! waiting for galaxy pages
 ## --- ??? COMMENTS ??? --- ##
 !WARNING! : Two tools in the same directory !
 --
+
+## --- Changelog/News --- ##
+Version 2.0.3:
+- Update: plot layout improvement
+- Update: suppression of combined table for simca
+- Improvement: addition of a new parameter "Null values"
+--
