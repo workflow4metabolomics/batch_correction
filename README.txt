@@ -1,5 +1,5 @@
 ## ****** Determine_bc + batch_correction environnemnt : ****** ##
-# version January 2016 M Landi / F Giacomoni / M Petera / E Thevenot
+# version March 2016 M Landi / F Giacomoni / M Petera / E Thevenot
 
 ## --- PERL compilator / libraries : --- ##
 NA
