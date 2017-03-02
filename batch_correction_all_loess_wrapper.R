@@ -42,7 +42,7 @@ options(stringsAsFactors = FALSE)
 ## libraries
 ##----------
 
-library(ropls)
+suppressMessages(library(ropls))
 
 ## constants
 ##----------
@@ -92,6 +92,21 @@ if(refC == "pool" &&
    !any("pool" %in% samDF[, "sampleType"]))
     stop("No 'pool' found in the 'sampleType' column; use the samples as normalization reference instead")
 
+refMN <- rawMN[samDF[, "sampleType"] == refC, ]
+refNasZerVl <- apply(refMN, 2,
+                     function(refVn)
+                     all(sapply(refVn,
+                                function(refN) {is.na(refN) || refN == 0})))
+
+if(sum(refNasZerVl)) {
+
+    refNasZerVi <- which(refNasZerVl)
+    cat("The following variables have 'NA' or 0 values in all reference samples; they will be removed from the data:\n", sep = "")
+    print(refNasZerVi)
+    rawMN <- rawMN[, !refNasZerVl, drop = FALSE]
+    varDF <- varDF[!refNasZerVl, , drop = FALSE]
+
+}
 
 ##------------------------------
 ## Computation
