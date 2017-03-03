@@ -1,10 +1,7 @@
-loessF <- function(datVn, qcaVi, preVi, spnN, vrbL=FALSE) {
+loessF <- function(datVn, qcaVi, preVi, spnN) {
 
     if(length(qcaVi) < 5) {
-
-        if(vrbL)
-            cat("\nWarning: less than 5 '", refC, "'; linear regression will be performed instead of loess regression for this batch\n", sep="")
-
+    
         return(predict(lm(datVn[qcaVi] ~ qcaVi),
                        newdata = data.frame(qcaVi = preVi)))
 
@@ -18,8 +15,7 @@ loessF <- function(datVn, qcaVi, preVi, spnN, vrbL=FALSE) {
     }
 
     ## Note:
-    ##  1) the surface = 'direct' argument allows extrapolation
-    ##  2) the span argument is set to 1
+    ##  the surface = 'direct' argument allows extrapolation
 
 } ## loessF
 
@@ -109,9 +105,14 @@ plotBatchF <- function(datMN, samDF.arg, spnN.arg) {
 
     pcaMN <- datMN
 
-    pcaLs <- opls(pcaMN, predI = 4, printL = FALSE, plotL = FALSE)
-    tMN <- pcaLs[["scoreMN"]]
-    vRelVn <- pcaLs[["modelDF"]][, "R2X"]
+    if(any(is.na(pcaMN))) {
+        minN <- min(pcaMN, na.rm = TRUE)
+        pcaMN[is.na(pcaMN)] <- minN
+    }
+
+    pcaLs <- opls(pcaMN, predI = 4, algoC = "svd", printL = FALSE, plotL = FALSE)
+    tMN <- getScoreMN(pcaLs)
+    vRelVn <- pcaLs@modelDF[, "R2X"]
 
     n <- nrow(tMN)
     hotN <- 2 * (n - 1) * (n^2 - 1) / (n^2 * (n - 2))
@@ -264,11 +265,14 @@ shiftBatchCorrectF <- function(rawMN.arg,
 
         batRefVi <- grep(refC.arg, batSamDF[, "sampleType"])
 
+        if(length(batRefVi) < 5)
+            cat("\nWarning: less than 5 '", refC.arg, "'; linear regression will be performed instead of loess regression for this batch\n", sep="")
+
         ## prediction of the loess fit
 
         batLoeMN <- apply(batRawMN,
                           2,
-                          function(rawVn) loessF(rawVn, batRefVi, batAllVi, spnN=spnN.arg, vrbL=TRUE))
+                          function(rawVn) loessF(rawVn, batRefVi, batAllVi, spnN=spnN.arg))
 
         ## normalization
 
