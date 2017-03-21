@@ -30,7 +30,7 @@ source_local <- function(...){
 	for(i in 1:length(list(...))){source(paste(base_dir, list(...)[[i]], sep="/"))}
 }
 #Import the different functions
-source_local("Normalisation_QCpool.r","RcheckLibrary.R","miniTools.R")
+source_local("Normalisation_QCpool.r","easyrlibrary-lib/RcheckLibrary.R","easyrlibrary-lib/miniTools.R")
 
 
 ## Reading of input files
@@ -56,7 +56,7 @@ for(mandcol in c("sampleType","injectionOrder","batch")){
 if(length(mand.check)>1){
   mand.check <- c(mand.check,"\nFor more information, see the help section or:",
                   "\n http://workflow4metabolomics.org/sites/",
-                  "workflow4metabolomics.org/files/files/MS_data_processing.pdf\n")
+                  "workflow4metabolomics.org/files/files/w4e-2016-data_processing.pdf\n")
   check.err(mand.check)
 }
 
