@@ -1,41 +1,53 @@
-<tool id="Batch_correction" name="Batch_correction" version="2.0.3">
-	<description>Corrects intensities for signal drift and batch-effects</description>
-	
-	<command interpreter="Rscript">
-		#if str($span_condition.method) == 'all_loess_pool':
-			batch_correction_all_loess_wrapper.R
-				dataMatrix "$dataMatrix"
-				sampleMetadata "$sampleMetadata"
-				variableMetadata "$variableMetadata"
-				method "all_loess_pool"
-				span "${span_condition.span}"
-				
-		#elif str($span_condition.method) == 'all_loess_sample':
-			batch_correction_all_loess_wrapper.R
-				dataMatrix "$dataMatrix"
-				sampleMetadata "$sampleMetadata"
-				variableMetadata "$variableMetadata"
-				method "all_loess_sample"
-				span "${span_condition.span}"
-		#else:
-			batch_correction_wrapper.R
-				analyse "batch_correction"
-				dataMatrix "$dataMatrix"
-				sampleMetadata "$sampleMetadata"
-				variableMetadata "$variableMetadata"
-				method "${span_condition.method}"
-				#if str($span_condition.method) == 'linear':
-					span "none"
-				#else:
-					span "${span_condition.span}"
-				#end if
-				valnull "${span_condition.valnull}"
-				ref_factor "${span_condition.ref_factor}"
-				detail "${span_condition.detail}"
-		#end if
-		dataMatrix_out "$dataMatrix_out" variableMetadata_out "$variableMetadata_out"
-		graph_output "$graph_output"  rdata_output "$rdata_output"
-	</command>
+<tool id="Batch_correction" name="Batch_correction" version="2.0.4">
+  <description>Corrects intensities for signal drift and batch-effects</description>
+
+  <requirements>
+    <requirement type="package">r-batch</requirement>
+    <requirement type="package">r-ade4</requirement>
+    <requirement type="package">bioconductor-pcamethods</requirement>
+    <requirement type="package">bioconductor-ropls</requirement>
+  </requirements>
+
+  <stdio>
+    <exit_code range="1:" level="fatal" />
+  </stdio>
+  
+  <command><![CDATA[
+    #if str($span_condition.method) == 'all_loess_pool':
+        Rscript $__tool_directory__/batch_correction_all_loess_wrapper.R
+        dataMatrix "$dataMatrix"
+        sampleMetadata "$sampleMetadata"
+        variableMetadata "$variableMetadata"
+        method "all_loess_pool"
+        span "${span_condition.span}"
+    
+    #elif str($span_condition.method) == 'all_loess_sample':
+        Rscript $__tool_directory__/batch_correction_all_loess_wrapper.R
+        dataMatrix "$dataMatrix"
+        sampleMetadata "$sampleMetadata"
+        variableMetadata "$variableMetadata"
+        method "all_loess_sample"
+        span "${span_condition.span}"
+    #else:
+        Rscript $__tool_directory__/batch_correction_wrapper.R
+        analyse "batch_correction"
+        dataMatrix "$dataMatrix"
+        sampleMetadata "$sampleMetadata"
+        variableMetadata "$variableMetadata"
+        method "${span_condition.method}"
+        #if str($span_condition.method) == 'linear':
+            span "none"
+        #else:
+            span "${span_condition.span}"
+        #end if
+	valnull "${span_condition.valnull}"
+        ref_factor "${span_condition.ref_factor}"
+        detail "${span_condition.detail}"
+    #end if
+    dataMatrix_out "$dataMatrix_out" variableMetadata_out "$variableMetadata_out"
+    graph_output "$graph_output"  rdata_output "$rdata_output"
+  ]]></command>
+
 	<inputs>
 		<param name="dataMatrix" label="Data Matrix file " format="tabular" type="data" />
 		<param name="sampleMetadata" label="Sample metadata file " format="tabular" type="data" help="must contain at least the three following columns: 'batch' + 'injectionOrder' + 'sampleType'"/>
@@ -102,10 +114,18 @@
 		<data name="graph_output" label="${tool.name}_${span_condition.method}_graph" format="pdf"/>
 		<data name="rdata_output" label="${tool.name}_${span_condition.method}_rdata" format="rdata"/>
 	</outputs>
-		
-	<stdio>
-		<exit_code range="1:" level="fatal" />
-	</stdio>	
+
+  <tests>
+    <test>
+      <param name="dataMatrix" value="input-batchcorrection-dataMatrix.tsv"/>
+      <param name="sampleMetadata" value="input-batchcorrection-sampleMetadata.tsv"/>
+      <param name="variableMetadata" value="input-batchcorrection-variableMetadata.tsv"/>
+      <param name="method" value="all_loess_pool"/>
+      <param name="span" value="1"/>
+      <output name="dataMatrix_out" file="output-batchcorrection-dataMatrix.tsv"/>
+    </test>
+  </tests>
+	
 	
 	<help>
 
@@ -113,18 +133,10 @@
 
 **Authors**
   | Jean-Francois Martin - PF MetaToul-AXIOM ; INRA ; MetaboHUB (for original version of this tool and overall development of the R script)
-
-.. class:: infomark
-
-**Contributors**
   | Melanie Petera - PFEM ; INRA ; MetaboHUB (for R wrapper and R script improvement)
-  | Etienne Thevenot - LIST/LADIS ; CEA ; MetaboHUB (for R script and wrapper concerning "all loess pool" and "all loess sample" methods)
-
-.. class:: infomark
-
-**Wrapping**
   | Marion Landi - FLAME ; PFEM ; INRA ; MetaboHUB (for xml interface and R wrapper)
   | Franck Giacomoni - PFEM ; INRA ; MetaboHUB (for xml interface and R wrapper)
+  | Etienne Thevenot - LIST/LADIS ; CEA ; MetaboHUB (for R script and wrapper regarding "all loess pool" and "all loess sample" methods)
 
 ---------------------------------------------------
 
@@ -138,8 +150,16 @@ when using the **linear**, **lowess** or **loess** methods:
 when using the **all loess pool** or **all loess sample** method:
   | `Dunn et al (2011). Procedures for large-scale metabolic profiling of serum and plasma using gas chromatography and liquid chromatography coupled to mass spectrometry. Nature Protocols, 6:1060-1083 &lt;http://dx.doi.org/10.1038/nprot.2011.335&gt;`_
   | Cleveland et al (1997). In Statistical Models in S; Chambers JM. and Hastie TJ. Ed.; Chapman et Hall: London; pp. 309-376
-  | Thevenot et al (2014). Statistical approaches to study the physiological variability of the human urinary metabolome. 8th French Metabolomics and Fluxomics Conference, Lyon, France.
+  | Etienne A. Thevenot, Aurelie Roux, Ying Xu, Eric Ezan, and Christophe Junot (2015). Analysis of the human adult urinary metabolome variations with age, body mass index and gender by implementing a comprehensive workflow for univariate and OPLS statistical analyses. *Journal of Proteome Research*, **14**:3322-3335 (http://dx.doi.org/10.1021/acs.jproteome.5b00354).
 
+---------------------------------------------------
+
+.. class:: infomark
+
+**Tool updates**
+
+See the **NEWS** section at the bottom of this page
+  
 ---------------------------------------------------
 
 ================
@@ -275,11 +295,36 @@ Working example
 .. class:: warningmark
 
 Refer to the corresponding "W4M HowTo" page:
- | `MS data processing - Filtering and correcting data &lt;http://workflow4metabolomics.org/sites/workflow4metabolomics.org/files/files/MS_data_processing.pdf&gt;`_
+ | `MS data processing - Filters and normalisation &lt;http://workflow4metabolomics.org/sites/workflow4metabolomics.org/files/files/w4e-2016-data_processing.pdf&gt;`_
  |
  |
 
+See also the reference history:
+ | `W4M00001_Sacurine-statistics (DOI:10.15454/1.4811121736910142E12) &lt;http://dx.doi.org/10.15454/1.4811121736910142E12&gt;`_
+ |
 
+---------------------------------------------------
+
+----
+NEWS
+----
+
+CHANGES IN VERSION 2.0.4
+========================
+
+INTERNAL MODIFICATIONS  
+
+For PCA figure display only ("all_loess_" options): missing values are set to the minimum value before PCA computation is performed (with svd)
+
+Additional running and installation tests added with planemo, conda, and travis
+
+BUG FIX
+
+Variables with NA or 0 values in all reference samples are discarded before applying the **all_loess** normalization
+
+INTERNAL MODIFICATIONS
+
+Modifications of the **all_loess_wrapper** file to handle the recent **ropls** package versions (i.e. 1.3.15 and above) which use S4 classes
 
   </help>
       <!-- [RECOMMANDED] All citations associated to this tool (main citation given above and other references). Can be extracted from the history panel -->
@@ -297,15 +342,11 @@ Refer to the corresponding "W4M HowTo" page:
             publisher = {Chapman et Hall: London},
             chapter = {8}
         }</citation>
-        <citation type="bibtex">@ARTICLE{Thevenot14,
-            author = {Thevenot et al},
-            year = {2014},
-            journal = {8th French Metabolomics and Fluxomics Conference, Lyon, France},
-            title = {Statistical approaches to study the physiological variability of the human urinary metabolome},
-            institution = {8th French Metabolomics and Fluxomics Conference, Lyon, France}
-        }</citation>
+	<citation type="doi">10.1021/acs.jproteome.5b00354</citation>
     </citations>
 	
+<!--
+
 example 1:
 
 Input files
@@ -690,5 +731,5 @@ Norma_result.tabular::
 	ion05	0	0	94.2986763636364	414.218462818182	600.817868636364	578.781479727273	467.623937181818	67.7758438818182	395.130825545454	803.848495272727	468.946563181818	362.182051727273	498.740498727273	52.1508526818182	347.760990090909	726.452054090909	92.9168421818182	674.263651818182	749.552006545455	695.297890909091	374.833317363636	254.164383090909
 	ion06	2756.58450391724	2621.24237826457	3459.67039593807	2259.03570054876	3542.65272205883	2628.90920103769	3392.25066785752	3358.22588611392	2589.44599169574	3429.68592298187	2758.73531975414	2238.0970735015	2103.99860111142	3708.61347563638	1441.84619925857	1289.1587961513	1886.14854378149	3700.84095135577	2478.28485110605	1405.63064191075	3641.2951457659	2465.74273425251
 	ion07	158.052416850832	157.236695576441	193.243760535699	127.848278698451	215.622242057156	150.522965863022	187.147883253472	208.498595063134	141.360943533866	193.242902316211	163.776450823485	151.418448347397	143.406307055514	196.298993992243	90.295450550822	86.5570806388865	117.979273835979	215.548190721704	140.362352983359	84.9696956072378	203.417614300817	141.373694094272
-
+-->
 </tool>
