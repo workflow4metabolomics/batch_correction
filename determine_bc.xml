@@ -1,8 +1,18 @@
-<tool id="Determine_BC" name="Determine_batch_correction" version="2016-03-03">
+<tool id="Determine_BC" name="Determine_batch_correction" version="2.0.4">
   <description>to choose between linear, lowess and loess methods</description>
-  
-  <command interpreter="Rscript">
-    batch_correction_wrapper.R
+
+  <requirements>
+    <requirement type="package">r-batch</requirement>
+    <requirement type="package">r-ade4</requirement>
+    <requirement type="package">bioconductor-pcamethods</requirement>
+  </requirements>
+
+  <stdio>
+    <exit_code range="1:" level="fatal" />
+  </stdio>
+ 
+  <command><![CDATA[
+    Rscript $__tool_directory__/batch_correction_wrapper.R
       analyse "determine_bc"
       sampleMetadata "$sampleMetadata"
       dataMatrix "$dataMatrix"
@@ -14,7 +24,8 @@
       #end if
       out_graph_pdf "$out_graph_pdf"
       out_preNormSummary "$out_preNormSummary"
-  </command>
+  ]]></command>
+  
   <inputs>
     <param name="dataMatrix" type="data" label="Data Matrix file " help="" format="tabular" />
     <param name="sampleMetadata" type="data" label="Sample metadata file " help="must contain at least the three following columns: 'batch' + 'injectionOrder' + 'sampleType'" format="tabular" />
@@ -34,10 +45,17 @@
     <data name="out_graph_pdf" label="Determine_BC_graph" format="pdf" ></data>
     <data name="out_preNormSummary" label="Determine_BC_preNormSummary" format="tabular" ></data>
   </outputs>
-  	
-  <stdio>
-    <exit_code range="1:" level="fatal" />
-  </stdio>	
+
+  <tests>
+    <test>
+      <param name="dataMatrix" value="input-determinebc-dataMatrix.tsv"/>
+      <param name="sampleMetadata" value="input-determinebc-sampleMetadata.tsv"/>
+      <param name="ref_factor" value="batch"/>
+      <param name="option" value="hide"/>
+      <param name="span" value="none"/>
+      <output name="out_preNormSummary" file="output-determinebc-preNormSummary.txt"/>
+    </test>
+  </tests>
 	
   <help>
 
@@ -173,19 +191,20 @@ Working example
 .. class:: warningmark
 
 Refer to the corresponding "W4M HowTo" page:
- | `MS data processing - Filtering and correcting data &lt;http://workflow4metabolomics.org/sites/workflow4metabolomics.org/files/files/MS_data_processing.pdf&gt;`_
+ | `MS data processing - Filters and normalisation &lt;http://workflow4metabolomics.org/sites/workflow4metabolomics.org/files/files/w4e-2016-data_processing.pdf&gt;`_
  |
  |
 
 
+</help>
 
-  </help>
       <!-- [RECOMMANDED] All citations associated to this tool (main citation given above and other references). Can be extracted from the history panel -->
     <citations>
         <!-- [HELP] As DOI or BibTex entry -->
         <citation type="doi">10.1021/pr900499r</citation>
     </citations>
   
+<!--  
 Input files
 ===========
 
@@ -260,6 +279,6 @@ out_graph_pdf.pdf
 
 .. image:: ./static/images/metabolomics/pdf_plotsituation.png
         :width: 800
-
+-->
 
 </tool>

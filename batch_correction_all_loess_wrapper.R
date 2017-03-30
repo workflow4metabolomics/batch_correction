@@ -1,7 +1,4 @@
-## Etienne Thevenot
-## CEA, MetaboHUB Paris
-## etienne.thevenot@cea.fr
-## April 8th, 2015
+#!/usr/bin/env Rscript
 
 library(batch) ## necessary for parseCommandArgs function
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
@@ -15,8 +12,6 @@ source_local <- function(fname){
 ## Import the different functions
 source_local("batch_correction_all_loess_script.R")
 
-
-
 argVc <- unlist(args)
 
 ##  argVc["method"] is either 'all_loess_pool' or 'all_loess_sample'
@@ -24,9 +19,6 @@ argVc <- unlist(args)
 ##  all variables are treated with loess
 ##  the reference observations for loess are either 'pool'
 ## ('all_loess_pool') or 'sample' ('all_loess_sample')
-
-
-#### Start_of_tested_code <- function() {}
 
 
 ##------------------------------
@@ -43,6 +35,9 @@ options(stringsAsFactors = FALSE)
 ##----------
 
 suppressMessages(library(ropls))
+
+if(packageVersion("ropls") < "1.4.0")
+    stop("Please use 'ropls' versions of 1.4.0 and above")
 
 ## constants
 ##----------
@@ -82,9 +77,6 @@ spnN <- as.numeric(argVc["span"])
 
 ## checking
 ##---------
-
-if(packageVersion("ropls") < "0.10.16")
-    cat("\nWarning: new version of the 'ropls' package is available\n", sep="")
 
 stopifnot(refC %in% c("pool", "sample"))
 
@@ -190,9 +182,6 @@ cat("\nEnd of '", modNamC, "' Galaxy module call: ",
 ## sink()
 
 options(stringsAsFactors = strAsFacL)
-
-
-#### End_of_tested_code <- function() {}
 
 
 rm(argVc)
