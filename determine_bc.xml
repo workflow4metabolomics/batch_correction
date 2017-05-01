@@ -1,4 +1,4 @@
-<tool id="Determine_BC" name="Determine_batch_correction" version="2.1.0">
+<tool id="Determine_BC" name="Determine_batch_correction" version="2.1.2">
   <description>to choose between linear, lowess and loess methods</description>
 
   <requirements>

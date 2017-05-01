@@ -7,8 +7,8 @@ Status: [![Build Status](https://travis-ci.org/workflow4metabolomics/batchcorrec
 
 ### Description
 
-**Version:** 2.1.0  
-**Date:** 2017-03-20  
+**Version:** 2.1.2  
+**Date:** 2017-04-30  
 **Author:** Jean-François Martin (INRA, AXIOM), Mélanie Pétéra (INRA, PFEM), Marion Landi (INRA, PFEM), Franck Giacomoni (INRA, PFEM), and Etienne A. Thévenot (CEA, LIST)  
 **Email:** [jean-francois.martin(at)toulouse.inra.fr](mailto:jean-francois.martin@toulouse.inra.frr), [melanie.petera(at)clermont.inra.fr](mailto:melanie.petera@clermont.inra.fr), [etienne.thevenot(at)cea.fr](mailto:etienne.thevenot@cea.fr)  
 **Citation:**  
@@ -75,6 +75,12 @@ See the reference histories [W4M00001_Sacurine-statistics; DOI:10.15454/1.481112
  
 
 ### News
+
+##### CHANGES IN VERSION 2.1.2  
+
+INTERNAL MODIFICATIONS  
+
+ * Minor modifications in config file  
 
 ##### CHANGES IN VERSION 2.1.0  
 
