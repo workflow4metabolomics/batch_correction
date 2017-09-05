@@ -26,13 +26,20 @@ LABEL tool_version = "${TOOL_VERSION}"
 ################################################################################
 ### install third part tools 
 
-# install R
+# add debian repo for latest version of R
+RUN echo "deb http://cran.univ-paris1.fr/bin/linux/ubuntu trusty/" >> /etc/apt/sources.list && \
+    apt-key adv --keyserver keyserver.ubuntu.com --recv-keys E084DAB9 
+
+# Update and upgrade system
 RUN apt-get update && \
-    apt-get install -y \ 
+    apt-get -y upgrade
+
+# install R
+RUN apt-get install -y \ 
     r-base \
     libcurl4-openssl-dev \
-    libxml2-dev \
-    git
+    libxml2-dev
+# NOTE: add `apt-get install -y git` if required
 
 # init R env. (Docker)
 RUN echo "r <- getOption('repos'); r['CRAN'] <- 'http://cran.us.r-project.org'; options(repos = r);" > ~/.Rprofile
@@ -71,11 +78,11 @@ ENV PATH = $PATH:/scripts
 
 ################################################################################
 ### clean
-RUN apt-get remove -y git && \
-    apt-get clean && \
+RUN apt-get clean && \
     apt-get autoremove -y && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/ /tmp/* /var/tmp/*
-
+# NOTE: run `apt-get remove -y git && \` if required 
+    
 ################################################################################
 ### Define Entry point script
 ## ENTRYPOINT ["/scripts/batch_correction_wrapper.R"]
