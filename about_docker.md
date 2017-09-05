@@ -10,10 +10,10 @@ Metadata
  * **@date creation**: 2017/09/04
  * **@main usage**: create a Docker environment / container for "Tool - Batch Correction"
 
- About
+About
 -----------
-For all informations about the tool please refer to its [README file](README.txt). 
-For further informations about W4M project and the people involved, Please refer to [W4M github](https://github.com/) and [W4M Docker Hub](https://hub.docker.com/r/workflow4metabolomics/). 
+For all informations about the tool please refer to its [README file](README.md). 
+For further informations about Workflow4Metabolomics project and the people involved, please refer to [workflow4metabolomics.org](http://workflow4metabolomics.org/), [W4M github](https://github.com/workflow4metabolomics/) and [W4M Docker Hub](https://hub.docker.com/r/workflow4metabolomics/). 
  
 Configuration
 -----------
@@ -31,7 +31,6 @@ Services provided
 Build a docker container for "Tool - Batch Correction" Galaxy Tool.
 Provide a XML Galaxy wrapper: [batch_correction.docker.xml](batch_correction.docker.xml)
 
- 
 Technical description
 -----------
 
@@ -68,10 +67,30 @@ Then add this XML resource in your `config/tool_conf.xml` file. For example:
     </section>
 ```
 
-Notes
------------
-TODO
-
 License (Dockerfile only!)
 -----------
-TODO
+The `Dockerfile` file is under the following license:
+```
+    Copyright (c) 2017 workflow4metabolomics.org / INRA
+
+    Permission is hereby granted, free of charge, to any person obtaining a copy
+    of this software and associated documentation files (the "Software"), to deal
+    in the Software without restriction, including without limitation the rights
+    to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+    copies of the Software, and to permit persons to whom the Software is
+    furnished to do so, subject to the following conditions:
+
+    The above copyright notice and this permission notice shall be included in all
+    copies or substantial portions of the Software.
+
+    THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+    IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+    FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+    AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+    LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+    OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+    SOFTWARE.
+```
+
+ * For the Galaxy Tool's license, please refer to its `README` file. 
+ * For the Galaxy Wrapper's license, please refer to its `XML` file. 
