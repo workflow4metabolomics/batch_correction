@@ -71,7 +71,8 @@ COPY "." "/scripts/"
 # WORKDIR "/scripts"
 
 ## set authorizations
-# RUN ["chmod", "a+x", "/scripts/batch_correction_wrapper.R"]
+RUN ["chmod", "a+x", "/scripts/batch_correction_all_loess_wrapper.R"]
+RUN ["chmod", "a+x", "/scripts/batch_correction_wrapper.R"]
 
 # make tool accessible through PATH
 ENV PATH = $PATH:/scripts
