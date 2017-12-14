@@ -22,7 +22,47 @@
 
 
 library(batch) #necessary for parseCommandArgs function
+
+##------------------------------
+## test help option
+##------------------------------
+
+# Prog. constants
+argv.help <- commandArgs(trailingOnly = FALSE)
+script.path <- sub("--file=", "", argv.help[grep("--file=", argv.help)])
+prog.name <- basename(script.path)
+
+# Test Help
+if (length(grep('-h', argv.help)) > 0) {
+  cat("Usage: Rscript ", 
+    prog.name,
+    "{args} \n",
+    "parameters: \n",
+    "\tanalyse {val}: must be set to \"batch_correction\"",
+    "\tdataMatrix {file}: set the input data matrix file (mandatory) \n",
+    "\tsampleMetadata {file}: set the input sample metadata file (mandatory) \n",
+    "\tvariableMetadata {file}: set the input variable metadata file (mandatory) \n",
+    "\tmethod {opt}: set the method; can set to \"linear\", \"lowess\" or \"loess\" (mandatory) \n",
+    "\tspan {condition}: set the span condition; set to \"none\" if method is set to \"linear\" (mandatory) \n", 
+    "\tref_factor {value}: set the ref_factor value; (if span value is set to NULL, optional) \n",
+    "\tdetail {value}: set the detail value; (if span value is set to NULL, optional) \n",
+    "\tdataMatrix_out {file}: set the output data matrix file (mandatory) \n",
+    "\tvariableMetadata_out {file}: set the output variable metadata file (mandatory) \n",
+    "\tgraph_output {file}: set the output graph file (mandatory) \n",
+    "\trdata_output {file}: set the output Rdata file (mandatory) \n",
+    "\n")
+  quit(status = 0)
+}
+
+##------------------------------
+## init. params
+##------------------------------
+
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
+
+##------------------------------
+## init. functions
+##------------------------------
 
 source_local <- function(...){
 	argv <- commandArgs(trailingOnly = FALSE)

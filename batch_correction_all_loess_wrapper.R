@@ -1,7 +1,44 @@
 #!/usr/bin/env Rscript
 
 library(batch) ## necessary for parseCommandArgs function
+
+##------------------------------
+## test help option
+##------------------------------
+
+# Prog. constants
+argv.help <- commandArgs(trailingOnly = FALSE)
+script.path <- sub("--file=", "", argv.help[grep("--file=", argv.help)])
+prog.name <- basename(script.path)
+
+# Test Help
+if (length(grep('-h', argv.help)) > 0) {
+  cat("Usage: Rscript ", 
+    prog.name,
+    "{args} \n",
+    "parameters: \n",
+    "\tdataMatrix {file}: set the input data matrix file (mandatory) \n",
+    "\tsampleMetadata {file}: set the input sample metadata file (mandatory) \n",
+    "\tvariableMetadata {file}: set the input variable metadata file (mandatory) \n",
+    "\tmethod {opt}: set the method; can set to \"all_loess_pool\" or \"all_loess_sample\" (mandatory) \n",
+    "\tspan {condition}: set the span condition; (mandatory) \n",
+    "\tdataMatrix_out {file}: set the output data matrix file (mandatory) \n",
+    "\tvariableMetadata_out {file}: set the output variable metadata file (mandatory) \n",
+    "\tgraph_output {file}: set the output graph file (mandatory) \n",
+    "\trdata_output {file}: set the output Rdata file (mandatory) \n",
+    "\n")
+  quit(status = 0)
+}
+
+##------------------------------
+## init. params
+##------------------------------
+
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
+
+##------------------------------
+## init. functions
+##------------------------------
 
 source_local <- function(fname){
     argv <- commandArgs(trailingOnly = FALSE)
