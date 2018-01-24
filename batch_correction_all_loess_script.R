@@ -37,7 +37,7 @@ plotBatchF <- function(datMN, samDF.arg, spnN.arg) {
 
     obsNamVc <- rownames(datMN)
 
-    obsColVc <- sapply(samDF.arg[, "sampleType"],
+    obsColVc <- sapply(samDF.arg[, args$sample_type_col_name],
                        function(typC)
                        ifelse(typC %in% names(colVc), colVc[typC], colVc["other"]))
 
@@ -45,7 +45,7 @@ plotBatchF <- function(datMN, samDF.arg, spnN.arg) {
 
     par(mar = c(3.6, 3.6, 3.1, 0.6))
 
-    batTab <- table(samDF.arg[, "batch"])
+    batTab <- table(samDF.arg[, args$batch_col_name])
 
     sumVn <- rowSums(datMN, na.rm = TRUE)
 
@@ -83,11 +83,11 @@ plotBatchF <- function(datMN, samDF.arg, spnN.arg) {
 
     for(batC in names(batTab)) {
 
-        batSeqVi <- which(samDF.arg[, "batch"] == batC)
+        batSeqVi <- which(samDF.arg[, args$batch_col_name] == batC)
         batPooVi <- intersect(batSeqVi,
-                              grep("pool", samDF.arg[, "sampleType"]))
+                              grep("pool", samDF.arg[, args$sample_type_col_name]))
         batSamVi <- intersect(batSeqVi,
-                              grep("sample", samDF.arg[, "sampleType"]))
+                              grep("sample", samDF.arg[, args$sample_type_col_name]))
         if(length(batPooVi))
             lines(batSeqVi,
                   loessF(sumVn, batPooVi, batSeqVi, spnN=spnN.arg),
@@ -215,18 +215,18 @@ shiftBatchCorrectF <- function(rawMN.arg,
 
     ## computing median off all pools (or samples) for each variable
 
-    refMeaVn <- apply(rawMN.arg[samDF.arg[, "sampleType"] == refC.arg, ],
+    refMeaVn <- apply(rawMN.arg[samDF.arg[, args$sample_type_col_name] == refC.arg, ],
                       2,
                       function(feaRefVn) mean(feaRefVn, na.rm = TRUE))
 
     ## splitting data and sample metadata from each batch
 
     batRawLs <- split(as.data.frame(rawMN.arg),
-                      f = samDF.arg[, "batch"])
+                      f = samDF.arg[, args$batch_col_name])
     batRawLs <- lapply(batRawLs, function(inpDF) as.matrix(inpDF))
 
     batSamLs <- split(as.data.frame(samDF.arg),
-                      f = samDF.arg[, "batch"])
+                      f = samDF.arg[, args$batch_col_name])
 
     ## checking extrapolation: are there pools at the first and last observations of each batch
 
@@ -234,7 +234,7 @@ shiftBatchCorrectF <- function(rawMN.arg,
         pooExtML <- matrix(FALSE, nrow = 2, ncol = length(batRawLs),
                            dimnames = list(c("first", "last"), names(batRawLs)))
         for(batC in names(batSamLs)) {
-            batSamTypVc <- batSamLs[[batC]][, "sampleType"]
+            batSamTypVc <- batSamLs[[batC]][, args$sample_type_col_name]
             pooExtML["first", batC] <- head(batSamTypVc, 1) == "pool"
             pooExtML["last", batC] <- tail(batSamTypVc, 1) == "pool"
         }
@@ -263,7 +263,7 @@ shiftBatchCorrectF <- function(rawMN.arg,
 
         batAllVi <- 1:nrow(batRawMN)
 
-        batRefVi <- grep(refC.arg, batSamDF[, "sampleType"])
+        batRefVi <- grep(refC.arg, batSamDF[, args$sample_type_col_name])
 
         if(length(batRefVi) < 5)
             cat("\nWarning: less than 5 '", refC.arg, "'; linear regression will be performed instead of loess regression for this batch\n", sep="")

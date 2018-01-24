@@ -50,6 +50,9 @@ if (length(grep('-h', argv.help)) > 0) {
     "\tvariableMetadata_out {file}: set the output variable metadata file (mandatory) \n",
     "\tgraph_output {file}: set the output graph file (mandatory) \n",
     "\trdata_output {file}: set the output Rdata file (mandatory) \n",
+    "\tbatch_col_name {val}: the column name for batch. Default value is \"batch\".\n",
+    "\tinjection_order_col_name {val}: the column name for the injection order. Default value is \"injectionOrder\".\n",
+    "\tsample_type_col_name {val}: the column name for the sample types. Default value is \"sampleType\".\n",
     "\n")
   quit(status = 0)
 }
@@ -59,6 +62,14 @@ if (length(grep('-h', argv.help)) > 0) {
 ##------------------------------
 
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
+
+# Set default col names
+if ( ! 'batch_col_name' %in% names(args))
+	args[['batch_col_name']] <- 'batch'
+if ( ! 'injection_order_col_name' %in% names(args))
+	args[['injection_order_col_name']] <- 'injectionOrder'
+if ( ! 'sample_type_col_name' %in% names(args))
+	args[['sample_type_col_name']] <- 'sampleType'
 
 ##------------------------------
 ## init. functions
@@ -87,7 +98,7 @@ iddata<-samp.id$dataMatrix ; idsample<-samp.id$Metadata ; samp.id<-samp.id$id.ma
 
 ### Checking mandatory variables
 mand.check <- ""
-for(mandcol in c("sampleType","injectionOrder","batch")){
+for(mandcol in c(args$sample_type_col_name, args$injection_order_col_name, args$batch_col_name)){
   if(!(mandcol%in%colnames(idsample))){
     mand.check <- c(mand.check,"\nError: no '",mandcol,"' column in sample metadata.\n",
                     "Note: table must include this exact column name (it is case-sensitive).\n")
@@ -111,22 +122,22 @@ idTdata=data.frame(dimnames(idTdata)[[1]],idTdata)
 ### Merge of 2 files (ok even if the two dataframe are not sorted on the same key)
 id=merge(idsample, idTdata, by.x=1, by.y=1)
 
-id$batch=as.factor(id$batch)
-ids=id[id$sampleType == 'pool' | id$sampleType == 'sample',]
+id[[args$batch_col_name]]=as.factor(id[[args$batch_col_name]])
+ids=id[id[[args$sample_type_col_name]] == 'pool' | id[[args$sample_type_col_name]] == 'sample',]
 nbid=dim(idsample)[2]
 	
 ### Checking the number of sample and pool
 	
 # least 2 samples
-if(length(which(ids$sampleType == "sample"))<2){
+if(length(which(ids[[args$sample_type_col_name]] == "sample"))<2){
 	table.check <- c(table.check,"\nError: less than 2 samples specified in sample metadata.",
 	       "\nMake sure this is not due to errors in sampleType coding.\n")
 }
 	
 # least 2 pools per batch for all batchs
-B <- rep(0,length(levels(ids$batch)))
-for(nbB in length(levels(ids$batch))){
-	B[nbB]<-length(which(ids[which(ids$batch==(levels(ids$batch)[nbB])),]$sampleType == "pool"))
+B <- rep(0,length(levels(ids[[args$batch_col_name]])))
+for(nbB in length(levels(ids[[args$batch_col_name]]))){
+	B[nbB]<-length(which(ids[which(ids[[args$batch_col_name]]==(levels(ids[[args$batch_col_name]])[nbB])),][[args$sample_type_col_name]] == "pool"))
 }
 if(length(which(B>1))==0){
 	table.check <- c(table.check,"\nError: less than 2 pools specified in each batch in sample metadata.",

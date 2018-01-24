@@ -26,6 +26,9 @@ if (length(grep('-h', argv.help)) > 0) {
     "\tvariableMetadata_out {file}: set the output variable metadata file (mandatory) \n",
     "\tgraph_output {file}: set the output graph file (mandatory) \n",
     "\trdata_output {file}: set the output Rdata file (mandatory) \n",
+    "\tbatch_col_name {val}: the column name for batch. Default value is \"batch\".\n",
+    "\tinjection_order_col_name {val}: the column name for the injection order. Default value is \"injectionOrder\".\n",
+    "\tsample_type_col_name {val}: the column name for the sample types. Default value is \"sampleType\".\n",
     "\n")
   quit(status = 0)
 }
@@ -35,6 +38,14 @@ if (length(grep('-h', argv.help)) > 0) {
 ##------------------------------
 
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
+
+# Set default col names
+if ( ! 'batch_col_name' %in% names(args))
+	args[['batch_col_name']] <- 'batch'
+if ( ! 'injection_order_col_name' %in% names(args))
+	args[['injection_order_col_name']] <- 'injectionOrder'
+if ( ! 'sample_type_col_name' %in% names(args))
+	args[['sample_type_col_name']] <- 'sampleType'
 
 ##------------------------------
 ## init. functions
@@ -118,10 +129,10 @@ spnN <- as.numeric(argVc["span"])
 stopifnot(refC %in% c("pool", "sample"))
 
 if(refC == "pool" &&
-   !any("pool" %in% samDF[, "sampleType"]))
+   !any("pool" %in% samDF[, args$sample_type_col_name]))
     stop("No 'pool' found in the 'sampleType' column; use the samples as normalization reference instead")
 
-refMN <- rawMN[samDF[, "sampleType"] == refC, ]
+refMN <- rawMN[samDF[, args$sample_type_col_name] == refC, ]
 refNasZerVl <- apply(refMN, 2,
                      function(refVn)
                      all(sapply(refVn,
@@ -146,7 +157,7 @@ if(sum(refNasZerVl)) {
 ##-------------------------------------
 
 samDF[, "ordIniVi"] <- 1:nrow(rawMN)
-ordBatInjVi <- order(samDF[, "batch"], samDF[, "injectionOrder"])
+ordBatInjVi <- order(samDF[, args$batch_col_name], samDF[, args$injection_order_col_name])
 rawMN <- rawMN[ordBatInjVi, ]
 samDF <- samDF[ordBatInjVi, ]
 
