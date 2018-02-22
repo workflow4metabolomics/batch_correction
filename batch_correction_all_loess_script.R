@@ -85,9 +85,9 @@ plotBatchF <- function(datMN, samDF.arg, spnN.arg) {
 
         batSeqVi <- which(samDF.arg[, args$batch_col_name] == batC)
         batPooVi <- intersect(batSeqVi,
-                              grep("pool", samDF.arg[, args$sample_type_col_name]))
+                              grep(args$sample_type_tags$pool, samDF.arg[, args$sample_type_col_name]))
         batSamVi <- intersect(batSeqVi,
-                              grep("sample", samDF.arg[, args$sample_type_col_name]))
+                              grep(args$sample_type_tags$sample, samDF.arg[, args$sample_type_col_name]))
         if(length(batPooVi))
             lines(batSeqVi,
                   loessF(sumVn, batPooVi, batSeqVi, spnN=spnN.arg),
@@ -230,13 +230,13 @@ shiftBatchCorrectF <- function(rawMN.arg,
 
     ## checking extrapolation: are there pools at the first and last observations of each batch
 
-    if(refC.arg == "pool") {
+    if(refC.arg == args$sample_type_tags$pool) {
         pooExtML <- matrix(FALSE, nrow = 2, ncol = length(batRawLs),
                            dimnames = list(c("first", "last"), names(batRawLs)))
         for(batC in names(batSamLs)) {
             batSamTypVc <- batSamLs[[batC]][, args$sample_type_col_name]
-            pooExtML["first", batC] <- head(batSamTypVc, 1) == "pool"
-            pooExtML["last", batC] <- tail(batSamTypVc, 1) == "pool"
+            pooExtML["first", batC] <- head(batSamTypVc, 1) == args$sample_type_tags$pool
+            pooExtML["last", batC] <- tail(batSamTypVc, 1) == args$sample_type_tags$pool
         }
         if(!all(c(pooExtML))) {
             cat("\nWarning: Pools are missing at the first and/or last position of the following batches:\n")

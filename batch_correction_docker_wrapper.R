@@ -33,7 +33,6 @@ script_bypass <- function(other.script.name) {
   script.name <- sub(file.arg.name, "", initial.options[grep(file.arg.name, initial.options)])
   script.basename <- dirname(script.name)
   other.script.fullpath <- paste(sep="/", script.basename, other.script.name)
-  # print(paste("calling", other.script.fullpath, "from", script.name))
   other.script.cmd <- paste(sep=" ", "Rscript", other.script.fullpath, "-h")
   system(other.script.cmd, wait=TRUE)
 }
@@ -44,7 +43,6 @@ source_wrapper <- function(other.script.name){
   script.name <- sub(file.arg.name, "", initial.options[grep(file.arg.name, initial.options)])
   script.basename <- dirname(script.name)
   other.script.fullpath <- paste(sep="/", script.basename, other.script.name)
-  #print(paste("calling", other.script.fullpath, "from", script.name))
   source(other.script.fullpath)
 }
 
