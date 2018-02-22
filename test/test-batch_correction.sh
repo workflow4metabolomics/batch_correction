@@ -42,9 +42,20 @@ run_mtbls404_test() {
 	Rscript $ROOTDIR/batch_correction_all_loess_wrapper.R dataMatrix "$matrix_file" sampleMetadata "$samp_file" variableMetadata "$var_file" method "all_loess_pool" span "1.0" dataMatrix_out "$matrix_outfile" variableMetadata_out "$var_outfile" graph_output "$graph_outfile" rdata_output "$rdata_outfile" batch_col_name "Factor.Value.Batch." injection_order_col_name "Factor.Value.Injection.order." sample_type_col_name "Factor.Value.Material.type." || exit 1
 }
 
+# Run custom sample type tags test {{{1
+################################################################
+
+run_custom_sample_type_tags_test() {
+
+	Rscript $ROOTDIR/batch_correction_docker_wrapper.R --loess "TRUE" dataMatrix "$ROOTDIR/test-data/input-batchcorrection-dataMatrix.tsv" sampleMetadata "$ROOTDIR/test-data/input-batchcorrection-sampleMetadata-customSampleType.tsv" variableMetadata "$ROOTDIR/test-data/input-batchcorrection-variableMetadata.tsv" method "all_loess_pool" span "1" dataMatrix_out "$PROG_PATH/output-batchcorrection-dataMatrix.tsv" variableMetadata_out "$PROG_PATH/output-batchcorrection-variableMetadata.tsv" graph_output "/tmp/test.pdf" rdata_output "/tmp/test.Rdata" sample_type_col_name MySampType sample_type_tags blank=blanc,pool=lot,sample=echant   || exit 1
+
+	diff $PROG_PATH/output-batchcorrection-dataMatrix.tsv $ROOTDIR/test-data/output-batchcorrection-dataMatrix.tsv || exit 2
+}
+
 # MAIN {{{1
 ################################################################
 
 run_batch_correction_simple_test
 run_same_test_as_batch_correction_XML
 run_mtbls404_test
+run_custom_sample_type_tags_test
