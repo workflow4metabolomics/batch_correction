@@ -2,10 +2,10 @@
   <description>Corrects intensities for signal drift and batch-effects</description>
 
   <requirements>
-    <requirement type="package">r-batch</requirement>
-    <requirement type="package">r-ade4</requirement>
-    <requirement type="package">bioconductor-pcamethods</requirement>
-    <requirement type="package">bioconductor-ropls</requirement>
+    <requirement type="package" version="1.1_4">r-batch</requirement>
+    <requirement type="package" version="1.7_8">r-ade4</requirement>
+    <requirement type="package" version="1.70.0">bioconductor-pcamethods</requirement>
+    <requirement type="package" version="1.10.0">bioconductor-ropls</requirement>
   </requirements>
 
   <stdio>
