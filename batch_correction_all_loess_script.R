@@ -25,9 +25,10 @@ plotBatchF <- function(datMN, samDF.arg, spnN.arg) {
                    raw = "Raw",
                    nrm = "Normalized")
 
-    colVc <- c(sample = "green4",
+    colVc <- c(samp = "green4",
+               biol = "green4",
                pool = "red",
-               blank = "black",
+               blan = "black",
                other = "yellow")
 
     par(font = 2, font.axis = 2, font.lab = 2, lwd = 2, pch = 18)
@@ -37,7 +38,7 @@ plotBatchF <- function(datMN, samDF.arg, spnN.arg) {
 
     obsNamVc <- rownames(datMN)
 
-    obsColVc <- sapply(samDF.arg[, args$sample_type_col_name],
+    obsColVc <- sapply(substr(samDF.arg[, args$sample_type_col_name], 1, 4),
                        function(typC)
                        ifelse(typC %in% names(colVc), colVc[typC], colVc["other"]))
 
@@ -94,7 +95,7 @@ plotBatchF <- function(datMN, samDF.arg, spnN.arg) {
                   col = colVc["pool"])
         lines(batSeqVi,
               loessF(sumVn, batSamVi, batSeqVi, spnN=spnN.arg),
-              col = colVc["sample"])
+              col = colVc["samp"])
 
     }
 
