@@ -7,9 +7,9 @@ Status: [![Build Status](https://travis-ci.org/workflow4metabolomics/batchcorrec
 
 ### Description
 
-**Version:** 2.1.2  
-**Date:** 2017-04-30  
-**Author:** Jean-François Martin (INRA, AXIOM), Mélanie Pétéra (INRA, PFEM), Marion Landi (INRA, PFEM), Franck Giacomoni (INRA, PFEM), and Etienne A. Thévenot (CEA, LIST)  
+**Version:** 2.2.2  
+**Date:** 2018-06-16    
+**Author:** Jean-Fran?ois Martin (INRA, AXIOM), M?lanie P?t?ra (INRA, PFEM), Marion Landi (INRA, PFEM), Franck Giacomoni (INRA, PFEM), and Etienne A. Th?venot (CEA, LIST)  
 **Email:** [jean-francois.martin(at)toulouse.inra.fr](mailto:jean-francois.martin@toulouse.inra.frr), [melanie.petera(at)clermont.inra.fr](mailto:melanie.petera@clermont.inra.fr), [etienne.thevenot(at)cea.fr](mailto:etienne.thevenot@cea.fr)  
 **Citation:**  
 **Licence:** CeCILL  
@@ -75,6 +75,18 @@ See the reference histories [W4M00001_Sacurine-statistics; DOI:10.15454/1.481112
  
 
 ### News
+
+###### CHANGES IN VERSION 2.2.2  
+
+INTERNAL MODIFICATIONS  
+
+Fixed bug for color plot ("all_loess" methods)  
+
+###### CHANGES IN VERSION 2.2.0  
+
+NEW FEATURE  
+
+Specific names for the 'sampleType', 'injectionOrder', and 'batch' from sampleMetadata can be selected by the user (for compatibility with the MTBLS downloader)  
 
 ##### CHANGES IN VERSION 2.1.2  
 

@@ -61,7 +61,7 @@ ok_norm=function(qcp,qci,spl,spi,method) {
   ok_norm=ok
 }
 
-plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNormSummary.txt",fact="batch",span="none") {
+plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNormSummary.txt",fact=args$batch_col_name,span="none") {
     #	Check for all ions in every batch if linear or lo(w)ess correction is possible.
     #	Use ok_norm function and create a file (PreNormSummary.txt) with the error code.
     #	Also create a pdf file with plots of linear and lo(w)ess regression lines.
@@ -70,13 +70,13 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
     #	outfic: name of regression plots pdf file
     #	fact: factor to be used as categorical variable for plots and PCA.  
     indfact	=which(dimnames(x)[[2]]==fact)
-    indtypsamp	=which(dimnames(x)[[2]]=="sampleType") 
-    indbatch	=which(dimnames(x)[[2]]=="batch")
-    indinject	=which(dimnames(x)[[2]]=="injectionOrder")
+    indtypsamp	=which(dimnames(x)[[2]]==args$sample_type_col_name) 
+    indbatch	=which(dimnames(x)[[2]]==args$batch_col_name)
+    indinject	=which(dimnames(x)[[2]]==args$injection_order_col_name)
     lastIon=dim(x)[2]
     nbi=lastIon-nbid # Number of ions = total number of columns - number of identifying columns
-    nbb=length(levels(x$batch)) # Number of batch = number of levels of "batch" comlumn (factor)
-    nbs=length(x$sampleType[x$sampleType=="sample"])# Number of samples = number of rows with "sample" value in sampleType
+    nbb=length(levels(x[[args$batch_col_name]])) # Number of batch = number of levels of "batch" comlumn (factor)
+    nbs=length(x[[args$sample_type_col_name]][x[[args$sample_type_col_name]]=="sample"])# Number of samples = number of rows with "sample" value in sampleType
     pdf(outfic,width=27,height=7*ceiling((nbb+2)/3))
     cat(nbi," ions ",nbb," batch(es) \n")
     cv=data.frame(matrix(0,nrow=nbi,ncol=2))# initialisation de la dataset qui contiendra les CV
@@ -84,13 +84,13 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
     for (p in 1:nbi) {# for each ion
         par (mfrow=c(ceiling((nbb+2)/3),3),ask=F,cex=1.2)
         labion=dimnames(x)[[2]][p+nbid]
-        indpool=which(x$sampleType=="pool") # QCpools subscripts in x 
+        indpool=which(x[[args$sample_type_col_name]]=="pool") # QCpools subscripts in x 
         pools1=x[indpool,p+nbid]; cv[p,1]=sd(pools1)/mean(pools1)# CV before correction
         for (b in 1:nbb) {# for each batch...
-            xb=data.frame(x[(x$batch==levels(x$batch)[b]),c(indtypsamp,indinject,p+nbid)])
-            indpb = which(xb$sampleType=="pool")# QCpools subscripts in the current batch
-            indsp = which(xb$sampleType=="sample")# samples subscripts in the current batch
-            indbt = which(xb$sampleType=="sample" | xb$sampleType=="pool")# indices de tous les samples d'un batch pools+samples  
+            xb=data.frame(x[(x[[args$batch_col_name]]==levels(x[[args$batch_col_name]])[b]),c(indtypsamp,indinject,p+nbid)])
+            indpb = which(xb[[args$sample_type_col_name]]=="pool")# QCpools subscripts in the current batch
+            indsp = which(xb[[args$sample_type_col_name]]=="sample")# samples subscripts in the current batch
+            indbt = which(xb[[args$sample_type_col_name]]=="sample" | xb[[args$sample_type_col_name]]=="pool")# indices de tous les samples d'un batch pools+samples  
             normLinearTest=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="linear")
             normLoessTest=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="loess")
             normLowessTest=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="lowess")
@@ -118,7 +118,7 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
         }
 # series de plot avant et apres correction
 minval=min(x[p+nbid]);maxval=max(x[p+nbid])
-plot( x$injectionOrder, x[,p+nbid],col=x$batch,ylim=c(minval,maxval),ylab=labion,
+plot( x[[args$injection_order_col_name]], x[,p+nbid],col=x[[args$batch_col_name]],ylim=c(minval,maxval),ylab=labion,
       main=paste0("before correction (CV for pools = ",round(cv[p,1],2),")"))
 suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect before correction"))
     }
@@ -141,9 +141,9 @@ normlowess=function (xb,detail="no",vref=1,b,span=NULL) {
   # vref : reference value (average of ion)
   # b : batch subscript
   # nbid: number of samples description columns (id and factors) with at least : "batch","injectionOrder","sampleType"
-  indpb = which(xb$sampleType=="pool") # pools subscripts of current batch
-  indsp = which(xb$sampleType=="sample") # samples of current batch subscripts
-  indbt = which(xb$sampleType=="sample" | xb$sampleType=="pool");# batch subscripts of all samples and QC-pools
+  indpb = which(xb[[args$sample_type_col_name]]=="pool") # pools subscripts of current batch
+  indsp = which(xb[[args$sample_type_col_name]]=="sample") # samples of current batch subscripts
+  indbt = which(xb[[args$sample_type_col_name]]=="sample" | xb[[args$sample_type_col_name]]=="pool");# batch subscripts of all samples and QC-pools
   labion=dimnames(xb)[[2]][3]
   newval=xb[[3]] # initialisation of corrected values = intial values
   ind <- 0 # initialisation of correction indicator
@@ -154,7 +154,7 @@ normlowess=function (xb,detail="no",vref=1,b,span=NULL) {
     reslowess=lowess(xb[indpb,2],xb[indpb,3],f=span2) # lowess regression with QC-pools 
     px=xb[indsp,2];  # vector of injectionOrder values only for samples  
     for(j in 1:length(indbt)) {	 
-      if (xb$sampleType[j]=="pool") {
+      if (xb[[args$sample_type_col_name]][j]=="pool") {
         if (reslowess$y[which(indpb==j)]==0) reslowess$y[which(indpb==j)] <- 1
         newval[j]=(vref*xb[j,3]) / (reslowess$y[which(indpb==j)])} 
       else { # for samples, the correction value cor correspond to the nearest QCpools 
@@ -190,9 +190,9 @@ normlinear <- function (xb,detail="no",vref=1,b,valneg=0) {
   # nbid: number of sample description columns (id and factors) with at least "batch", "injectionOrder" and "sampleType"
   # b: which batch it is
   # valneg: to determine what to do with generated negative and Inf values
-  indpb = which(xb$sampleType=="pool")# pools subscripts of current batch
-  indsp = which(xb$sampleType=="sample")# samples of current batch subscripts
-  indbt = which(xb$sampleType=="sample" | xb$sampleType=="pool") # QCpools and samples of current batch subscripts
+  indpb = which(xb[[args$sample_type_col_name]]=="pool")# pools subscripts of current batch
+  indsp = which(xb[[args$sample_type_col_name]]=="sample")# samples of current batch subscripts
+  indbt = which(xb[[args$sample_type_col_name]]=="sample" | xb[[args$sample_type_col_name]]=="pool") # QCpools and samples of current batch subscripts
   labion=dimnames(xb)[[2]][3]
   newval=xb[[3]] # initialisation of corrected values = intial values	
   ind <- 0 # initialisation of correction indicator
@@ -249,9 +249,9 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL) {
     #   detail : level of detail in the outlog file.
     #   vref : reference value (average of ion)
     #   b : batch subscript
-    indpb = which(xb$sampleType=="pool") # pools subscripts of current batch
-    indsp = which(xb$sampleType=="sample") # samples of current batch subscripts
-    indbt = which(xb$sampleType=="sample" | xb$sampleType=="pool");# batch subscripts of all samples and QCpools
+    indpb = which(xb[[args$sample_type_col_name]]=="pool") # pools subscripts of current batch
+    indsp = which(xb[[args$sample_type_col_name]]=="sample") # samples of current batch subscripts
+    indbt = which(xb[[args$sample_type_col_name]]=="sample" | xb[[args$sample_type_col_name]]=="pool");# batch subscripts of all samples and QCpools
     labion=dimnames(xb)[[2]][3]
     newval=xb[[3]] # initialisation of corrected values = intial values
     ind <- 0 # initialisation of correction indicator
@@ -302,15 +302,15 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
   # method: regression method to be used to correct : "linear" or "lowess" or "loess"
   # valNull: to determine what to do with negatively estimated intensities
 	indfact		=which(dimnames(x)[[2]]==fact)
-	indtypsamp=which(dimnames(x)[[2]]=="sampleType")
-	indbatch	=which(dimnames(x)[[2]]=="batch")
-	indinject	=which(dimnames(x)[[2]]=="injectionOrder")
+	indtypsamp=which(dimnames(x)[[2]]==args$sample_type_col_name)
+	indbatch	=which(dimnames(x)[[2]]==args$batch_col_name)
+	indinject	=which(dimnames(x)[[2]]==args$injection_order_col_name)
 	lastIon=dim(x)[2]
 	valref=apply(as.matrix(x[,(nbid+1):(lastIon)]),2,mean) # reference value for each ion used to still have the same rought size of values
 	nbi=lastIon-nbid # number of ions
-	nbb=length(levels(x$batch)) # Number of batch(es) = number of levels of factor "batch" (can be =1)
-	nbs=length(x$sampleType[x$sampleType=="sample"])# Number of samples 
-	nbp=length(x$sampleType[x$sampleType=="pool"])# Number of QCpools
+	nbb=length(levels(x[[args$batch_col_name]])) # Number of batch(es) = number of levels of factor "batch" (can be =1)
+	nbs=length(x[[args$sample_type_col_name]][x[[args$sample_type_col_name]]=="sample"])# Number of samples 
+	nbp=length(x[[args$sample_type_col_name]][x[[args$sample_type_col_name]]=="pool"])# Number of QCpools
 	Xn=data.frame(x[,c(1:nbid)],matrix(0,nrow=nbp+nbs,ncol=nbi))# initialisation of the corrected dataframe (=initial dataframe)
   dimnames(Xn)=dimnames(x)
 	cv=data.frame(matrix(0,nrow=nbi,ncol=2))# initialisation of dataframe containing CV before and after correction
@@ -323,14 +323,14 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
 	for (p in 1:nbi) {# for each ion
 	  labion=dimnames(x)[[2]][p+nbid]
         if (detail == "reg") {if(nbb<6){par(mfrow=c(3,3),ask=F,cex=1.5)}else{par(mfrow=c(4,4),ask=F,cex=1.5)}}
-		indpool=which(x$sampleType=="pool")# QCpools subscripts in all batches
+		indpool=which(x[[args$sample_type_col_name]]=="pool")# QCpools subscripts in all batches
 		pools1=x[indpool,p+nbid]; cv[p,1]=sd(pools1)/mean(pools1)# CV before correction
 		for (b in 1:nbb) {# for every batch
-			indpb = which(x$batch==levels(x$batch)[b] & x$sampleType=="pool")# QCpools subscripts of the current batch	
-			indsp = which(x$batch==levels(x$batch)[b] & x$sampleType=="sample")# samples subscripts of the current batch
-      indbt = which(x$batch==levels(x$batch)[b] & (x$sampleType=="pool" | x$sampleType=="sample")) # subscripts of all samples
+			indpb = which(x[[args$batch_col_name]]==levels(x[[args$batch_col_name]])[b] & x[[args$sample_type_col_name]]=="pool")# QCpools subscripts of the current batch	
+			indsp = which(x[[args$batch_col_name]]==levels(x[[args$batch_col_name]])[b] & x[[args$sample_type_col_name]]=="sample")# samples subscripts of the current batch
+      indbt = which(x[[args$batch_col_name]]==levels(x[[args$batch_col_name]])[b] & (x[[args$sample_type_col_name]]=="pool" | x[[args$sample_type_col_name]]=="sample")) # subscripts of all samples
       # cat(dimnames(x)[[2]][p+nbid]," indsp:",length(indsp)," indpb=",length(indpb)," indbt=",length(indbt)," ")
-			sub=data.frame(x[(x$batch==levels(x$batch)[b]),c(indtypsamp,indinject,p+nbid)])
+			sub=data.frame(x[(x[[args$batch_col_name]]==levels(x[[args$batch_col_name]])[b]),c(indtypsamp,indinject,p+nbid)])
 			if (method=="linear") { res.norm = normlinear(sub,detail,valref[p],b,valNull)
 			} else { if (method=="loess"){ res.norm <- normloess(sub,detail,valref[p],b,span)
 			  } else { if (method=="lowess"){ res.norm <- normlowess(sub,detail,valref[p],b,span)
@@ -353,12 +353,12 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
 		if (detail=="reg" || detail=="plot" ) {
 		  	# plot before and after correction
 		  	minval=min(cbind(x[p+nbid],Xn[p+nbid]),na.rm=TRUE);maxval=max(cbind(x[p+nbid],Xn[p+nbid]),na.rm=TRUE)
-		  	plot( x$injectionOrder, x[,p+nbid],col=x$batch,ylab=labion,ylim=c(minval,maxval),
+		  	plot( x[[args$injection_order_col_name]], x[,p+nbid],col=x[[args$batch_col_name]],ylab=labion,ylim=c(minval,maxval),
               main=paste0("before correction (CV for pools = ",round(cv[p,1],2),")"))
-              points(x$injectionOrder[indpool],x[indpool,p+nbid],col="maroon",pch=".",cex=2)
-		  	plot(Xn$injectionOrder,Xn[,p+nbid],col=x$batch,ylab="",ylim=c(minval,maxval),
+              points(x[[args$injection_order_col_name]][indpool],x[indpool,p+nbid],col="maroon",pch=".",cex=2)
+		  	plot(Xn[[args$injection_order_col_name]],Xn[,p+nbid],col=x[[args$batch_col_name]],ylab="",ylim=c(minval,maxval),
              main=paste0("after correction (CV for pools = ",round(cv[p,2],2),")"))
-              points(Xn$injectionOrder[indpool],Xn[indpool,p+nbid],col="maroon",pch=".",cex=2)
+              points(Xn[[args$injection_order_col_name]][indpool],Xn[indpool,p+nbid],col="maroon",pch=".",cex=2)
 		  	suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect before correction"))
 		  	suppressWarnings(plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect after correction"))
 		}
