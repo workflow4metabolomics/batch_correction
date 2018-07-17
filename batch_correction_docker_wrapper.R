@@ -1,4 +1,4 @@
-#!/usr/bin/Rscript --vanilla --slave --no-site-file
+#!/usr/bin/env Rscript
 
 ################################################################################################
 # batch_correction_main_wrapper                                                                #
