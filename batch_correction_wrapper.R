@@ -53,6 +53,7 @@ if (length(grep('-h', argv.help)) > 0) {
     "\tbatch_col_name {val}: the column name for batch. Default value is \"batch\".\n",
     "\tinjection_order_col_name {val}: the column name for the injection order. Default value is \"injectionOrder\".\n",
     "\tsample_type_col_name {val}: the column name for the sample types. Default value is \"sampleType\".\n",
+    "\tsample_type_tags {val}: the tags used inside the sample type column, defined as key/value pairs separated by commas (example: blank=blank,pool=pool,sample=sample).\n",
     "\n")
   quit(status = 0)
 }
@@ -70,6 +71,16 @@ if ( ! 'injection_order_col_name' %in% names(args))
 	args[['injection_order_col_name']] <- 'injectionOrder'
 if ( ! 'sample_type_col_name' %in% names(args))
 	args[['sample_type_col_name']] <- 'sampleType'
+if ( ! 'sample_type_tags' %in% names(args))
+	args[['sample_type_tags']] <- 'blank=blank,pool=pool,sample=sample'
+
+# Parse sample type tags
+sample.type.tags <- list()
+for (kv in strsplit(strsplit(args$sample_type_tags, ',')[[1]], '='))
+	sample.type.tags[[kv[[1]]]] <- kv[[2]]
+if ( ! all(c('pool', 'blank', 'sample') %in% names(sample.type.tags)))
+	stop("All tags pool, blank and sample must be defined in option sampleTypeTags.")
+args$sample_type_tags <- sample.type.tags
 
 ##------------------------------
 ## init. functions
@@ -123,13 +134,13 @@ idTdata=data.frame(dimnames(idTdata)[[1]],idTdata)
 id=merge(idsample, idTdata, by.x=1, by.y=1)
 
 id[[args$batch_col_name]]=as.factor(id[[args$batch_col_name]])
-ids=id[id[[args$sample_type_col_name]] == 'pool' | id[[args$sample_type_col_name]] == 'sample',]
+ids=id[id[[args$sample_type_col_name]] == args$sample_type_tags$pool | id[[args$sample_type_col_name]] == args$sample_type_tags$sample,]
 nbid=dim(idsample)[2]
 	
 ### Checking the number of sample and pool
 	
 # least 2 samples
-if(length(which(ids[[args$sample_type_col_name]] == "sample"))<2){
+if(length(which(ids[[args$sample_type_col_name]] == args$sample_type_tags$sample))<2){
 	table.check <- c(table.check,"\nError: less than 2 samples specified in sample metadata.",
 	       "\nMake sure this is not due to errors in sampleType coding.\n")
 }
@@ -137,7 +148,7 @@ if(length(which(ids[[args$sample_type_col_name]] == "sample"))<2){
 # least 2 pools per batch for all batchs
 B <- rep(0,length(levels(ids[[args$batch_col_name]])))
 for(nbB in length(levels(ids[[args$batch_col_name]]))){
-	B[nbB]<-length(which(ids[which(ids[[args$batch_col_name]]==(levels(ids[[args$batch_col_name]])[nbB])),][[args$sample_type_col_name]] == "pool"))
+	B[nbB]<-length(which(ids[which(ids[[args$batch_col_name]]==(levels(ids[[args$batch_col_name]])[nbB])),][[args$sample_type_col_name]] == args$sample_type_tags$pool))
 }
 if(length(which(B>1))==0){
 	table.check <- c(table.check,"\nError: less than 2 pools specified in each batch in sample metadata.",
