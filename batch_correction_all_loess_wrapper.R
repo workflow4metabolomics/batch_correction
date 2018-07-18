@@ -105,17 +105,20 @@ cat("\nStart of the '", modNamC, "' Galaxy module call: ",
 
 rawMN <- t(as.matrix(read.table(argVc["dataMatrix"],
                                 header = TRUE,
+                                comment.char = '',
                                 row.names = 1,
                                 sep = "\t")))
 
 samDF <- read.table(argVc["sampleMetadata"],
                     header = TRUE,
+                    comment.char = '',
                     row.names = 1,
                     sep = "\t")
 
 varDF <- read.table(argVc["variableMetadata"],
                     check.names = FALSE,
                     header = TRUE,
+                    comment.char = '',
                     row.names = 1,
                     sep = "\t") ## not used; for compatibility only
 
