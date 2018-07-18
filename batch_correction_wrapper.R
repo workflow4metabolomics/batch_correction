@@ -85,8 +85,8 @@ source_local("Normalisation_QCpool.r","easyrlibrary-lib/RcheckLibrary.R","easyrl
 
 
 ## Reading of input files
-idsample=read.table(args$sampleMetadata,header=T,sep='\t',check.names=FALSE)
-iddata=read.table(args$dataMatrix,header=T,sep='\t',check.names=FALSE)
+idsample=read.table(args$sampleMetadata,header=T,sep='\t',check.names=FALSE,comment.char = '')
+iddata=read.table(args$dataMatrix,header=T,sep='\t',check.names=FALSE,comment.char = '')
 
 ### Table match check 
 table.check <- match2(iddata,idsample,"sample")
@@ -150,7 +150,7 @@ factbio=args$ref_factor
 
 if(args$analyse == "batch_correction") {
 	## Reading of Metadata Ions file
-	metaion=read.table(args$variableMetadata,header=T,sep='\t',check.names=FALSE)
+	metaion=read.table(args$variableMetadata,header=T,sep='\t',check.names=FALSE,comment.char = '')
 	## Table match check 
 	table.check <- c(table.check,match2(iddata,metaion,"variable"))
 	check.err(table.check)

@@ -93,9 +93,10 @@ plotBatchF <- function(datMN, samDF.arg, spnN.arg) {
             lines(batSeqVi,
                   loessF(sumVn, batPooVi, batSeqVi, spnN=spnN.arg),
                   col = colVc["pool"])
-        lines(batSeqVi,
-              loessF(sumVn, batSamVi, batSeqVi, spnN=spnN.arg),
-              col = colVc["samp"])
+		if (length(batSamVi))
+        	lines(batSeqVi,
+              	  loessF(sumVn, batSamVi, batSeqVi, spnN=spnN.arg),
+              	  col = colVc["samp"])
 
     }
 
