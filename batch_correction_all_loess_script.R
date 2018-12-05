@@ -86,9 +86,9 @@ plotBatchF <- function(datMN, samDF.arg, spnN.arg) {
 
         batSeqVi <- which(samDF.arg[, args$batch_col_name] == batC)
         batPooVi <- intersect(batSeqVi,
-                              grep("pool", samDF.arg[, args$sample_type_col_name]))
+                              which(samDF.arg[, args$sample_type_col_name] == "pool"))
         batSamVi <- intersect(batSeqVi,
-                              grep("sample", samDF.arg[, args$sample_type_col_name]))
+                              which(samDF.arg[, args$sample_type_col_name] == "sample"))
         if(length(batPooVi))
             lines(batSeqVi,
                   loessF(sumVn, batPooVi, batSeqVi, spnN=spnN.arg),
@@ -264,8 +264,8 @@ shiftBatchCorrectF <- function(rawMN.arg,
 
         batAllVi <- 1:nrow(batRawMN)
 
-        batRefVi <- grep(refC.arg, batSamDF[, args$sample_type_col_name])
-
+        batRefVi <- which(batSamDF[, args$sample_type_col_name] == refC.arg)
+        
         if(length(batRefVi) < 5)
             cat("\nWarning: less than 5 '", refC.arg, "'; linear regression will be performed instead of loess regression for this batch\n", sep="")
 

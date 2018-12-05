@@ -7,8 +7,8 @@ Status: [![Build Status](https://travis-ci.org/workflow4metabolomics/batchcorrec
 
 ### Description
 
-**Version:** 2.2.2  
-**Date:** 2018-06-16    
+**Version:** 2.2.4  
+**Date:** 2018-12-05    
 **Author:** Jean-Fran?ois Martin (INRA, AXIOM), M?lanie P?t?ra (INRA, PFEM), Marion Landi (INRA, PFEM), Franck Giacomoni (INRA, PFEM), and Etienne A. Th?venot (CEA, LIST)  
 **Email:** [jean-francois.martin(at)toulouse.inra.fr](mailto:jean-francois.martin@toulouse.inra.frr), [melanie.petera(at)clermont.inra.fr](mailto:melanie.petera@clermont.inra.fr), [etienne.thevenot(at)cea.fr](mailto:etienne.thevenot@cea.fr)  
 **Citation:**  
@@ -75,6 +75,12 @@ See the reference histories [W4M00001_Sacurine-statistics; DOI:10.15454/1.481112
  
 
 ### News
+
+###### CHANGES IN VERSION 2.2.4  
+
+INTERNAL MODIFICATIONS  
+
+Fixed bug for the selection of pools ("all_loess" methods)  
 
 ###### CHANGES IN VERSION 2.2.2  
 
