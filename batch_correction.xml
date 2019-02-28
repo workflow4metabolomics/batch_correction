@@ -1,4 +1,4 @@
-<tool id="Batch_correction" name="Batch_correction" version="2.2.3">
+<tool id="Batch_correction" name="Batch_correction" version="2.2.4">
   <description>Corrects intensities for signal drift and batch-effects</description>
 
   <requirements>
@@ -330,6 +330,13 @@ See also the reference history:
 ----
 NEWS
 ----
+
+CHANGES IN VERSION 2.2.4  
+========================  
+
+INTERNAL MODIFICATIONS  
+
+Fixed bug for pool selection ("all_loess" methods)  
 
 CHANGES IN VERSION 2.2.2  
 ========================  
