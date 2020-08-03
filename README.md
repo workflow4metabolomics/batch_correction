@@ -3,7 +3,7 @@ Signal drift and batch-effect correction
 
 A Galaxy module from the [Workflow4metabolomics](http://workflow4metabolomics.org) infrastructure  
 
-Status: [![Build Status](https://travis-ci.org/workflow4metabolomics/batchcorrection.svg?branch=master)](https://travis-ci.org/workflow4metabolomics/batchcorrection).
+Status: [![Build Status](https://travis-ci.org/workflow4metabolomics/batch_correction.svg?branch=master)](https://travis-ci.org/workflow4metabolomics/batch_correction).
 
 ### Description
 
