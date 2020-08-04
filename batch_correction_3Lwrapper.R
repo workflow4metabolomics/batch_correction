@@ -15,6 +15,7 @@
 # Version 2.91: 25-08-2016 error message improvment                                            #
 # Version 3: xx-xx-2020                                                                        #
 #            - split of tool-linked code and script-linked one                                 #
+#            - addition of args print and sessionInfo()                                        #
 #                                                                                              #
 # Input files: dataMatrix.txt, sampleMetadata.txt, variableMetadata.txt (BC only)              #
 # Output files: graph.pdf, corrected table (BC only), diagnostic table (DBC only),             #
@@ -66,6 +67,14 @@ if (length(grep('-h', argv.help)) > 0) {
 
 args = parseCommandArgs(evaluate=FALSE) #interpretation of arguments given in command line as an R list of objects
 
+
+cat('\nJob starting time:\n',format(Sys.time(), "%a %d %b %Y %X"),
+'\n\n--------------------------------------------------------------------', 
+'\nParameters used:\n\n')
+print(args)
+cat('--------------------------------------------------------------------\n\n')
+
+
 # Set default col names
 if ( ! 'batch_col_name' %in% names(args))
 	args[['batch_col_name']] <- 'batch'
@@ -116,5 +125,12 @@ meth3L(idsample=args$sampleMetadata, iddata=args$dataMatrix, sample_type_col_nam
        batch_col_name=args$batch_col_name, sample_type_tags=args$sample_type_tags, factbio=args$ref_factor, analyse=args$analyse, metaion=args$variableMetadata,
 	   detail=args$detail, method=args$method, outlog=args$graph_output, span=args$span, valnull=args$valnull, rdata_output=args$rdata_output,
 	   dataMatrix_out=args$dataMatrix_out, variableMetadata_out=args$variableMetadata_out, out_graph_pdf=args$out_graph_pdf, out_preNormSummary=args$out_preNormSummary)
+
+
+cat('\n--------------------------------------------------------------------',
+'\nInformation about R (version, Operating System, attached or loaded packages):\n\n')
+sessionInfo()
+cat('--------------------------------------------------------------------\n',
+'\nJob ending time:\n',format(Sys.time(), "%a %d %b %Y %X"))
 
 rm(args)
