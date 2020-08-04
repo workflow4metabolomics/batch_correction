@@ -29,7 +29,7 @@
         method "all_loess_sample"
         span "${span_condition.span}"
     #else:
-        Rscript $__tool_directory__/batch_correction_wrapper.R
+        Rscript $__tool_directory__/batch_correction_3Lwrapper.R
         analyse "batch_correction"
         dataMatrix "$dataMatrix"
         sampleMetadata "$sampleMetadata"

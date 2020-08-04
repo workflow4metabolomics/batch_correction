@@ -3,7 +3,7 @@
 ################################################################################################
 # batch_correction_wrapper                                                                     #
 #                                                                                              #
-# Author: Marion LANDI / Jean-Francois MARTIN / Melanie Petera                                 #
+# Authors: Marion LANDI / Jean-Francois MARTIN / Melanie Petera                                #
 # User: Galaxy                                                                                 #
 # Original data: --                                                                            #
 # Starting date: 22-07-2014                                                                    #
@@ -13,10 +13,12 @@
 # Version 2.2: 16-03-2015 inclusion of miniTools' functions for special characters             #
 # Version 2.90: 18-08-2015 new parameter valnull                                               #
 # Version 2.91: 25-08-2016 error message improvment                                            #
+# Version 3: xx-xx-2020                                                                        #
+#            - split of tool-linked code and script-linked one                                 #
 #                                                                                              #
-#                                                                                              #
-# Input files: dataMatrix.txt ; sampleMetadata.txt ; variableMetadata.txt (for DBC)            #
-# Output files: graph_output.pdf ; corrected table ; diagnostic table                          #
+# Input files: dataMatrix.txt, sampleMetadata.txt, variableMetadata.txt (BC only)              #
+# Output files: graph.pdf, corrected table (BC only), diagnostic table (DBC only),             #
+#               variableMetadata (BC only)                                                     #
 #                                                                                              #
 ################################################################################################
 
@@ -92,102 +94,27 @@ source_local <- function(...){
 	for(i in 1:length(list(...))){source(paste(base_dir, list(...)[[i]], sep="/"))}
 }
 #Import the different functions
-source_local("Normalisation_QCpool.r","easyrlibrary-lib/RcheckLibrary.R","easyrlibrary-lib/miniTools.R")
+source_local("batch_correction_3Lfct.R","batch_correction_3Llauncher.R","easyrlibrary-lib/RcheckLibrary.R","easyrlibrary-lib/miniTools.R")
 
-
-## Reading of input files
-idsample=read.table(args$sampleMetadata,header=T,sep='\t',check.names=FALSE,comment.char = '')
-iddata=read.table(args$dataMatrix,header=T,sep='\t',check.names=FALSE,comment.char = '')
-
-### Table match check 
-table.check <- match2(iddata,idsample,"sample")
-if(length(table.check)>1){check.err(table.check)}
-
-### StockID
-samp.id <- stockID(iddata,idsample,"sample")
-iddata<-samp.id$dataMatrix ; idsample<-samp.id$Metadata ; samp.id<-samp.id$id.match
-
-### Checking mandatory variables
-mand.check <- ""
-for(mandcol in c(args$sample_type_col_name, args$injection_order_col_name, args$batch_col_name)){
-  if(!(mandcol%in%colnames(idsample))){
-    mand.check <- c(mand.check,"\nError: no '",mandcol,"' column in sample metadata.\n",
-                    "Note: table must include this exact column name (it is case-sensitive).\n")
-  }
-}
-if(length(mand.check)>1){
-  mand.check <- c(mand.check,"\nFor more information, see the help section or:",
-                  "\n http://workflow4metabolomics.org/sites/",
-                  "workflow4metabolomics.org/files/files/w4e-2016-data_processing.pdf\n")
-  check.err(mand.check)
-}
-
-### Formating
-idsample[[1]]=make.names(idsample[[1]])
-dimnames(iddata)[[1]]=iddata[[1]]
-
-### Transposition of ions data
-idTdata=t(iddata[,2:dim(iddata)[2]])
-idTdata=data.frame(dimnames(idTdata)[[1]],idTdata)
-	
-### Merge of 2 files (ok even if the two dataframe are not sorted on the same key)
-id=merge(idsample, idTdata, by.x=1, by.y=1)
-
-id[[args$batch_col_name]]=as.factor(id[[args$batch_col_name]])
-ids=id[id[[args$sample_type_col_name]] == args$sample_type_tags$pool | id[[args$sample_type_col_name]] == args$sample_type_tags$sample,]
-nbid=dim(idsample)[2]
-	
-### Checking the number of sample and pool
-	
-# least 2 samples
-if(length(which(ids[[args$sample_type_col_name]] == args$sample_type_tags$sample))<2){
-	table.check <- c(table.check,"\nError: less than 2 samples specified in sample metadata.",
-	       "\nMake sure this is not due to errors in sampleType coding.\n")
-}
-	
-# least 2 pools per batch for all batchs
-B <- rep(0,length(levels(ids[[args$batch_col_name]])))
-for(nbB in length(levels(ids[[args$batch_col_name]]))){
-	B[nbB]<-length(which(ids[which(ids[[args$batch_col_name]]==(levels(ids[[args$batch_col_name]])[nbB])),][[args$sample_type_col_name]] == args$sample_type_tags$pool))
-}
-if(length(which(B>1))==0){
-	table.check <- c(table.check,"\nError: less than 2 pools specified in each batch in sample metadata.",
-	       "\nMake sure this is not due to errors in sampleType coding.\n")
-}
-	
-### Factor of interest 
-factbio=args$ref_factor
-
-
+# Specificities of BC and DBC
 if(args$analyse == "batch_correction") {
-	## Reading of Metadata Ions file
-	metaion=read.table(args$variableMetadata,header=T,sep='\t',check.names=FALSE,comment.char = '')
-	## Table match check 
-	table.check <- c(table.check,match2(iddata,metaion,"variable"))
-	check.err(table.check)
-	
-	## variables
-	detail=args$detail
-	method=args$method
-	
-	## outputs
-	outlog=args$graph_output
-	
-	## Launch
-	res = norm_QCpool(ids,nbid,outlog,factbio,metaion,detail,F,F,method,args$span,args$valnull)
-	save(res, file=args$rdata_output)
-	write.table(reproduceID(res[[1]],res[[3]],"sample",samp.id)$dataMatrix, file=args$dataMatrix_out, sep = '\t', row.names=F, quote=F)
-	write.table(res[[2]], file=args$variableMetadata_out, sep = '\t', row.names=F, quote=F)
+  args$out_graph_pdf <- NULL
+  args$out_preNormSummary <- NULL
 }else{
-	## error check
-	check.err(table.check)
-	
-	## outputs
-	out_graph_pdf=args$out_graph_pdf
-	out_preNormSummary=args$out_preNormSummary
-	
-	## Launch
-	plotsituation(ids,nbid,out_graph_pdf,out_preNormSummary,factbio,args$span)
+  args$variableMetadata <- NULL
+  args$rdata_output <- NULL
+  args$dataMatrix_out <- NULL
+  args$variableMetadata_out <- NULL
+  args$graph_output <- NULL
+  args$method <- NULL
+  args$detail <- NULL
+  args$valnull <- NULL
 }
+
+# Launch tool
+meth3L(idsample=args$sampleMetadata, iddata=args$dataMatrix, sample_type_col_name=args$sample_type_col_name, injection_order_col_name=args$injection_order_col_name,
+       batch_col_name=args$batch_col_name, sample_type_tags=args$sample_type_tags, factbio=args$ref_factor, analyse=args$analyse, metaion=args$variableMetadata,
+	   detail=args$detail, method=args$method, outlog=args$graph_output, span=args$span, valnull=args$valnull, rdata_output=args$rdata_output,
+	   dataMatrix_out=args$dataMatrix_out, variableMetadata_out=args$variableMetadata_out, out_graph_pdf=args$out_graph_pdf, out_preNormSummary=args$out_preNormSummary)
 
 rm(args)

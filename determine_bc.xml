@@ -12,7 +12,7 @@
   </stdio>
  
   <command><![CDATA[
-    Rscript $__tool_directory__/batch_correction_wrapper.R
+    Rscript $__tool_directory__/batch_correction_3Lwrapper.R
       analyse "determine_bc"
       sampleMetadata "$sampleMetadata"
       dataMatrix "$dataMatrix"
