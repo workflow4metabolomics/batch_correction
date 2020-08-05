@@ -6,6 +6,7 @@
 # Based on batch_correction_wrapper.R version 2.91                                                            #
 # Version 1: xx-xx-2020                                                                                       #
 #            - split of tool-linked code and script-linked one                                                #
+#            - handling of sample tags' parameters                                                            #
 #                                                                                                             #
 # Input files: dataMatrix.txt, sampleMetadata.txt, variableMetadata.txt (BC only)                             #
 # Output files: graph.pdf, corrected table (BC only), diagnostic table (DBC only), variableMetadata (BC only) #
@@ -33,7 +34,7 @@ mand.check <- ""
 for(mandcol in c(sample_type_col_name, injection_order_col_name, batch_col_name)){
   if(!(mandcol%in%colnames(idsample))){
     mand.check <- c(mand.check,"\nError: no '",mandcol,"' column in sample metadata.\n",
-                    "Note: table must include this exact column name (it is case-sensitive).\n")
+                    "Note: column names are case-sensitive.\n")
   }
 }
 if(length(mand.check)>1){
@@ -55,28 +56,33 @@ idTdata=data.frame(dimnames(idTdata)[[1]],idTdata)
 id=merge(idsample, idTdata, by.x=1, by.y=1)
 
 id[[batch_col_name]]=as.factor(id[[batch_col_name]])
-ids=id[id[[sample_type_col_name]] == sample_type_tags$pool | id[[sample_type_col_name]] == sample_type_tags$sample,]
+ids=id[(id[[sample_type_col_name]] %in% sample_type_tags$pool) | (id[[sample_type_col_name]] %in% sample_type_tags$sample),]
 nbid=dim(idsample)[2]
 	
 ### Checking the number of sample and pool
 	
 # least 2 samples
-if(length(which(ids[[sample_type_col_name]] == sample_type_tags$sample))<2){
+if(length(which(ids[[sample_type_col_name]] %in% sample_type_tags$sample))<2){
 	table.check <- c(table.check,"\nError: less than 2 samples specified in sample metadata.",
-	       "\nMake sure this is not due to errors in sampleType coding.\n")
+	       "\nMake sure this is not due to errors in your ",sample_type_col_name," coding.\n")
 }
 	
 # least 2 pools per batch for all batchs
 B <- rep(0,length(levels(ids[[batch_col_name]])))
-for(nbB in length(levels(ids[[batch_col_name]]))){
-	B[nbB]<-length(which(ids[which(ids[[batch_col_name]]==(levels(ids[[batch_col_name]])[nbB])),][[sample_type_col_name]] == sample_type_tags$pool))
+for(nbB in 1:length(levels(ids[[batch_col_name]]))){
+	B[nbB]<-length(which(ids[which(ids[[batch_col_name]]==(levels(ids[[batch_col_name]])[nbB])),,drop=FALSE][[sample_type_col_name]] %in% sample_type_tags$pool))
 }
 if(length(which(B>1))==0){
-	table.check <- c(table.check,"\nError: less than 2 pools specified in each batch in sample metadata.",
-	       "\nMake sure this is not due to errors in sampleType coding.\n")
+	table.check <- c(table.check,"\nError: less than 2 pools specified in at least one batch in sample metadata.",
+	       "\nMake sure this is not due to errors in your ",sample_type_col_name," coding.\n")
 }
 
+
+
 ### BC/DBC-specific processing
+
+# Gathering mandatory information in a single object
+sm.meta <- list(batch=batch_col_name, injectionOrder=injection_order_col_name, sampleType=sample_type_col_name, sampleTag=sample_type_tags)
 
 if(analyse == "batch_correction") {
 	## Reading of Metadata Ions file
@@ -86,7 +92,7 @@ if(analyse == "batch_correction") {
 	check.err(table.check)
 	
 	## Launch
-	res = norm_QCpool(ids,nbid,outlog,factbio,metaion,detail,F,F,method,span,valnull)
+	res = norm_QCpool(ids,nbid,outlog,factbio,metaion,detail,FALSE,FALSE,method,span,valnull,sm.meta)
 	save(res, file=rdata_output)
 	write.table(reproduceID(res[[1]],res[[3]],"sample",samp.id)$dataMatrix, file=dataMatrix_out, sep = '\t', row.names=FALSE, quote=FALSE)
 	write.table(res[[2]], file=variableMetadata_out, sep = '\t', row.names=FALSE, quote=FALSE)
@@ -95,7 +101,7 @@ if(analyse == "batch_correction") {
 	check.err(table.check)
 	
 	## Launch
-	plotsituation(ids,nbid,out_graph_pdf,out_preNormSummary,factbio,span)
+	plotsituation(ids,nbid,out_graph_pdf,out_preNormSummary,factbio,span,sm.meta)
 }
 
 }#end of meth3L

@@ -16,6 +16,7 @@
 # Version 3: xx-xx-2020                                                                        #
 #            - split of tool-linked code and script-linked one                                 #
 #            - addition of args print and sessionInfo()                                        #
+#            - adjustment of sample tags' parameters to 3L methods                             #
 #                                                                                              #
 # Input files: dataMatrix.txt, sampleMetadata.txt, variableMetadata.txt (BC only)              #
 # Output files: graph.pdf, corrected table (BC only), diagnostic table (DBC only),             #
@@ -88,7 +89,7 @@ if ( ! 'sample_type_tags' %in% names(args))
 # Parse sample type tags
 sample.type.tags <- list()
 for (kv in strsplit(strsplit(args$sample_type_tags, ',')[[1]], '='))
-	sample.type.tags[[kv[[1]]]] <- kv[[2]]
+	sample.type.tags[[kv[[1]]]] <- kv[-1]
 if ( ! all(c('pool', 'blank', 'sample') %in% names(sample.type.tags)))
 	stop("All tags pool, blank and sample must be defined in option sampleTypeTags.")
 args$sample_type_tags <- sample.type.tags

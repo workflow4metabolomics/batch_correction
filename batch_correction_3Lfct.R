@@ -25,6 +25,7 @@
 # Version 2.30 addition of suppressWarnings() for known and controlled warnings ; suppression of one useless "cat" message ; change in Rdata names ; 'batch(es)' in cat
 # Version 2.90 change in handling of generated negative and Inf values
 # Version 2.91 Plot improvement
+# Version 3.00 - handling of sample tags' parameters
 
 ok_norm=function(qcp,qci,spl,spi,method) {
   # Function used for one ion within one batch to determine whether or not batch correction is possible
@@ -61,22 +62,27 @@ ok_norm=function(qcp,qci,spl,spi,method) {
   ok_norm=ok
 }
 
-plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNormSummary.txt",fact=args$batch_col_name,span="none") {
-    #	Check for all ions in every batch if linear or lo(w)ess correction is possible.
-    #	Use ok_norm function and create a file (PreNormSummary.txt) with the error code.
-    #	Also create a pdf file with plots of linear and lo(w)ess regression lines.
-    #	x: dataframe with ions in columns and samples in rows ; x is the result of concatenation of sample metadata file and ions file
-    #	nbid: number of samples description columns (id and factors) with at least : "batch","injectionOrder","sampleType"
-    #	outfic: name of regression plots pdf file
-    #	fact: factor to be used as categorical variable for plots and PCA.  
+plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNormSummary.txt",fact="batch",span="none",
+                           sm_meta=list(batch="batch", injectionOrder="injectionOrder", sampleType="sampleType", 
+                           sampleTag=list(pool="pool",blank="blank",sample="sample"))) {
+    # Checks for all ions in every batch if linear or lo(w)ess correction is possible.
+    # Uses ok_norm function and creates a file (PreNormSummary.txt) with the corresponding error codes.
+    # Also creates a pdf file with plots of linear and lo(w)ess regression lines.
+    # Parameters:
+    # x: dataframe with ions in columns and samples in rows ; x is the result of concatenation of sample metadata file and ions file
+    # nbid: number of samples description columns (id and factors) with at least : "batch","injectionOrder","sampleType"
+    # outfic: name of regression plots pdf file
+    # outres: name of summary table file
+    # fact: factor to be used as categorical variable for plots and PCA
+    # sm_meta: list of information about sample metadata coding
     indfact	=which(dimnames(x)[[2]]==fact)
-    indtypsamp	=which(dimnames(x)[[2]]==args$sample_type_col_name) 
-    indbatch	=which(dimnames(x)[[2]]==args$batch_col_name)
-    indinject	=which(dimnames(x)[[2]]==args$injection_order_col_name)
+    indtypsamp	=which(dimnames(x)[[2]]==sm_meta$sampleType) 
+    indbatch	=which(dimnames(x)[[2]]==sm_meta$batch)
+    indinject	=which(dimnames(x)[[2]]==sm_meta$injectionOrder)
     lastIon=dim(x)[2]
     nbi=lastIon-nbid # Number of ions = total number of columns - number of identifying columns
-    nbb=length(levels(x[[args$batch_col_name]])) # Number of batch = number of levels of "batch" comlumn (factor)
-    nbs=length(x[[args$sample_type_col_name]][x[[args$sample_type_col_name]]==args$sample_type_tags$sample])# Number of samples = number of rows with "sample" value in sampleType
+    nbb=length(levels(x[[sm_meta$batch]])) # Number of batch = number of levels of "batch" comlumn (factor)
+    nbs=length(x[[sm_meta$sampleType]][x[[sm_meta$sampleType]] %in% sm_meta$sampleTag$sample])# Number of samples = number of rows with "sample" value in sampleType
     pdf(outfic,width=27,height=7*ceiling((nbb+2)/3))
     cat(nbi," ions ",nbb," batch(es) \n")
     cv=data.frame(matrix(0,nrow=nbi,ncol=2))# initialisation de la dataset qui contiendra les CV
@@ -84,13 +90,13 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
     for (p in 1:nbi) {# for each ion
         par (mfrow=c(ceiling((nbb+2)/3),3),ask=F,cex=1.2)
         labion=dimnames(x)[[2]][p+nbid]
-        indpool=which(x[[args$sample_type_col_name]]==args$sample_type_tags$pool) # QCpools subscripts in x 
+        indpool=which(x[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool) # QCpools subscripts in x 
         pools1=x[indpool,p+nbid]; cv[p,1]=sd(pools1)/mean(pools1)# CV before correction
         for (b in 1:nbb) {# for each batch...
-            xb=data.frame(x[(x[[args$batch_col_name]]==levels(x[[args$batch_col_name]])[b]),c(indtypsamp,indinject,p+nbid)])
-            indpb = which(xb[[args$sample_type_col_name]]==args$sample_type_tags$pool)# QCpools subscripts in the current batch
-            indsp = which(xb[[args$sample_type_col_name]]==args$sample_type_tags$sample)# samples subscripts in the current batch
-            indbt = which(xb[[args$sample_type_col_name]]==args$sample_type_tags$sample | xb[[args$sample_type_col_name]]==args$sample_type_tags$pool)# indices de tous les samples d'un batch pools+samples  
+            xb=data.frame(x[(x[[sm_meta$batch]]==levels(x[[sm_meta$batch]])[b]),c(indtypsamp,indinject,p+nbid)])
+            indpb = which(xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool)# QCpools subscripts in the current batch
+            indsp = which(xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$sample)# samples subscripts in the current batch
+            indbt = which((xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$sample) | (xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool))# indices de tous les samples d'un batch pools+samples  
             normLinearTest=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="linear")
             normLoessTest=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="loess")
             normLowessTest=ok_norm(xb[indpb,3],xb[indpb,2], xb[indsp,3],xb[indsp,2],method="lowess")
@@ -118,7 +124,7 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
         }
 # series de plot avant et apres correction
 minval=min(x[p+nbid]);maxval=max(x[p+nbid])
-plot( x[[args$injection_order_col_name]], x[,p+nbid],col=x[[args$batch_col_name]],ylim=c(minval,maxval),ylab=labion,
+plot( x[[sm_meta$injectionOrder]], x[,p+nbid],col=x[[sm_meta$batch]],ylim=c(minval,maxval),ylab=labion,
       main=paste0("before correction (CV for pools = ",round(cv[p,1],2),")"))
 suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect before correction"))
     }
@@ -135,15 +141,16 @@ write.table(bilan,file=outres,sep="\t",row.names=F,quote=F)
 }
 
 
-normlowess=function (xb,detail="no",vref=1,b,span=NULL) {
+normlowess=function (xb,detail="no",vref=1,b,span=NULL,sm_meta=list(batch="batch", injectionOrder="injectionOrder", sampleType="sampleType", 
+                     sampleTag=list(pool="pool",blank="blank",sample="sample"))){
   #	Correction function applied to 1 ion in 1 batch. Use a lowess regression computed on QC-pools in order to correct samples intensity values
   #	xb : dataframe for 1 ion in columns and samples in rows.
   # vref : reference value (average of ion)
   # b : batch subscript
   # nbid: number of samples description columns (id and factors) with at least : "batch","injectionOrder","sampleType"
-  indpb = which(xb[[args$sample_type_col_name]]==args$sample_type_tags$pool) # pools subscripts of current batch
-  indsp = which(xb[[args$sample_type_col_name]]==args$sample_type_tags$sample) # samples of current batch subscripts
-  indbt = which(xb[[args$sample_type_col_name]]==args$sample_type_tags$sample | xb[[args$sample_type_col_name]]==args$sample_type_tags$pool);# batch subscripts of all samples and QC-pools
+  indpb = which(xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool) # pools subscripts of current batch
+  indsp = which(xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$sample) # samples of current batch subscripts
+  indbt = which((xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$sample) | (xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool));# batch subscripts of all samples and QC-pools
   labion=dimnames(xb)[[2]][3]
   newval=xb[[3]] # initialisation of corrected values = intial values
   ind <- 0 # initialisation of correction indicator
@@ -154,7 +161,7 @@ normlowess=function (xb,detail="no",vref=1,b,span=NULL) {
     reslowess=lowess(xb[indpb,2],xb[indpb,3],f=span2) # lowess regression with QC-pools 
     px=xb[indsp,2];  # vector of injectionOrder values only for samples  
     for(j in 1:length(indbt)) {	 
-      if (xb[[args$sample_type_col_name]][j]==args$sample_type_tags$pool) {
+      if (xb[[sm_meta$sampleType]][j] %in% sm_meta$sampleTag$pool) {
         if (reslowess$y[which(indpb==j)]==0) reslowess$y[which(indpb==j)] <- 1
         newval[j]=(vref*xb[j,3]) / (reslowess$y[which(indpb==j)])} 
       else { # for samples, the correction value cor correspond to the nearest QCpools 
@@ -183,16 +190,17 @@ normlowess=function (xb,detail="no",vref=1,b,span=NULL) {
   return(newval)
 }
 
-normlinear <- function (xb,detail="no",vref=1,b,valneg=0) {
+normlinear <- function (xb,detail="no",vref=1,b,valneg=0,sm_meta=list(batch="batch", injectionOrder="injectionOrder", sampleType="sampleType", 
+                        sampleTag=list(pool="pool",blank="blank",sample="sample"))){
   # Correction function applied to 1 ion in 1 batch.
   # Use a linear regression computed on QC-pools in order to correct samples intensity values
   # xb: dataframe with ions in columns and samples in rows; x is a result of concatenation of sample metadata file and ion file 
   # nbid: number of sample description columns (id and factors) with at least "batch", "injectionOrder" and "sampleType"
   # b: which batch it is
   # valneg: to determine what to do with generated negative and Inf values
-  indpb = which(xb[[args$sample_type_col_name]]==args$sample_type_tags$pool)# pools subscripts of current batch
-  indsp = which(xb[[args$sample_type_col_name]]==args$sample_type_tags$sample)# samples of current batch subscripts
-  indbt = which(xb[[args$sample_type_col_name]]==args$sample_type_tags$sample | xb[[args$sample_type_col_name]]==args$sample_type_tags$pool) # QCpools and samples of current batch subscripts
+  indpb = which(xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool)# pools subscripts of current batch
+  indsp = which(xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$sample)# samples of current batch subscripts
+  indbt = which((xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$sample) | (xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool)) # QCpools and samples of current batch subscripts
   labion=dimnames(xb)[[2]][3]
   newval=xb[[3]] # initialisation of corrected values = intial values	
   ind <- 0 # initialisation of correction indicator
@@ -242,16 +250,17 @@ normlinear <- function (xb,detail="no",vref=1,b,valneg=0) {
 }
 
 
-normloess <- function (xb,detail="no",vref=1,b,span=NULL) {
+normloess <- function (xb,detail="no",vref=1,b,span=NULL,sm_meta=list(batch="batch", injectionOrder="injectionOrder", sampleType="sampleType", 
+                       sampleTag=list(pool="pool",blank="blank",sample="sample"))){
     #	Correction function applied to 1 ion in 1 batch. 
     #   Use a loess regression computed on QC-pools in order to correct samples intensity values.
     #	xb : dataframe for 1 ion in columns and samples in rows.
     #   detail : level of detail in the outlog file.
     #   vref : reference value (average of ion)
     #   b : batch subscript
-    indpb = which(xb[[args$sample_type_col_name]]==args$sample_type_tags$pool) # pools subscripts of current batch
-    indsp = which(xb[[args$sample_type_col_name]]==args$sample_type_tags$sample) # samples of current batch subscripts
-    indbt = which(xb[[args$sample_type_col_name]]==args$sample_type_tags$sample | xb[[args$sample_type_col_name]]==args$sample_type_tags$pool);# batch subscripts of all samples and QCpools
+    indpb = which(xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool) # pools subscripts of current batch
+    indsp = which(xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$sample) # samples of current batch subscripts
+    indbt = which((xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$sample) | (xb[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool));# batch subscripts of all samples and QCpools
     labion=dimnames(xb)[[2]][3]
     newval=xb[[3]] # initialisation of corrected values = intial values
     ind <- 0 # initialisation of correction indicator
@@ -286,8 +295,9 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL) {
 
 
 
-norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPool=F, NormInt=F, method="linear",span="none",valNull="0")
-{
+norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPool=FALSE, NormInt=FALSE, method="linear",span="none",valNull="0",
+                         sm_meta=list(batch="batch", injectionOrder="injectionOrder", sampleType="sampleType", 
+                         sampleTag=list(pool="pool",blank="blank",sample="sample"))) {
   ### Correction applying linear or lo(w)ess correction function on all ions for every batch of a dataframe.
   # x: dataframe with ions in column and samples' metadata
   # nbid: number of sample description columns (id and factors) with at least "batch", "injectionOrder", "sampleType"
@@ -300,17 +310,19 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
   # NormMoyPool: not used
   # NormInt: not used
   # method: regression method to be used to correct : "linear" or "lowess" or "loess"
+  # span: span value for lo(w)ess regresion; "none" for linear or default values
   # valNull: to determine what to do with negatively estimated intensities
+  # sm_meta: list of information about sample metadata coding
 	indfact		=which(dimnames(x)[[2]]==fact)
-	indtypsamp=which(dimnames(x)[[2]]==args$sample_type_col_name)
-	indbatch	=which(dimnames(x)[[2]]==args$batch_col_name)
-	indinject	=which(dimnames(x)[[2]]==args$injection_order_col_name)
+	indtypsamp=which(dimnames(x)[[2]]==sm_meta$sampleType)
+	indbatch	=which(dimnames(x)[[2]]==sm_meta$batch)
+	indinject	=which(dimnames(x)[[2]]==sm_meta$injectionOrder)
 	lastIon=dim(x)[2]
 	valref=apply(as.matrix(x[,(nbid+1):(lastIon)]),2,mean) # reference value for each ion used to still have the same rought size of values
 	nbi=lastIon-nbid # number of ions
-	nbb=length(levels(x[[args$batch_col_name]])) # Number of batch(es) = number of levels of factor "batch" (can be =1)
-	nbs=length(x[[args$sample_type_col_name]][x[[args$sample_type_col_name]]==args$sample_type_tags$sample])# Number of samples 
-	nbp=length(x[[args$sample_type_col_name]][x[[args$sample_type_col_name]]==args$sample_type_tags$pool])# Number of QCpools
+	nbb=length(levels(x[[sm_meta$batch]])) # Number of batch(es) = number of levels of factor "batch" (can be =1)
+	nbs=length(x[[sm_meta$sampleType]][x[[sm_meta$sampleType]] %in% sm_meta$sampleTag$sample])# Number of samples 
+	nbp=length(x[[sm_meta$sampleType]][x[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool])# Number of QCpools
 	Xn=data.frame(x[,c(1:nbid)],matrix(0,nrow=nbp+nbs,ncol=nbi))# initialisation of the corrected dataframe (=initial dataframe)
   dimnames(Xn)=dimnames(x)
 	cv=data.frame(matrix(0,nrow=nbi,ncol=2))# initialisation of dataframe containing CV before and after correction
@@ -323,17 +335,17 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
 	for (p in 1:nbi) {# for each ion
 	  labion=dimnames(x)[[2]][p+nbid]
         if (detail == "reg") {if(nbb<6){par(mfrow=c(3,3),ask=F,cex=1.5)}else{par(mfrow=c(4,4),ask=F,cex=1.5)}}
-		indpool=which(x[[args$sample_type_col_name]]==args$sample_type_tags$pool)# QCpools subscripts in all batches
+		indpool=which(x[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool)# QCpools subscripts in all batches
 		pools1=x[indpool,p+nbid]; cv[p,1]=sd(pools1)/mean(pools1)# CV before correction
 		for (b in 1:nbb) {# for every batch
-			indpb = which(x[[args$batch_col_name]]==levels(x[[args$batch_col_name]])[b] & x[[args$sample_type_col_name]]==args$sample_type_tags$pool)# QCpools subscripts of the current batch	
-			indsp = which(x[[args$batch_col_name]]==levels(x[[args$batch_col_name]])[b] & x[[args$sample_type_col_name]]==args$sample_type_tags$sample)# samples subscripts of the current batch
-      indbt = which(x[[args$batch_col_name]]==levels(x[[args$batch_col_name]])[b] & (x[[args$sample_type_col_name]]==args$sample_type_tags$pool | x[[args$sample_type_col_name]]==args$sample_type_tags$sample)) # subscripts of all samples
+			indpb = which((x[[sm_meta$batch]]==levels(x[[sm_meta$batch]])[b]) & (x[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool))# QCpools subscripts of the current batch	
+			indsp = which((x[[sm_meta$batch]]==levels(x[[sm_meta$batch]])[b]) & (x[[sm_meta$sampleType]] %in% sm_meta$sampleTag$sample))# samples subscripts of the current batch
+      indbt = which(x[[sm_meta$batch]]==levels(x[[sm_meta$batch]])[b] & ((x[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool) | (x[[sm_meta$sampleType]] %in% sm_meta$sampleTag$sample))) # subscripts of all samples
       # cat(dimnames(x)[[2]][p+nbid]," indsp:",length(indsp)," indpb=",length(indpb)," indbt=",length(indbt)," ")
-			sub=data.frame(x[(x[[args$batch_col_name]]==levels(x[[args$batch_col_name]])[b]),c(indtypsamp,indinject,p+nbid)])
-			if (method=="linear") { res.norm = normlinear(sub,detail,valref[p],b,valNull)
-			} else { if (method=="loess"){ res.norm <- normloess(sub,detail,valref[p],b,span)
-			  } else { if (method=="lowess"){ res.norm <- normlowess(sub,detail,valref[p],b,span)
+			sub=data.frame(x[(x[[sm_meta$batch]]==levels(x[[sm_meta$batch]])[b]),c(indtypsamp,indinject,p+nbid)])
+			if (method=="linear") { res.norm = normlinear(sub,detail,valref[p],b,valNull,sm_meta)
+			} else { if (method=="loess"){ res.norm <- normloess(sub,detail,valref[p],b,span,sm_meta)
+			  } else { if (method=="lowess"){ res.norm <- normlowess(sub,detail,valref[p],b,span,sm_meta)
           } else {stop("\n--\nNo valid 'method' argument supplied.\nMust be 'linear','loess' or 'lowess'.\n--\n")}
 			}}
 			Xn[indbt,p+nbid] = res.norm[[1]]
@@ -353,12 +365,12 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
 		if (detail=="reg" || detail=="plot" ) {
 		  	# plot before and after correction
 		  	minval=min(cbind(x[p+nbid],Xn[p+nbid]),na.rm=TRUE);maxval=max(cbind(x[p+nbid],Xn[p+nbid]),na.rm=TRUE)
-		  	plot( x[[args$injection_order_col_name]], x[,p+nbid],col=x[[args$batch_col_name]],ylab=labion,ylim=c(minval,maxval),
+		  	plot( x[[sm_meta$injectionOrder]], x[,p+nbid],col=x[[sm_meta$batch]],ylab=labion,ylim=c(minval,maxval),
               main=paste0("before correction (CV for pools = ",round(cv[p,1],2),")"))
-              points(x[[args$injection_order_col_name]][indpool],x[indpool,p+nbid],col="maroon",pch=".",cex=2)
-		  	plot(Xn[[args$injection_order_col_name]],Xn[,p+nbid],col=x[[args$batch_col_name]],ylab="",ylim=c(minval,maxval),
+              points(x[[sm_meta$injectionOrder]][indpool],x[indpool,p+nbid],col="maroon",pch=".",cex=2)
+		  	plot(Xn[[sm_meta$injectionOrder]],Xn[,p+nbid],col=x[[sm_meta$batch]],ylab="",ylim=c(minval,maxval),
              main=paste0("after correction (CV for pools = ",round(cv[p,2],2),")"))
-              points(Xn[[args$injection_order_col_name]][indpool],Xn[indpool,p+nbid],col="maroon",pch=".",cex=2)
+              points(Xn[[sm_meta$injectionOrder]][indpool],Xn[indpool,p+nbid],col="maroon",pch=".",cex=2)
 		  	suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect before correction"))
 		  	suppressWarnings(plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect after correction"))
 		}
