@@ -191,22 +191,27 @@ Input files
 | 3 : Variable metadata file |   tabular  |
 +----------------------------+------------+
 
+	| 
 
 Data Matrix file must contain the intensity values of variables.
 	| First line must contain all the samples' names
 	| First column must contain all the variables' ID
-	| 
+
 
 Sample metadata file must contain at least the three following columns: 
-	| "batch" to identify the batches of analyses
-	| "injectionOrder" (integers) defining the injection order of all samples (QC-pools as well as analysed samples)
-	| "sampleType" indicating if a sample ("sample") or a QC-pool ("pool"); each batch needs
-	| at least 3 QC-pools for intra-batch linear adjustment and 8 for lo(w)ess adjustment (5 for **all loess** methods)
+	| - a batch column (default to "*batch*") to identify the batches of analyses
+	| - an injection order column (default to "*injectionOrder*") composed of integers defining the injection order of samples
+	| - a sample type column (default to "*sampleType*") indicating if a sample is a biological one ("*sample*"), a QC-pool ("*pool*") or a blank ("*blank*")
+	| *Default values* can be changed according to your data coding using the customisation parameters in the "**Sample metadata file coding parameters**" section.
 
+
+**Notes concerning your design:** 
+	| - the 3 mandatory columns must not contain NA
+	| - your data should contain at least 3 QC-pools in each batch for intra-batch **linear** adjustment and 8 for **lo(w)ess** adjustment (minimum of 5 for **all loess** methods)
 
 .. class:: warningmark
 
-MISSING DATA are allowed only with the **all loess** methods
+MISSING DATA in the data matrix (intensities) are allowed only with the **all loess** methods
 
 
 ----------

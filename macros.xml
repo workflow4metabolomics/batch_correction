@@ -2,19 +2,21 @@
 <macros>
 
     <xml name="sm_customisation">
+      <section name="smcust" title="Sample metadata file coding parameters" expanded="False">
         <param name="batch_col_name" label="Batch column name" type="text" size="64" value="batch" help="The name of the column containing the batch values."/>
         <param name="injection_order_col_name" label="Injection order column name" type="text" size="64" value="injectionOrder" help="The name of the column containing the injection order values."/>
         <param name="sample_type_col_name" label="Sample type column name" type="text" size="64" value="sampleType" help="The name of the column containing the sample type values."/>
         <param name="sampleTypeTagPool" type="text" size="64"  value="pool" label="Set the name used to tag samples as pool in the sample type column."/>
         <param name="sampleTypeTagBlank" type="text" size="64"  value="blank" label="Set the name used to tag samples as blank in the sample type column."/>
         <param name="sampleTypeTagSample" type="text" size="64"  value="sample" label="Set the name used to tag samples as real sample in the sample type column."/>
+      </section>
     </xml>
 
     <token name="@SM_CUSTOM@">
-        batch_col_name "$batch_col_name"
-        injection_order_col_name "$injection_order_col_name"
-        sample_type_col_name "$sample_type_col_name"
-        sample_type_tags "blank=$sampleTypeTagBlank,pool=$sampleTypeTagPool,sample=$sampleTypeTagSample"
+        batch_col_name "$smcust.batch_col_name"
+        injection_order_col_name "$smcust.injection_order_col_name"
+        sample_type_col_name "$smcust.sample_type_col_name"
+        sample_type_tags "blank=$smcust.sampleTypeTagBlank,pool=$smcust.sampleTypeTagPool,sample=$smcust.sampleTypeTagSample"
     </token>
 
     <xml name="foi">
