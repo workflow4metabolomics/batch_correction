@@ -1,6 +1,10 @@
 <tool id="Determine_BC" name="Determine_batch_correction" version="2.2.3">
   <description>to choose between linear, lowess and loess methods</description>
-
+  
+  <macros>
+    <import>macros.xml</import>
+  </macros>
+  
   <requirements>
     <requirement type="package" version="1.1_4">r-batch</requirement>
     <requirement type="package" version="1.7_8">r-ade4</requirement>
@@ -24,12 +28,14 @@
       #end if
       out_graph_pdf "$out_graph_pdf"
       out_preNormSummary "$out_preNormSummary"
+	  @SM_CUSTOM@
   ]]></command>
   
   <inputs>
     <param name="dataMatrix" type="data" label="Data Matrix file " help="" format="tabular" />
     <param name="sampleMetadata" type="data" label="Sample metadata file " help="must contain at least the three following columns: 'batch' + 'injectionOrder' + 'sampleType'" format="tabular" />
-    <param name="ref_factor" type="text" label="Factor of interest " help="column name of the factor of interest (often a biological factor); if none, leave 'batch'" value="batch" />
+    <expand macro="sm_customisation"/>
+    <expand macro="foi"/>
     <conditional name="advance">
         <param name="option" type="select" label="Advanced options" help="should only be put at 'show' if you have good understanding of the span parameter and are willing to adjust it">
             <option value="show">show</option>
@@ -57,7 +63,7 @@
       <output name="out_preNormSummary" file="output-determinebc-preNormSummary.txt"/>
     </test>
   </tests>
-	
+
   <help>
 
 .. class:: infomark
