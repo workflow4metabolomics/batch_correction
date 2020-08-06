@@ -7,6 +7,7 @@
 # Version 1: xx-xx-2020                                                                                       #
 #            - split of tool-linked code and script-linked one                                                #
 #            - handling of sample tags' parameters                                                            #
+#            - accepting samples beyond pools and samples                                                     #
 #                                                                                                             #
 # Input files: dataMatrix.txt, sampleMetadata.txt, variableMetadata.txt (BC only)                             #
 # Output files: graph.pdf, corrected table (BC only), diagnostic table (DBC only), variableMetadata (BC only) #
@@ -53,10 +54,9 @@ idTdata=t(iddata[,2:dim(iddata)[2]])
 idTdata=data.frame(dimnames(idTdata)[[1]],idTdata)
 	
 ### Merge of 2 files (ok even if the two dataframe are not sorted on the same key)
-id=merge(idsample, idTdata, by.x=1, by.y=1)
+ids=merge(idsample, idTdata, by.x=1, by.y=1)
 
-id[[batch_col_name]]=as.factor(id[[batch_col_name]])
-ids=id[(id[[sample_type_col_name]] %in% sample_type_tags$pool) | (id[[sample_type_col_name]] %in% sample_type_tags$sample),]
+ids[[batch_col_name]]=as.factor(ids[[batch_col_name]])
 nbid=dim(idsample)[2]
 	
 ### Checking the number of sample and pool
