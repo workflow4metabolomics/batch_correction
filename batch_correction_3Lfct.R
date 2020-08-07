@@ -118,8 +118,9 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
             reslowess=lowess(xb[indpb,2],xb[indpb,3],f=span2)
             reslowessSample=lowess(xb[indsp,2],xb[indsp,3])
             liminf=min(xb[,3]);limsup=max(xb[,3])
-            plot(xb[indsp,2],xb[indsp,3],pch=16, main=paste(labion,"batch ",b),ylab="intensity",xlab="injection order",ylim=c(liminf,limsup))
-            if(nrow(xb)>(length(indpb)+length(indsp))){points(xb[-c(indpb,indsp),2], xb[-c(indpb,indsp),3],pch=18,col="lightgrey")}
+            firstinj=min(xb[,2]);lastinj=max(xb[,2])
+            plot(xb[indsp,2],xb[indsp,3],pch=16, main=paste(labion,"batch ",b),ylab="intensity",xlab="injection order",ylim=c(liminf,limsup),xlim=c(firstinj,lastinj))
+            if(nrow(xb)>(length(indpb)+length(indsp))){points(xb[-c(indpb,indsp),2], xb[-c(indpb,indsp),3],pch=18,col="grey")}
             points(xb[indpb,2], xb[indpb,3],pch=5)
             points(cbind(resloess$x,resloess$fitted)[order(resloess$x),],type="l",col="green3")
             points(cbind(resloessSample$x,resloessSample$fitted)[order(resloessSample$x),],type="l",col="green3",lty=2)
@@ -133,7 +134,7 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
         # series de plot avant correction
         minval=min(x[p+nbid]);maxval=max(x[p+nbid])
         plot( x[[sm_meta$injectionOrder]], x[,p+nbid],col=x[[sm_meta$batch]],ylim=c(minval,maxval),ylab=labion,
-              main=paste0("before correction (CV for pools = ",round(cv[p,1],2),")"))
+              main=paste0("before correction (CV for pools = ",round(cv[p,1],2),")"),xlab="injection order")
         suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect before correction"))
     }
     dev.off()
@@ -182,7 +183,8 @@ normlowess=function (xb,detail="no",vref=1,b,span=NULL,sm_meta=list(batch="batch
     }
     if (detail=="reg") {
       liminf=min(xb[,3]);limsup=max(xb[,3])
-      plot(xb[indsp,2],xb[indsp,3],pch=16,main=paste(labion,"batch ",b),ylab="intensity",xlab="injection order",ylim=c(liminf,limsup))
+      firstinj=min(xb[,2]);lastinj=max(xb[,2])
+      plot(xb[indsp,2],xb[indsp,3],pch=16,main=paste(labion,"batch ",b),ylab="intensity",xlab="injection order",ylim=c(liminf,limsup),xlim=c(firstinj,lastinj))
       if(nrow(xb)>(length(indpb)+length(indsp))){points(xb[-c(indpb,indsp),2], xb[-c(indpb,indsp),3],pch=18)}
       points(xb[indpb,2], xb[indpb,3],pch=5)
       points(reslowess,type="l",col="red")
@@ -226,8 +228,9 @@ normlinear <- function (xb,detail="no",vref=1,b,valneg=0,sm_meta=list(batch="bat
     pente=reslsfit$coefficients[2]
     if (detail=="reg") {
       liminf=min(xb[,3]);limsup=max(xb[,3])
+      firstinj=min(xb[,2]);lastinj=max(xb[,2])
       plot(xb[indsp,2],xb[indsp,3],pch=16,
-           main=paste(labion,"batch ",b),ylab="intensity",xlab="injection order",ylim=c(liminf,limsup))
+           main=paste(labion,"batch ",b),ylab="intensity",xlab="injection order",ylim=c(liminf,limsup),xlim=c(firstinj,lastinj))
       if(nrow(xb)>(length(indpb)+length(indsp))){points(xb[-c(indpb,indsp),2], xb[-c(indpb,indsp),3],pch=18)}
       points(xb[indpb,2], xb[indpb,3],pch=5)
       abline(reslsfit)
@@ -297,7 +300,8 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL,sm_meta=list(batch="bat
         } else { newval=(vref*xb[,3]) / corv  ; ind <- 1 } # confirmation of correction 
         if ((detail=="reg")&(ind==1)) { # plot
             liminf=min(xb[,3]);limsup=max(xb[,3])
-            plot(xb[indsp,2],xb[indsp,3],pch=16,main=paste(labion,"batch ",b),ylab="intensity",xlab="injection order",ylim=c(liminf,limsup))
+            firstinj=min(xb[,2]);lastinj=max(xb[,2])
+            plot(xb[indsp,2],xb[indsp,3],pch=16,main=paste(labion,"batch ",b),ylab="intensity",xlab="injection order",ylim=c(liminf,limsup),xlim=c(firstinj,lastinj))
             if(nrow(xb)>(length(indpb)+length(indsp))){points(xb[-c(indpb,indsp),2], xb[-c(indpb,indsp),3],pch=18)}
             points(xb[indpb,2], xb[indpb,3],pch=5)
             points(cbind(resloess$x,resloess$fitted)[order(resloess$x),],type="l",col="red")
@@ -358,6 +362,7 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
 	for (p in 1:nbi) {# for each ion
 	  labion=dimnames(x)[[2]][p+nbid]
         if (detail == "reg") {if(nbb<6){par(mfrow=c(3,3),ask=F,cex=1.5)}else{par(mfrow=c(4,4),ask=F,cex=1.5)}}
+        if (detail == "plot") {par(mfrow=c(2,2),ask=F,cex=1.5)}
 		indpool=which(x[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool)# QCpools subscripts in all batches
 		pools1=x[indpool,p+nbid]; cv[p,1]=sd(pools1)/mean(pools1)# CV before correction
 		for (b in 1:nbb) {# for every batch
@@ -389,13 +394,13 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
 		  	# plot before and after correction
 		  	minval=min(cbind(x[p+nbid],Xn[p+nbid]),na.rm=TRUE);maxval=max(cbind(x[p+nbid],Xn[p+nbid]),na.rm=TRUE)
 		  	plot( x[[sm_meta$injectionOrder]], x[,p+nbid],col=x[[sm_meta$batch]],ylab=labion,ylim=c(minval,maxval),
-              main=paste0("before correction (CV for pools = ",round(cv[p,1],2),")"))
-              points(x[[sm_meta$injectionOrder]][indpool],x[indpool,p+nbid],col="maroon",pch=".",cex=2)
+              main=paste0("before correction (CV for pools = ",round(cv[p,1],2),")"),xlab="injection order")
+              points(x[[sm_meta$injectionOrder]][indpool],x[indpool,p+nbid],col="maroon",pch=16,cex=1)
 		  	plot(Xn[[sm_meta$injectionOrder]],Xn[,p+nbid],col=x[[sm_meta$batch]],ylab="",ylim=c(minval,maxval),
-             main=paste0("after correction (CV for pools = ",round(cv[p,2],2),")"))
-              points(Xn[[sm_meta$injectionOrder]][indpool],Xn[indpool,p+nbid],col="maroon",pch=".",cex=2)
-		  	suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect before correction"))
-		  	suppressWarnings(plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect after correction"))
+             main=paste0("after correction (CV for pools = ",round(cv[p,2],2),")"),xlab="injection order")
+              points(Xn[[sm_meta$injectionOrder]][indpool],Xn[indpool,p+nbid],col="maroon",pch=16,cex=1)
+            suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect before correction"))
+            suppressWarnings(plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect after correction"))
 		}
 	}
   ### Replacement of post correction negative values by chosen value
@@ -408,19 +413,31 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
 
 	if (detail=="reg" || detail=="plot" || detail=="no") {
 		if (nbi > 3) {
-			par(mfrow=c(3,4),ask=F,cex=1.2) # PCA Plot before/after, normed only and ions plot
+            # Sum of ions before/after plot
+            par(mfrow=c(1,2),ask=F,cex=1.2)
+            xsum <- rowSums(x[,(nbid+1):lastIon],na.rm=TRUE)
+            Xnsum <- rowSums(Xn[,(nbid+1):lastIon],na.rm=TRUE)
+            plot(x[[sm_meta$injectionOrder]],xsum,col=x[[sm_meta$batch]],ylab="sum of variables' intensities",xlab="injection order",
+                 ylim=c(min(c(xsum,Xnsum),na.rm=TRUE),max(c(xsum,Xnsum),na.rm=TRUE)),main="Sum of intensities\nBefore correction")
+            points(x[[sm_meta$injectionOrder]][indpool],xsum[indpool],col="maroon",pch=16,cex=1.2)
+            plot(x[[sm_meta$injectionOrder]],Xnsum,col=x[[sm_meta$batch]],ylab="sum of variables' intensities",xlab="injection order",
+                 ylim=c(min(c(xsum,Xnsum),na.rm=TRUE),max(c(xsum,Xnsum),na.rm=TRUE)),main="Sum of intensities\nAfter correction")
+            points(x[[sm_meta$injectionOrder]][indpool],Xnsum[indpool],col="maroon",pch=16,cex=1.2)
+            # PCA Plot before/after, normed only and ions plot
+            par(mfrow=c(3,4),ask=F,cex=1.2) 
 			acplight(x[,c(indtypsamp,indbatch,indtypsamp,indfact,(nbid+1):lastIon)],"uv",TRUE)
 			norm.ion <- which(colnames(Xn)%in%(rownames(res.ind)[which(rowSums(res.ind)>=1)]))
 			acplight(Xn[,c(indtypsamp,indbatch,indtypsamp,indfact,(nbid+1):lastIon)],"uv",TRUE,norm.ion)
 			if(length(norm.ion)>0){acplight(Xn[,c(indtypsamp,indbatch,indtypsamp,indfact,norm.ion)],"uv",TRUE)}
-			par(mfrow=c(1,2),ask=F,cex=1.2) # Before/after boxplot
+            # Before/after boxplot
+            par(mfrow=c(1,2),ask=F,cex=1.2) 
 			cvplot=cv[!is.na(cv[[1]])&!is.na(cv[[2]]),]
-      if(nrow(cvplot)>0){
-			  boxplot(cvplot[[1]],ylim=c(min(cvplot),max(cvplot)),main="CV before correction")
-        boxplot(cvplot[[2]],ylim=c(min(cvplot),max(cvplot)),main="CV after correction")
-      }
-      dev.off()
-		}
+            if(nrow(cvplot)>0){
+              boxplot(cvplot[[1]],ylim=c(min(cvplot),max(cvplot)),main="CV of pools before correction")
+              boxplot(cvplot[[2]],ylim=c(min(cvplot),max(cvplot)),main="CV of pools after correction")
+            }
+            dev.off()
+        }
 	}
   if (nbi<=3) {dev.off()}
   # transposed matrix is return  (format of the initial matrix with ions in rows)
