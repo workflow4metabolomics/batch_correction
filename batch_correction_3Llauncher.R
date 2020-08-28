@@ -18,9 +18,22 @@ meth3L <- function(idsample,iddata,sample_type_col_name,injection_order_col_name
                    factbio,analyse,metaion,detail,method,outlog,span,valnull,
                    rdata_output,dataMatrix_out,variableMetadata_out,out_graph_pdf,out_preNormSummary){
 
+## Import function
+tab.import <- function(tested.file,tabtype){
+  tab.res <- tryCatch(read.table(tested.file,header=TRUE,sep='\t',check.names=FALSE,comment.char = ''), error=conditionMessage)
+  if(length(tab.res)==1){
+    stop(paste("Could not import the",tabtype,"file. There may be issues in your table integrity.\nCorresponding R error message:\n",tab.res))
+  }else{
+    tab.comp <- tryCatch(read.table(tested.file,header=TRUE,sep='\t',check.names=FALSE,comment.char = '',quote=""), error=conditionMessage)
+    if((length(tab.comp)!=1)&&(dim(tab.res)!=dim(tab.comp))){ # wrong original import due to quotes inside a column name
+      return(tab.comp)
+    }else{ return(tab.res) }
+  }
+}
+
 ## Reading of input files
-idsample=read.table(idsample,header=TRUE,sep='\t',check.names=FALSE,comment.char = '')
-iddata=read.table(iddata,header=TRUE,sep='\t',check.names=FALSE,comment.char = '')
+idsample=tab.import(idsample,"sampleMetadata")
+iddata=tab.import(iddata,"dataMatrix")
 
 ### Table match check 
 table.check <- match2(iddata,idsample,"sample")
@@ -45,7 +58,17 @@ if(length(mand.check)>1){
   check.err(mand.check)
 }
 
-### Formating ########## to update: check if make.names needed, change colnames for mandatory var
+if(analyse == "batch_correction") {
+    ## Reading of Metadata Ions file
+    metaion=read.table(metaion,header=T,sep='\t',check.names=FALSE,comment.char = '')
+    ## Table match check 
+    table.check <- c(table.check,match2(iddata,metaion,"variable"))
+    ## StockID
+    var.id <- stockID(iddata,metaion,"variable")
+    iddata<-var.id$dataMatrix ; metaion<-var.id$Metadata ; var.id<-var.id$id.match
+}
+
+### Formating
 idsample[[1]]=make.names(idsample[[1]])
 dimnames(iddata)[[1]]=iddata[[1]]
 
@@ -77,6 +100,23 @@ if(length(which(B>1))==0){
 	       "\nMake sure this is not due to errors in your ",sample_type_col_name," coding.\n")
 }
 
+### Checking the unicity of samples and variables
+uni.check <- function(tested.tab,tabtype,err.obj){
+  unicity <- duplicated(tested.tab[,1])
+  if(sum(unicity)>0){
+    #Sending back an explicit error
+    duptable <- t(t(table(tested.tab[,1][unicity])+1))
+    err.obj <- c(err.obj,paste0("\n-------\nError: your '",tabtype,"' IDs contain duplicates:\n"),
+                 paste(rownames(duptable),duptable,sep=": ",collapse="\n"),
+                 "\nSince identifiers are meant to be unique, please check your data.\n-------\n")
+  }
+  return(err.obj)
+}
+table.check <- uni.check(ids,"sample",table.check)
+if(analyse == "batch_correction"){table.check <- uni.check(metaion,"variable",table.check)}
+
+## error check
+check.err(table.check)
 
 
 ### BC/DBC-specific processing
@@ -85,21 +125,18 @@ if(length(which(B>1))==0){
 sm.meta <- list(batch=batch_col_name, injectionOrder=injection_order_col_name, sampleType=sample_type_col_name, sampleTag=sample_type_tags)
 
 if(analyse == "batch_correction") {
-	## Reading of Metadata Ions file
-	metaion=read.table(metaion,header=T,sep='\t',check.names=FALSE,comment.char = '')
-	## Table match check 
-	table.check <- c(table.check,match2(iddata,metaion,"variable"))
-	check.err(table.check)
-	
 	## Launch
 	res = norm_QCpool(ids,nbid,outlog,factbio,metaion,detail,FALSE,FALSE,method,span,valnull,sm.meta)
+    ## Get back original IDs
+    var.id <- reproduceID(res[[1]],res[[2]],"variable",var.id)
+    res[[1]] <- var.id$dataMatrix ; res[[2]] <- var.id$Metadata
+    samp.id <- reproduceID(res[[1]],res[[3]],"sample",samp.id)
+    res[[1]] <- samp.id$dataMatrix ; res[[3]] <- samp.id$Metadata
+    ## Save files
 	save(res, file=rdata_output)
-	write.table(reproduceID(res[[1]],res[[3]],"sample",samp.id)$dataMatrix, file=dataMatrix_out, sep = '\t', row.names=FALSE, quote=FALSE)
+    write.table(res[[1]], file=dataMatrix_out, sep = '\t', row.names=FALSE, quote=FALSE)
 	write.table(res[[2]], file=variableMetadata_out, sep = '\t', row.names=FALSE, quote=FALSE)
 }else{
-	## error check
-	check.err(table.check)
-	
 	## Launch
 	plotsituation(ids,nbid,out_graph_pdf,out_preNormSummary,factbio,span,sm.meta)
 }
