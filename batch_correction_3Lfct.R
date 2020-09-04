@@ -28,6 +28,7 @@
 # Version 3.00 - handling of sample tags' parameters
 #              - accepting sample types beyond "pool" and "sample"
 #              - dealing with NA
+#              - changes in the normalisation strategy regarding mean values to adjust for NA or 0 values
 
 ok_norm=function(qcp,qci,spl,spi,method,normref=NA,valimp="0") {
   # Function used for one ion within one batch to determine whether or not batch correction is possible
@@ -35,6 +36,7 @@ ok_norm=function(qcp,qci,spl,spi,method,normref=NA,valimp="0") {
   #   0 : no preliminary-condition problem
   #   1 : standard deviation of QC-pools or samples = 0
   #   2 : insufficient number of QC-pools within a batch (n=3 for linear, n=8 for lowess or loess)
+  #   2.5 : less than 2 samples within a batch
   #   3 : significant difference between QC-pools' and samples' means
   #   4 : denominator =0 when on 1 pool per batch <> 0
   #   5 : (linear regression only) the slopes ratio ?QC-pools/samples? is lower than -0.2
@@ -48,8 +50,8 @@ ok_norm=function(qcp,qci,spl,spi,method,normref=NA,valimp="0") {
   
   ok=0
   if (method=="linear") {minQC=3} else {minQC=8}
-  if (length(qcp)<minQC) { ok=2 
-  } else {
+  if (length(qcp[!is.na(qcp)])<minQC) { ok=2 } else { if (length(spl[!is.na(spl)])<2) { ok=2.5
+  } else { 
     if (sd(qcp,na.rm=TRUE)==0 | sd(spl,na.rm=TRUE)==0) { ok=1 
     } else {
     cvp= sd(qcp,na.rm=TRUE)/mean(qcp,na.rm=TRUE); cvs=sd(spl,na.rm=TRUE)/mean(spl,na.rm=TRUE)
@@ -74,7 +76,7 @@ ok_norm=function(qcp,qci,spl,spi,method,normref=NA,valimp="0") {
             normval = c(spl,qcp)*normref / denom
             if(length(which((normval==Inf)|(denom<1)))==length(normval)){ok=6}
           } 
-  }}}}} 
+  }}}}}} 
   ok_norm=ok
 }
 
@@ -120,24 +122,27 @@ plotsituation <- function (x, nbid,outfic="plot_regression.pdf", outres="PreNorm
             pre_bilan[ p,3*b-2]=normLinearTest
             pre_bilan[ p,3*b-1]=normLoessTest
             pre_bilan[ p,3*b]=normLowessTest
-          if(length(indpb)>1){
+          if(length(indpb)>1){ 
             if(span=="none"){span1<-1 ; span2<-2*length(indpool)/nbs}else{span1<-span ; span2<-span}
-            resloess=loess(xb[indpb,3]~xb[indpb,2],span=span1,degree=2,family="gaussian",iterations=4,surface="direct") 
-            resloessSample=loess(xb[indsp,3]~xb[indsp,2],span=2*length(indpool)/nbs,degree=2,family="gaussian",iterations=4,surface="direct") 
-            reslowess=lowess(xb[indpb,2],xb[indpb,3],f=span2)
-            reslowessSample=lowess(xb[indsp,2],xb[indsp,3])
+            if(normLoessTest!=2){resloess=loess(xb[indpb,3]~xb[indpb,2],span=span1,degree=2,family="gaussian",iterations=4,surface="direct")}
+            if(length(which(!(is.na(xb[indsp,3]))))>1){resloessSample=loess(xb[indsp,3]~xb[indsp,2],span=2*length(indpool)/nbs,degree=2,family="gaussian",iterations=4,surface="direct") }
+            if(normLowessTest!=2){reslowess=lowess(xb[indpb,2],xb[indpb,3],f=span2)}
+            if(length(which(!(is.na(xb[indsp,3]))))>1){reslowessSample=lowess(xb[indsp,2],xb[indsp,3])}
             liminf=min(xb[,3],na.rm=TRUE);limsup=max(xb[,3],na.rm=TRUE)
             firstinj=min(xb[,2],na.rm=TRUE);lastinj=max(xb[,2],na.rm=TRUE)
             plot(xb[indsp,2],xb[indsp,3],pch=16, main=paste(labion,"batch ",b),ylab="intensity",xlab="injection order",ylim=c(liminf,limsup),xlim=c(firstinj,lastinj))
             if(nrow(xb)>(length(indpb)+length(indsp))){points(xb[-c(indpb,indsp),2], xb[-c(indpb,indsp),3],pch=18,col="grey")}
             points(xb[indpb,2], xb[indpb,3],pch=5)
-            points(cbind(resloess$x,resloess$fitted)[order(resloess$x),],type="l",col="green3")
-            points(cbind(resloessSample$x,resloessSample$fitted)[order(resloessSample$x),],type="l",col="green3",lty=2)
-            points(reslowess,type="l",col="red"); points(reslowessSample,type="l",col="red",lty=2)
+            if(normLoessTest!=2){points(cbind(resloess$x,resloess$fitted)[order(resloess$x),],type="l",col="green3")}
+            if(length(which(!(is.na(xb[indsp,3]))))>1){points(cbind(resloessSample$x,resloessSample$fitted)[order(resloessSample$x),],type="l",col="green3",lty=2)}
+            if(normLowessTest!=2){points(reslowess,type="l",col="red")}; if(length(which(!(is.na(xb[indsp,3]))))>1){points(reslowessSample,type="l",col="red",lty=2)}
             abline(lsfit(xb[indpb,2],xb[indpb,3]),col="blue")
-            abline(lsfit(xb[indsp,2],xb[indsp,3]),lty=2,col="blue")
+            if(length(which(!(is.na(xb[indsp,3]))))>1){abline(lsfit(xb[indsp,2],xb[indsp,3]),lty=2,col="blue")}
             legend("topleft",c("pools","samples"),lty=c(1,2),bty="n")
             legend("topright",c("linear","lowess","loess"),lty=1,col=c("blue","red","green3"),bty="n")
+          } else {
+            plot.new()
+            legend("center","Plot only available when the\nbatch contains at least 2 pools.")
           }
         }
         # series de plot avant correction
@@ -199,14 +204,19 @@ normlowess=function (xb,detail="no",vref=1,b,span=NULL,sm_meta=list(batch="batch
       points(reslowess,type="l",col="red")
     }
     ind <- 1
-  } else {# if ok_norm <> 0 , we perform a correction based on batch samples average
-    moySample=mean(xb[indsp,3],na.rm=TRUE);if (moySample==0) moySample=1
-    newval[-c(indpb)] = (vref*xb[-c(indpb),3])/moySample
-    if(length(indpb)>0){
-      moypool=mean(xb[indpb,3],na.rm=TRUE) ; if (moypool==0) moypool=1
-      newval[indpb] = (vref*xb[indpb,3])/moypool
-    } else {
-      stop("\n- - - -\n No pool detected in this batch - correction process aborted\n- - - -\n")
+  } else {# if ok_norm != 0 , we perform a correction based on batch pool or sample average
+    if((length(which(!is.na(xb[indpb,3])))>0)&(length(which(xb[indpb,3]>0))>0)){
+      moypool=mean(xb[indpb,3],na.rm=TRUE)
+      newval = (vref*xb[,3])/moypool
+    } else { 
+      moysamp=mean(xb[indsp,3],na.rm=TRUE)
+      if((!is.na(moysamp))&(moysamp>0)){
+        cat("Warning: no pool value >0 detected in batch",b,"of ion",labion,": sample mean used as normalisation term.\n")
+        newval = (vref*xb[,3])/moysamp
+      } else {
+        dev.off()
+        stop(paste("\n- - - -\nNo pool nor sample value >0 in batch",b,"of ion",labion,"- correction process aborted.\n- - - -\n"))
+      }
     }
   }
   newval <- list(norm.ion=newval,norm.ind=ind)
@@ -264,14 +274,19 @@ normlinear <- function (xb,detail="no",vref=1,b,valneg=0,sm_meta=list(batch="bat
 	##  }
 	  }
 	}
-  } else {# if ok_norm!=0 , we perform a correction based on batch samples average.
-    moySample=mean(xb[indsp,3],na.rm=TRUE); if (moySample==0) moySample=1
-    newval[-c(indpb)] = (vref*xb[-c(indpb),3])/moySample
-    if(length(indpb)>0){
-      moypool=mean(xb[indpb,3],na.rm=TRUE) ; if (moypool==0) moypool=1
-      newval[indpb] = (vref*xb[indpb,3])/moypool
-    } else {
-        stop("\n- - - -\n No pool detected in this batch - correction process aborted\n- - - -\n")
+  } else {# if ok_norm != 0 , we perform a correction based on batch pool or sample average
+    if((length(which(!is.na(xb[indpb,3])))>0)&(length(which(xb[indpb,3]>0))>0)){
+      moypool=mean(xb[indpb,3],na.rm=TRUE)
+      newval = (vref*xb[,3])/moypool
+    } else { 
+      moysamp=mean(xb[indsp,3],na.rm=TRUE)
+      if((!is.na(moysamp))&(moysamp>0)){
+        cat("Warning: no pool value >0 detected in batch",b,"of ion",labion,": sample mean used as normalisation term.\n")
+        newval = (vref*xb[,3])/moysamp
+      } else {
+        dev.off()
+        stop(paste("\n- - - -\nNo pool nor sample value >0 in batch",b,"of ion",labion,"- correction process aborted.\n- - - -\n"))
+      }
     }
   }
   newval <- list(norm.ion=newval,norm.ind=ind)
@@ -316,14 +331,19 @@ normloess <- function (xb,detail="no",vref=1,b,span=NULL,sm_meta=list(batch="bat
             points(cbind(resloess$x,resloess$fitted)[order(resloess$x),],type="l",col="red")
         }
     } 
-    if (ind==0) {# if ok_norm != 0 or if correction creates outliers, we perform a correction based on batch samples average
-      moySample=mean(xb[indsp,3],na.rm=TRUE);if (moySample==0) moySample=1
-      newval[-c(indpb)] = (vref*xb[-c(indpb),3])/moySample
-      if(length(indpb)>0){
-        moypool=mean(xb[indpb,3],na.rm=TRUE) ; if (moypool==0) moypool=1
-        newval[indpb] = (vref*xb[indpb,3])/moypool
-      } else {
-        stop("\n- - - -\n No pool detected in this batch - correction process aborted\n- - - -\n")
+    if (ind==0) {# if ok_norm != 0 or if correction creates outliers, we perform a correction based on batch pool or sample average
+      if((length(which(!is.na(xb[indpb,3])))>0)&(length(which(xb[indpb,3]>0))>0)){
+        moypool=mean(xb[indpb,3],na.rm=TRUE)
+        newval = (vref*xb[,3])/moypool
+      } else { 
+        moysamp=mean(xb[indsp,3],na.rm=TRUE)
+        if((!is.na(moysamp))&(moysamp>0)){
+          cat("Warning: no pool value >0 detected in batch",b,"of ion",labion,": sample mean used as normalisation term.\n")
+          newval = (vref*xb[,3])/moysamp
+        } else {
+          dev.off()
+          stop(paste("\n- - - -\nNo pool nor sample value >0 in batch",b,"of ion",labion,"- correction process aborted.\n- - - -\n"))
+        }
       }
     }
     newval <- list(norm.ion=newval,norm.ind=ind)
@@ -355,8 +375,8 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
 	indbatch	=which(dimnames(x)[[2]]==sm_meta$batch)
 	indinject	=which(dimnames(x)[[2]]==sm_meta$injectionOrder)
 	lastIon=dim(x)[2]
-    indpoolsamp=which(x[[sm_meta$sampleType]] %in% c(sm_meta$sampleTag$pool,sm_meta$sampleTag$sample))# QCpools and samples subscripts
-    valref=apply(as.matrix(x[indpoolsamp,(nbid+1):(lastIon)]),2,mean,na.rm=TRUE) # reference value for each ion used to still have the same rought size of values
+	indpool=which(x[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool)# QCpools subscripts in all batches
+    valref=apply(as.matrix(x[indpool,(nbid+1):(lastIon)]),2,mean,na.rm=TRUE) # reference value for each ion used to still have the same rought size of values
 	nbi=lastIon-nbid # number of ions
 	nbb=length(levels(x[[sm_meta$batch]])) # Number of batch(es) = number of levels of factor "batch" (can be =1)
     Xn=data.frame(x[,c(1:nbid)],matrix(0,nrow=nrow(x),ncol=nbi))# initialisation of the corrected dataframe (=initial dataframe)
@@ -370,10 +390,25 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
   res.ind <- matrix(NA,ncol=nbb,nrow=nbi,dimnames=list(dimnames(x)[[2]][-c(1:nbid)],paste("norm.b",1:nbb,sep="")))
 	for (p in 1:nbi) {# for each ion
 	  labion=dimnames(x)[[2]][p+nbid]
+	  pools1=x[indpool,p+nbid]
+      if(length(which(pools1[!(is.na(pools1))]>0))<2){ # if not enough pools >0 -> no normalisation
+        war.note <- paste("Warning: less than 2 pools with values >0 in",labion,"-> no normalisation for this ion.")
+        cat(war.note,"\n")
+        Xn[,p+nbid] <- x[,p+nbid]
+        res.ind[p,] <- rep(0,nbb)
+        if (detail=="reg" || detail=="plot" ) {
+          par(mfrow=c(2,2),ask=F,cex=1.5)
+          plot.new()
+          legend("center",war.note)
+          minval=min(x[p+nbid],na.rm=TRUE);maxval=max(x[p+nbid],na.rm=TRUE)
+          plot( x[[sm_meta$injectionOrder]], x[,p+nbid],col=x[[sm_meta$batch]],ylab=labion,ylim=c(minval,maxval),
+          main="No correction",xlab="injection order")
+          points(x[[sm_meta$injectionOrder]][indpool],x[indpool,p+nbid],col="maroon",pch=16,cex=1)
+        }
+      } else {
         if (detail == "reg") {if(nbb<6){par(mfrow=c(3,3),ask=F,cex=1.5)}else{par(mfrow=c(4,4),ask=F,cex=1.5)}}
         if (detail == "plot") {par(mfrow=c(2,2),ask=F,cex=1.5)}
-		indpool=which(x[[sm_meta$sampleType]] %in% sm_meta$sampleTag$pool)# QCpools subscripts in all batches
-        pools1=x[indpool,p+nbid]; cv[p,1]=sd(pools1,na.rm=TRUE)/mean(pools1,na.rm=TRUE)# CV before correction
+        cv[p,1]=sd(pools1,na.rm=TRUE)/mean(pools1,na.rm=TRUE)# CV before correction
 		for (b in 1:nbb) {# for every batch
             indbt = which(x[[sm_meta$batch]]==(levels(x[[sm_meta$batch]])[b])) # subscripts of all samples
 			sub=data.frame(x[(x[[sm_meta$batch]]==levels(x[[sm_meta$batch]])[b]),c(indtypsamp,indinject,p+nbid)])
@@ -411,6 +446,7 @@ norm_QCpool <- function (x, nbid, outlog, fact, metaion, detail="no", NormMoyPoo
             suppressWarnings(plot.design( x[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect before correction"))
             suppressWarnings(plot.design(Xn[c(indtypsamp,indbatch,indfact,p+nbid)],main="factors effect after correction"))
 		}
+      }
 	}
   ### Replacement of post correction negative values by chosen value
 	Xnn=Xn
@@ -480,10 +516,10 @@ acplight <- function(ids, scaling="uv", indiv=FALSE,indcol=NULL) {
     ions=as.matrix(idss[,5:dim(idss)[2]])
 	# Removing ions containing NA (not compatible with standard PCA)
 	ions=t(na.omit(t(ions)))
-	if(i==1){if(ncol(ions)!=(ncol(idss)-4)){cat("Note:",(ncol(idss)-4)-ncol(ions),"ions were ignored for PCA display due to NA in intensities.\n")}}
+    if(i==1){if(ncol(ions)!=(ncol(idss)-4)){cat("Note:",(ncol(idss)-4)-ncol(ions),"ions were ignored for PCA display due to NA in intensities.\n")}}
     # Scaling choice: "uv","none","pareto"
     object=suppressWarnings(prep(ions, scale=scaling, center=TRUE))
-	if(i==1){if(length(which(apply(ions,2,var)==0))>0){cat("Warning: there are",length(which(apply(ions,2,var)==0)),"constant ions.\n")}}
+    if(i==1){if(length(which(apply(ions,2,var)==0))>0){cat("Warning: there are",length(which(apply(ions,2,var)==0)),"constant ions.\n")}}
     # ALGO: nipals,svdImpute, Bayesian, svd, probalistic=F
     result <- pca(object, center=F, method="svd", nPcs=2)
     # ADE4 : to plot samples' ellipsoid for each class
