@@ -20,7 +20,7 @@
     </token>
 
     <xml name="foi">
-        <param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="Column name of a factor of interest in the sampleMatadata table (if none, fill with the batch column name). This factor does not affect correction calculation." />
+        <param name="ref_factor" label="Factor of interest " type="text"  value="batch" help="Column name of a factor of interest in the sampleMatadata table (if none, fill with the batch column name). Used for graphical display only; this factor does not affect correction calculation." />
     </xml>
 
     <xml name="lll_span">
@@ -28,9 +28,10 @@
     </xml>
 
     <xml name="lll_options">
-        <param name="valnull" label="Null values" type="select" display="radio" help="What to do of generated negative or infinite values">
-            <option value="0">consider it as a null intensity</option>
-            <option value="NA">consider it as a missing value</option>
+        <param name="valnull" label="Unconsistant values" type="select" display="radio" help="What to do of generated negative or infinite values">
+            <option value="none">Prevent it: normalisation term reset to adequate minimum one</option>
+            <option value="0">Consider it as a null intensity ('0')</option>
+            <option value="NA">Consider it as a missing value ('NA')</option>
         </param>
         <expand macro="foi"/>
         <param name="detail" label="Level of details for plots " type="select" help="Amount of plots in the pdf file output. See Help section for more details.">

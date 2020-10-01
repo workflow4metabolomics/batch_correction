@@ -8,6 +8,8 @@
 #            - split of tool-linked code and script-linked one                                                #
 #            - handling of sample tags' parameters                                                            #
 #            - accepting samples beyond pools and samples                                                     #
+#            - dealing with special characters in IDs and column names                                        #
+#            - adding a min.norm argument to the function                                                     #
 #                                                                                                             #
 # Input files: dataMatrix.txt, sampleMetadata.txt, variableMetadata.txt (BC only)                             #
 # Output files: graph.pdf, corrected table (BC only), diagnostic table (DBC only), variableMetadata (BC only) #
@@ -16,7 +18,7 @@
 
 meth3L <- function(idsample,iddata,sample_type_col_name,injection_order_col_name,batch_col_name,sample_type_tags,
                    factbio,analyse,metaion,detail,method,outlog,span,valnull,
-                   rdata_output,dataMatrix_out,variableMetadata_out,out_graph_pdf,out_preNormSummary){
+                   rdata_output,dataMatrix_out,variableMetadata_out,out_graph_pdf,out_preNormSummary,min.norm){
 
 ## Import function
 tab.import <- function(tested.file,tabtype){
@@ -126,7 +128,7 @@ sm.meta <- list(batch=batch_col_name, injectionOrder=injection_order_col_name, s
 
 if(analyse == "batch_correction") {
 	## Launch
-	res = norm_QCpool(ids,nbid,outlog,factbio,metaion,detail,FALSE,FALSE,method,span,valnull,sm.meta)
+	res = norm_QCpool(ids,nbid,outlog,factbio,metaion,detail,FALSE,FALSE,method,span,valnull,sm.meta,min.norm)
     ## Get back original IDs
     var.id <- reproduceID(res[[1]],res[[2]],"variable",var.id)
     res[[1]] <- var.id$dataMatrix ; res[[2]] <- var.id$Metadata

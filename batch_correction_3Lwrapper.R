@@ -17,6 +17,7 @@
 #            - split of tool-linked code and script-linked one                                 #
 #            - addition of args print and sessionInfo()                                        #
 #            - adjustment of sample tags' parameters to 3L methods                             #
+#            - addition of the min.norm argument in meth3L() call                              #
 #                                                                                              #
 # Input files: dataMatrix.txt, sampleMetadata.txt, variableMetadata.txt (BC only)              #
 # Output files: graph.pdf, corrected table (BC only), diagnostic table (DBC only),             #
@@ -125,10 +126,11 @@ if(args$analyse == "batch_correction") {
 meth3L(idsample=args$sampleMetadata, iddata=args$dataMatrix, sample_type_col_name=args$sample_type_col_name, injection_order_col_name=args$injection_order_col_name,
        batch_col_name=args$batch_col_name, sample_type_tags=args$sample_type_tags, factbio=args$ref_factor, analyse=args$analyse, metaion=args$variableMetadata,
 	   detail=args$detail, method=args$method, outlog=args$graph_output, span=args$span, valnull=args$valnull, rdata_output=args$rdata_output,
-	   dataMatrix_out=args$dataMatrix_out, variableMetadata_out=args$variableMetadata_out, out_graph_pdf=args$out_graph_pdf, out_preNormSummary=args$out_preNormSummary)
+       dataMatrix_out=args$dataMatrix_out, variableMetadata_out=args$variableMetadata_out, out_graph_pdf=args$out_graph_pdf, out_preNormSummary=args$out_preNormSummary,
+       min.norm=1)
 
 
-cat('\n--------------------------------------------------------------------',
+cat('\n\n--------------------------------------------------------------------',
 '\nInformation about R (version, Operating System, attached or loaded packages):\n\n')
 sessionInfo()
 cat('--------------------------------------------------------------------\n',

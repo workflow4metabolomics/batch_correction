@@ -44,7 +44,7 @@
         #else:
             span "${span_condition.span}"
         #end if
-	valnull "${span_condition.valnull}"
+        valnull "${span_condition.valnull}"
         ref_factor "${span_condition.ref_factor}"
         detail "${span_condition.detail}"
     #end if
@@ -233,13 +233,14 @@ Span
 	| (the higher the smoother; higher values are prefered to avoid overfitting; Cleveland et al, 1997).
 	|
 
-Null values
+Unconsistant values
 	| available for regression model *linear*, *lowess* and *loess*
 	| Controls what is done regarding negative or infinite values that can be generated during regression estimation. 
-	| *consider it as a missing value* will switch concerned intensities to NA;
+	| *Prevent it* will change the normalisation term leading to an unconsistant value to prevent it:
+	| when intra batch denominator term is below 1, it is turned to the minimum >1 one obtained in the concerned batch.
+	| *Consider it as a missing value* will switch concerned intensities to NA;
 	| this option implies that concerned ions will not be considered in PCA display. 
-	| *consider it as a null intensity* will switch concerned intensities to 0 for lo(w)ess
-	| or correct them by the batch mean instead of regression estimate for linear. 
+	| *Consider it as a null intensity* will switch concerned intensities to 0.
 	| 
 
 Factor of interest
