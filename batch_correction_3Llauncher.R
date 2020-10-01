@@ -77,29 +77,29 @@ dimnames(iddata)[[1]]=iddata[[1]]
 ### Transposition of ions data
 idTdata=t(iddata[,2:dim(iddata)[2]])
 idTdata=data.frame(dimnames(idTdata)[[1]],idTdata)
-	
+
 ### Merge of 2 files (ok even if the two dataframe are not sorted on the same key)
 ids=merge(idsample, idTdata, by.x=1, by.y=1)
 
 ids[[batch_col_name]]=as.factor(ids[[batch_col_name]])
 nbid=dim(idsample)[2]
-	
+
 ### Checking the number of sample and pool
-	
+
 # least 2 samples
 if(length(which(ids[[sample_type_col_name]] %in% sample_type_tags$sample))<2){
-	table.check <- c(table.check,"\nError: less than 2 samples specified in sample metadata.",
-	       "\nMake sure this is not due to errors in your ",sample_type_col_name," coding.\n")
+    table.check <- c(table.check,"\nError: less than 2 samples specified in sample metadata.",
+           "\nMake sure this is not due to errors in your ",sample_type_col_name," coding.\n")
 }
-	
+
 # least 2 pools per batch for all batchs
 B <- rep(0,length(levels(ids[[batch_col_name]])))
 for(nbB in 1:length(levels(ids[[batch_col_name]]))){
-	B[nbB]<-length(which(ids[which(ids[[batch_col_name]]==(levels(ids[[batch_col_name]])[nbB])),,drop=FALSE][[sample_type_col_name]] %in% sample_type_tags$pool))
+    B[nbB]<-length(which(ids[which(ids[[batch_col_name]]==(levels(ids[[batch_col_name]])[nbB])),,drop=FALSE][[sample_type_col_name]] %in% sample_type_tags$pool))
 }
 if(length(which(B>1))==0){
-	table.check <- c(table.check,"\nError: less than 2 pools specified in at least one batch in sample metadata.",
-	       "\nMake sure this is not due to errors in your ",sample_type_col_name," coding.\n")
+    table.check <- c(table.check,"\nError: less than 2 pools specified in at least one batch in sample metadata.",
+           "\nMake sure this is not due to errors in your ",sample_type_col_name," coding.\n")
 }
 
 ### Checking the unicity of samples and variables
@@ -127,20 +127,20 @@ check.err(table.check)
 sm.meta <- list(batch=batch_col_name, injectionOrder=injection_order_col_name, sampleType=sample_type_col_name, sampleTag=sample_type_tags)
 
 if(analyse == "batch_correction") {
-	## Launch
-	res = norm_QCpool(ids,nbid,outlog,factbio,metaion,detail,FALSE,FALSE,method,span,valnull,sm.meta,min.norm)
+    ## Launch
+    res = norm_QCpool(ids,nbid,outlog,factbio,metaion,detail,FALSE,FALSE,method,span,valnull,sm.meta,min.norm)
     ## Get back original IDs
     var.id <- reproduceID(res[[1]],res[[2]],"variable",var.id)
     res[[1]] <- var.id$dataMatrix ; res[[2]] <- var.id$Metadata
     samp.id <- reproduceID(res[[1]],res[[3]],"sample",samp.id)
     res[[1]] <- samp.id$dataMatrix ; res[[3]] <- samp.id$Metadata
     ## Save files
-	save(res, file=rdata_output)
+    save(res, file=rdata_output)
     write.table(res[[1]], file=dataMatrix_out, sep = '\t', row.names=FALSE, quote=FALSE)
-	write.table(res[[2]], file=variableMetadata_out, sep = '\t', row.names=FALSE, quote=FALSE)
+    write.table(res[[2]], file=variableMetadata_out, sep = '\t', row.names=FALSE, quote=FALSE)
 }else{
-	## Launch
-	plotsituation(ids,nbid,out_graph_pdf,out_preNormSummary,factbio,span,sm.meta)
+    ## Launch
+    plotsituation(ids,nbid,out_graph_pdf,out_preNormSummary,factbio,span,sm.meta)
 }
 
 }#end of meth3L

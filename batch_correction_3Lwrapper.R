@@ -79,20 +79,20 @@ cat('--------------------------------------------------------------------\n\n')
 
 # Set default col names
 if ( ! 'batch_col_name' %in% names(args))
-	args[['batch_col_name']] <- 'batch'
+    args[['batch_col_name']] <- 'batch'
 if ( ! 'injection_order_col_name' %in% names(args))
-	args[['injection_order_col_name']] <- 'injectionOrder'
+    args[['injection_order_col_name']] <- 'injectionOrder'
 if ( ! 'sample_type_col_name' %in% names(args))
-	args[['sample_type_col_name']] <- 'sampleType'
+    args[['sample_type_col_name']] <- 'sampleType'
 if ( ! 'sample_type_tags' %in% names(args))
-	args[['sample_type_tags']] <- 'blank=blank,pool=pool,sample=sample'
+    args[['sample_type_tags']] <- 'blank=blank,pool=pool,sample=sample'
 
 # Parse sample type tags
 sample.type.tags <- list()
 for (kv in strsplit(strsplit(args$sample_type_tags, ',')[[1]], '='))
-	sample.type.tags[[kv[[1]]]] <- kv[-1]
+    sample.type.tags[[kv[[1]]]] <- kv[-1]
 if ( ! all(c('pool', 'blank', 'sample') %in% names(sample.type.tags)))
-	stop("All tags pool, blank and sample must be defined in option sampleTypeTags.")
+    stop("All tags pool, blank and sample must be defined in option sampleTypeTags.")
 args$sample_type_tags <- sample.type.tags
 
 ##------------------------------
@@ -100,9 +100,9 @@ args$sample_type_tags <- sample.type.tags
 ##------------------------------
 
 source_local <- function(...){
-	argv <- commandArgs(trailingOnly = FALSE)
-	base_dir <- dirname(substring(argv[grep("--file=", argv)], 8))
-	for(i in 1:length(list(...))){source(paste(base_dir, list(...)[[i]], sep="/"))}
+    argv <- commandArgs(trailingOnly = FALSE)
+    base_dir <- dirname(substring(argv[grep("--file=", argv)], 8))
+    for(i in 1:length(list(...))){source(paste(base_dir, list(...)[[i]], sep="/"))}
 }
 #Import the different functions
 source_local("batch_correction_3Lfct.R","batch_correction_3Llauncher.R","easyrlibrary-lib/RcheckLibrary.R","easyrlibrary-lib/miniTools.R")
@@ -125,7 +125,7 @@ if(args$analyse == "batch_correction") {
 # Launch tool
 meth3L(idsample=args$sampleMetadata, iddata=args$dataMatrix, sample_type_col_name=args$sample_type_col_name, injection_order_col_name=args$injection_order_col_name,
        batch_col_name=args$batch_col_name, sample_type_tags=args$sample_type_tags, factbio=args$ref_factor, analyse=args$analyse, metaion=args$variableMetadata,
-	   detail=args$detail, method=args$method, outlog=args$graph_output, span=args$span, valnull=args$valnull, rdata_output=args$rdata_output,
+       detail=args$detail, method=args$method, outlog=args$graph_output, span=args$span, valnull=args$valnull, rdata_output=args$rdata_output,
        dataMatrix_out=args$dataMatrix_out, variableMetadata_out=args$variableMetadata_out, out_graph_pdf=args$out_graph_pdf, out_preNormSummary=args$out_preNormSummary,
        min.norm=1)
 
