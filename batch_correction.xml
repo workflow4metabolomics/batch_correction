@@ -89,10 +89,12 @@
 	</inputs>
 	
 	<outputs>
-		<data name="dataMatrix_out" label="${tool.name}_${span_condition.method}_${dataMatrix.name}" format="tabular"/>
-		<data name="variableMetadata_out" label="${tool.name}_${span_condition.method}_${variableMetadata.name}" format="tabular"/>
+        <data name="dataMatrix_out" label="BC_${span_condition.method}_${dataMatrix.name}" format="tabular"/>
+        <data name="variableMetadata_out" label="BC_${span_condition.method}_${variableMetadata.name}" format="tabular"/>
 		<data name="graph_output" label="${tool.name}_${span_condition.method}_graph" format="pdf"/>
-		<data name="rdata_output" label="${tool.name}_${span_condition.method}_rdata" format="rdata"/>
+        <data name="rdata_output" label="${tool.name}_${span_condition.method}_rdata" format="rdata">
+            <filter>span_condition['method'] == 'all_loess_pool' or span_condition['method'] == 'all_loess_sample'</filter>
+        </data>
 	</outputs>
 
   <tests>
@@ -263,7 +265,7 @@ Level of details for plots
 Output files
 ------------
 
-Batch_correction_$method_rdata.rdata
+Batch_correction_$method_rdata.rdata ('all_loess' methods only)
 	| binary data
 	| Download, open R and use the 'load' function; objects are in the 'res' list
 	|
