@@ -4,7 +4,7 @@
 # Authors: Jean-Francois MARTIN / Melanie Petera                                                              #
 # Starting date: 04-08-2020                                                                                   #
 # Based on batch_correction_wrapper.R version 2.91                                                            #
-# Version 1: xx-xx-2020                                                                                       #
+# Version 1: 02-10-2020                                                                                       #
 #            - split of tool-linked code and script-linked one                                                #
 #            - handling of sample tags' parameters                                                            #
 #            - accepting samples beyond pools and samples                                                     #

@@ -7,10 +7,10 @@ Status: [![Build Status](https://travis-ci.org/workflow4metabolomics/batch_corre
 
 ### Description
 
-**Version:** 2.2.4  
-**Date:** 2019-01-22    
-**Author:** Jean-Francois Martin (INRA, AXIOM), Melanie Petera (INRA, PFEM), Marion Landi (INRA, PFEM), Franck Giacomoni (INRA, PFEM), and Etienne A. Thevenot (CEA, LIST)  
-**Email:** [jean-francois.martin(at)toulouse.inra.fr](mailto:jean-francois.martin@toulouse.inra.frr), [melanie.petera(at)clermont.inra.fr](mailto:melanie.petera@clermont.inra.fr), [etienne.thevenot(at)cea.fr](mailto:etienne.thevenot@cea.fr)  
+**Version:** 3.0.0  
+**Date:** 2020-10-02    
+**Author:** Jean-Francois Martin (INRAE, AXIOM), Melanie Petera (INRAE, PFEM), Marion Landi (PFEM), Franck Giacomoni (INRAE, PFEM), and Etienne A. Thevenot (CEA, LIST)  
+**Email:** [jean-francois.martin(at)inrae.fr](mailto:jean-francois.martin@inrae.fr), [melanie.petera(at)inrae.fr](mailto:melanie.petera@inrae.fr), [etienne.thevenot(at)cea.fr](mailto:etienne.thevenot@cea.fr)  
 **Citation:**  
 **Licence:** CeCILL  
 **Reference history:** [W4M00001_Sacurine-statistics; DOI:10.15454/1.4811121736910142E12](http://dx.doi.org/10.15454/1.4811121736910142E12) and [W4M00002_Sacurine-comprehensive; DOI:10.15454/1.481114233733302E12](http://dx.doi.org/10.15454/1.481114233733302E12)  
@@ -23,16 +23,14 @@ Status: [![Build Status](https://travis-ci.org/workflow4metabolomics/batch_corre
     + `determine_bc.xml` (for the "Determine Batch Correction" module)  
 * Image files: 
     + `static/images/batch_correction.png`    
-    + `static/images/determine_batch_correction.png`  
-    + `static/images/pdf_plotsituation.png`    
-    + `static/images/Vdk_pdf1.png`    
-    + `static/images/Vdk_pdf2.png`        
+    + `static/images/determine_batch_correction.png`          
 * Wrapper files:
-    + `batch_correction_wrapper.R`  
+    + `batch_correction_3Lwrapper.R`  
     + `batch_correction_all_loess_wrapper.R`  
 * Script files:
-    + `Normalisation_QCpool.r`  
-     + `batch_correction_all_loess_script.R`  
+    + `batch_correction_3Lfct.R`  
+    + `batch_correction_3Llauncher.R`
+    + `batch_correction_all_loess_script.R`  
 * R packages
   + **batch** from CRAN  
   
@@ -75,6 +73,24 @@ See the reference histories [W4M00001_Sacurine-statistics; DOI:10.15454/1.481112
  
 
 ### News
+
+###### CHANGES IN VERSION 3.0.0  
+
+NEW FEATURES 
+
+ * Specific names for the 'sampleType', 'injectionOrder', and 'batch' from sampleMetadata are now available in a dedicated parameter section
+ * Addition of a sum of ions before/after plot for linear/lowess/loess methods
+ * Addition of a third option in "Null values" parameter (renamed "unconsistant values") in linear/lowess/loess methods
+ * linear/lowess/loess methods now handle NA in intensities and allow "blank" samples in the dataset
+
+INTERNAL MODIFICATIONS
+
+ * XML optimisation using macros
+ * Output name changes
+ * linear/lowess/loess methods: disabling of RData output
+ * linear/lowess/loess methods: split of tool-linked code and script-linked one
+ * linear/lowess/loess methods: adjustments in the normalisation process to match matters linked to NA acceptance
+ * linear/lowess/loess methods: better handling of special characters in IDs and column names
 
 ###### CHANGES IN VERSION 2.2.4  
 

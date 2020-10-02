@@ -71,6 +71,6 @@ if (length(grep('-h', argv.wrapper)) > 0) {
 if (length(grep('--loess', argv.wrapper)) > 0) {
   source_wrapper("batch_correction_all_loess_wrapper.R")
 } else {
-  source_wrapper("batch_correction_wrapper.R")
+  source_wrapper("batch_correction_3Lwrapper.R")
 }
 

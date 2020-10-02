@@ -13,7 +13,7 @@
 # Version 2.2: 16-03-2015 inclusion of miniTools' functions for special characters             #
 # Version 2.90: 18-08-2015 new parameter valnull                                               #
 # Version 2.91: 25-08-2016 error message improvment                                            #
-# Version 3: xx-xx-2020                                                                        #
+# Version 3: 02-10-2020                                                                        #
 #            - split of tool-linked code and script-linked one                                 #
 #            - addition of args print and sessionInfo()                                        #
 #            - adjustment of sample tags' parameters to 3L methods                             #

@@ -54,7 +54,7 @@
   ]]></command>
 
 	<inputs>
-		<param name="dataMatrix" label="Data Matrix file " format="tabular" type="data" />
+        <param name="dataMatrix" label="Data matrix file " format="tabular" type="data" />
 		<param name="sampleMetadata" label="Sample metadata file " format="tabular" type="data" help="must contain at least the three following columns: 'batch' + 'injectionOrder' + 'sampleType'"/>
 		<param name="variableMetadata" label="Variable metadata file " format="tabular" type="data" />
 
@@ -213,15 +213,17 @@ Sample metadata file must contain at least the three following columns:
  | - the 3 mandatory columns must not contain NA
  | - your data should contain at least 3 QC-pools in each batch for intra-batch **linear** adjustment and 8 for **lo(w)ess** adjustment (minimum of 5 for **all loess** methods)
 
-.. class:: warningmark
-
-MISSING DATA in the data matrix (intensities) are allowed only with the **all loess** methods
 
 
 ----------
 Parameters
 ----------
 
+
+Sample metadata file coding parameters
+ | Enables to give the names of columns in the sample metadata table that contain the injection order, the batches and the sample types.
+ | Also enables to specify the sample type coding used in the sampletype column. 
+ |
 
 Type of regression model
  | To choose between *linear*, *lowess*, *loess*, *all loess pool*, and *all loess sample* strategies
@@ -250,14 +252,13 @@ Unconsistant values
 
 Factor of interest
  | available for regression model *linear*, *lowess* and *loess*
- | Name of the factor (column header) in Sample metadata file that will be used as a categorical variable for plots and PCA.
- | (often a biological factor ; if none, leave "batch")
+ | Name of the factor (column header) that will be used as a categorical variable for design plots (often a biological factor ; if none, put the batch column name).
  | This factor does not affect correction calculation.
  | 
 
 Level of details for plots
  | available for regression model *linear*, *lowess* and *loess*
- | *basic*: PCA + CV boxplot (before and after correction)
+ | *basic*: Sum of intensities + PCA + CV boxplot (before and after correction)
  | *standard*: 'basic' plots + before/after-correction plots of intensities over injection order, and design effects for each ion
  | *complete*: 'standard' plots + QC-pool regression plots per batch with samples' intensities over injection order
  | This factor is not used by the *all loess* methods where a unique figure is generated showing the sum of intensities along injection order, and the first 4 PCA scores.
@@ -280,25 +281,25 @@ Batch_correction_$method_graph.pdf
 
 Batch_correction_$method_variableMetadata.tabular
  | tsv output
- | Identical to the Variable metadata input file, with x more columns (where x is the number of batches) in case of *linear*, *lowess* and *loess* methods
+ | Identical to the variable metadata input file, with x more columns (where x is the number of batches) in case of *linear*, *lowess* and *loess* methods
  |
 
 Batch_correction_$method_dataMatrix.tabular
  | tsv output (tabulated)
- | Same formatting as Data Matrix file; contains corrected intensities
+ | Same formatting as the data matrix file; contains corrected intensities
  |
 
 
 ---------------------------------------------------
 
----------------
-Working example
----------------
+----------------------
+Additional information
+----------------------
 
 .. class:: infomark
 
 Refer to the corresponding "W4M HowTo" page:
- | `MS data processing - Filters and normalisation &lt;http://workflow4metabolomics.org/sites/workflow4metabolomics.org/files/files/w4e-2016-data_processing.pdf&gt;`_
+ | `MS data processing - Filters and normalisation &lt;https://download.workflow4metabolomics.org/docs/w4e2018/2018-10_EC_W4E%20-%20Dataprocessing_Filter_and_normalisation.pdf&gt;`_
  |
 
 See also the reference history:
@@ -310,6 +311,27 @@ See also the reference history:
 ----
 NEWS
 ----
+
+CHANGES IN VERSION 3.0.0  
+========================  
+
+NEW FEATURES 
+
+| - Specific names for the 'sampleType', 'injectionOrder', and 'batch' from sampleMetadata are now available in a dedicated parameter section
+| - Addition of a sum of ions before/after plot for linear/lowess/loess methods
+| - Addition of a third option in "Null values" parameter (renamed "unconsistant values") in linear/lowess/loess methods
+| - linear/lowess/loess methods now handle NA in intensities and allow "blank" samples in the dataset
+|
+
+INTERNAL MODIFICATIONS
+
+| - XML optimisation using macros
+| - Output name changes
+| - linear/lowess/loess methods: disabling of RData output
+| - linear/lowess/loess methods: split of tool-linked code and script-linked one
+| - linear/lowess/loess methods: adjustments in the normalisation process to match matters linked to NA acceptance
+| - linear/lowess/loess methods: better handling of special characters in IDs and column names
+|
 
 CHANGES IN VERSION 2.2.4  
 ========================  
