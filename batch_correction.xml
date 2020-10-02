@@ -160,6 +160,8 @@ See the **NEWS** section at the bottom of this page
 Batch_correction
 ================
 
+|
+
 -----------
 Description
 -----------
@@ -193,23 +195,23 @@ Input files
 | 3 : Variable metadata file |   tabular  |
 +----------------------------+------------+
 
-	| 
+ | 
 
 Data Matrix file must contain the intensity values of variables.
-	| First line must contain all the samples' names
-	| First column must contain all the variables' ID
+ | First line must contain all the samples' names
+ | First column must contain all the variables' ID
 
 
 Sample metadata file must contain at least the three following columns: 
-	| - a batch column (default to "*batch*") to identify the batches of analyses
-	| - an injection order column (default to "*injectionOrder*") composed of integers defining the injection order of samples
-	| - a sample type column (default to "*sampleType*") indicating if a sample is a biological one ("*sample*"), a QC-pool ("*pool*") or a blank ("*blank*")
-	| *Default values* can be changed according to your data coding using the customisation parameters in the "**Sample metadata file coding parameters**" section.
+ | - a batch column (default to "*batch*") to identify the batches of analyses
+ | - an injection order column (default to "*injectionOrder*") composed of integers defining the injection order of samples
+ | - a sample type column (default to "*sampleType*") indicating if a sample is a biological one ("*sample*"), a QC-pool ("*pool*") or a blank ("*blank*")
+ | *Default values* can be changed according to your data coding using the customisation parameters in the "**Sample metadata file coding parameters**" section.
 
 
 **Notes concerning your design:** 
-	| - the 3 mandatory columns must not contain NA
-	| - your data should contain at least 3 QC-pools in each batch for intra-batch **linear** adjustment and 8 for **lo(w)ess** adjustment (minimum of 5 for **all loess** methods)
+ | - the 3 mandatory columns must not contain NA
+ | - your data should contain at least 3 QC-pools in each batch for intra-batch **linear** adjustment and 8 for **lo(w)ess** adjustment (minimum of 5 for **all loess** methods)
 
 .. class:: warningmark
 
@@ -220,45 +222,46 @@ MISSING DATA in the data matrix (intensities) are allowed only with the **all lo
 Parameters
 ----------
 
+
 Type of regression model
-	| To choose between *linear*, *lowess*, *loess*, *all loess pool*, and *all loess sample* strategies
-	| **- Option 1** (**linear**, **lowess**, and **loess** methods): before the normalisation of each variable, some quality metrics are computed (see the "Determine Batch Correction" module); depending on the result, the variable can be normalized or not, with either the **linear**, **lowess** or **loess** model.
-	| **- Option 2** (**all loess pool** and **all loess sample**): each variable is normalized by using the 'loess' model;
-	| in the case **all loess pool** is chosen and the number of pool observations is below 5, the linear method is used (for all variables) and a warning is generated;
-	| if the pool intensities are not representative of the samples (which can be viewed on the figure where both trends are shown), the case **all loess sample** enables using the sample intensities (instead of the pool intensities) as the reference for the loess curve.
-	| In all "option 2" cases: the **median intensity of the reference observations** (either 'pool' or 'sample') is used as the scaling factor after the initial intensities have been divided by the loess predictions.
-	|
+ | To choose between *linear*, *lowess*, *loess*, *all loess pool*, and *all loess sample* strategies
+ | **- Option 1** (**linear**, **lowess**, and **loess** methods): before the normalisation of each variable, some quality metrics are computed (see the "Determine Batch Correction" module); depending on the result, the variable can be normalized or not, with either the **linear**, **lowess** or **loess** model.
+ | **- Option 2** (**all loess pool** and **all loess sample**): each variable is normalized by using the 'loess' model;
+ | in the case **all loess pool** is chosen and the number of pool observations is below 5, the linear method is used (for all variables) and a warning is generated;
+ | if the pool intensities are not representative of the samples (which can be viewed on the figure where both trends are shown), the case **all loess sample** enables using the sample intensities (instead of the pool intensities) as the reference for the loess curve.
+ | In all "option 2" cases: the **median intensity of the reference observations** (either 'pool' or 'sample') is used as the scaling factor after the initial intensities have been divided by the loess predictions.
+ |
 
 Span
-	| Smoothing parameter, advanced option for *lo(w)ess* and *all loess* methods
-	| In case of a loess fit, the **span** parameter (between 0 and 1) controls the smoothing
-	| (the higher the smoother; higher values are prefered to avoid overfitting; Cleveland et al, 1997).
-	|
+ | Smoothing parameter, advanced option for *lo(w)ess* and *all loess* methods
+ | In case of a loess fit, the **span** parameter (between 0 and 1) controls the smoothing
+ | (the higher the smoother; higher values are prefered to avoid overfitting; Cleveland et al, 1997).
+ |
 
 Unconsistant values
-	| available for regression model *linear*, *lowess* and *loess*
-	| Controls what is done regarding negative or infinite values that can be generated during regression estimation. 
-	| *Prevent it* will change the normalisation term leading to an unconsistant value to prevent it:
-	| when intra batch denominator term is below 1, it is turned to the minimum >1 one obtained in the concerned batch.
-	| *Consider it as a missing value* will switch concerned intensities to NA;
-	| this option implies that concerned ions will not be considered in PCA display. 
-	| *Consider it as a null intensity* will switch concerned intensities to 0.
-	| 
+ | available for regression model *linear*, *lowess* and *loess*
+ | Controls what is done regarding negative or infinite values that can be generated during regression estimation. 
+ | *Prevent it* will change the normalisation term leading to an unconsistant value to prevent it:
+ | when intra batch denominator term is below 1, it is turned to the minimum >1 one obtained in the concerned batch.
+ | *Consider it as a missing value* will switch concerned intensities to NA;
+ | this option implies that concerned ions will not be considered in PCA display. 
+ | *Consider it as a null intensity* will switch concerned intensities to 0.
+ | 
 
 Factor of interest
-	| available for regression model *linear*, *lowess* and *loess*
-	| Name of the factor (column header) in Sample metadata file that will be used as a categorical variable for plots and PCA.
-	| (often a biological factor ; if none, leave "batch")
-	| This factor does not affect correction calculation.
-	| 
+ | available for regression model *linear*, *lowess* and *loess*
+ | Name of the factor (column header) in Sample metadata file that will be used as a categorical variable for plots and PCA.
+ | (often a biological factor ; if none, leave "batch")
+ | This factor does not affect correction calculation.
+ | 
 
 Level of details for plots
-	| available for regression model *linear*, *lowess* and *loess*
-	| *basic*: PCA + CV boxplot (before and after correction)
-	| *standard*: 'basic' plots + before/after-correction plots of intensities over injection order, and design effects for each ion
-	| *complete*: 'standard' plots + QC-pool regression plots per batch with samples' intensities over injection order
-	| This factor is not used by the *all loess* methods where a unique figure is generated showing the sum of intensities along injection order, and the first 4 PCA scores.
-	| 
+ | available for regression model *linear*, *lowess* and *loess*
+ | *basic*: PCA + CV boxplot (before and after correction)
+ | *standard*: 'basic' plots + before/after-correction plots of intensities over injection order, and design effects for each ion
+ | *complete*: 'standard' plots + QC-pool regression plots per batch with samples' intensities over injection order
+ | This factor is not used by the *all loess* methods where a unique figure is generated showing the sum of intensities along injection order, and the first 4 PCA scores.
+ | 
 
 
 ------------
@@ -266,26 +269,26 @@ Output files
 ------------
 
 Batch_correction_$method_rdata.rdata ('all_loess' methods only)
-	| binary data
-	| Download, open R and use the 'load' function; objects are in the 'res' list
-	|
+ | binary data
+ | Download, open R and use the 'load' function; objects are in the 'res' list
+ |
 
 Batch_correction_$method_graph.pdf
-	| graphical output
-	| For the *linear* and *lo(w)ess* methods, content depends on level of details chosen 
-	|
+ | graphical output
+ | For the *linear* and *lo(w)ess* methods, content depends on level of details chosen 
+ |
 
 Batch_correction_$method_variableMetadata.tabular
-	| tsv output
-	| Identical to the Variable metadata input file, with x more columns (where x is the number of batches) in case of *linear*, *lowess* and *loess* methods
-	|
+ | tsv output
+ | Identical to the Variable metadata input file, with x more columns (where x is the number of batches) in case of *linear*, *lowess* and *loess* methods
+ |
 
 Batch_correction_$method_dataMatrix.tabular
-	| tsv output (tabulated)
-	| Same formatting as Data Matrix file; contains corrected intensities
-	|
+ | tsv output (tabulated)
+ | Same formatting as Data Matrix file; contains corrected intensities
+ |
 
-	
+
 ---------------------------------------------------
 
 ---------------
@@ -297,11 +300,10 @@ Working example
 Refer to the corresponding "W4M HowTo" page:
  | `MS data processing - Filters and normalisation &lt;http://workflow4metabolomics.org/sites/workflow4metabolomics.org/files/files/w4e-2016-data_processing.pdf&gt;`_
  |
- |
 
 See also the reference history:
  | `W4M00001_Sacurine-statistics (DOI:10.15454/1.4811121736910142E12) &lt;http://dx.doi.org/10.15454/1.4811121736910142E12&gt;`_
- |
+
 
 ---------------------------------------------------
 
