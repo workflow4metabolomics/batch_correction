@@ -53,49 +53,49 @@
     @SM_CUSTOM@
   ]]></command>
 
-	<inputs>
+    <inputs>
         <param name="dataMatrix" label="Data matrix file " format="tabular" type="data" />
-		<param name="sampleMetadata" label="Sample metadata file " format="tabular" type="data" help="must contain at least the three following columns: 'batch' + 'injectionOrder' + 'sampleType'"/>
-		<param name="variableMetadata" label="Variable metadata file " format="tabular" type="data" />
+        <param name="sampleMetadata" label="Sample metadata file " format="tabular" type="data" help="must contain at least the three following columns: 'batch' + 'injectionOrder' + 'sampleType'"/>
+        <param name="variableMetadata" label="Variable metadata file " format="tabular" type="data" />
 
         <expand macro="sm_customisation"/>
-		
-		<conditional name="span_condition">
-			<param name="method" label="Type of regression model " type="select" help="To select between linear or non-linear (lowess or loess) methods to be used in Van der Kloet algorithm ; when using loess, you can choose to use pools or samples to model batch effect.">
-				<option value="linear">linear</option>
-				<option value="lowess">lowess</option>
-				<option value="loess">loess</option>
-				<option value="all_loess_pool">all loess pool</option>
-				<option value="all_loess_sample">all loess sample</option>
-			</param>
-			<when value="linear">
+        
+        <conditional name="span_condition">
+            <param name="method" label="Type of regression model " type="select" help="To select between linear or non-linear (lowess or loess) methods to be used in Van der Kloet algorithm ; when using loess, you can choose to use pools or samples to model batch effect.">
+                <option value="linear">linear</option>
+                <option value="lowess">lowess</option>
+                <option value="loess">loess</option>
+                <option value="all_loess_pool">all loess pool</option>
+                <option value="all_loess_sample">all loess sample</option>
+            </param>
+            <when value="linear">
                 <expand macro="lll_options"/>
-			</when>
-			<when value="lowess">
+            </when>
+            <when value="lowess">
                 <expand macro="lll_span"/>
                 <expand macro="lll_options"/>
-			</when>
-			<when value="loess">
+            </when>
+            <when value="loess">
                 <expand macro="lll_span"/>
                 <expand macro="lll_options"/>
-			</when>
-			<when value="all_loess_pool">
-				<param name="span" type="float" value="1" label="span" help="smoothing parameter; must be > 0"/>
-			</when>
-			<when value="all_loess_sample">
-				<param name="span" type="float" value="1" label="span" help="smoothing parameter; must be > 0"/>
-			</when>
-		</conditional>
-	</inputs>
-	
-	<outputs>
+            </when>
+            <when value="all_loess_pool">
+                <param name="span" type="float" value="1" label="span" help="smoothing parameter; must be > 0"/>
+            </when>
+            <when value="all_loess_sample">
+                <param name="span" type="float" value="1" label="span" help="smoothing parameter; must be > 0"/>
+            </when>
+        </conditional>
+    </inputs>
+
+    <outputs>
         <data name="dataMatrix_out" label="BC_${span_condition.method}_${dataMatrix.name}" format="tabular"/>
         <data name="variableMetadata_out" label="BC_${span_condition.method}_${variableMetadata.name}" format="tabular"/>
-		<data name="graph_output" label="${tool.name}_${span_condition.method}_graph" format="pdf"/>
+        <data name="graph_output" label="${tool.name}_${span_condition.method}_graph" format="pdf"/>
         <data name="rdata_output" label="${tool.name}_${span_condition.method}_rdata" format="rdata">
             <filter>span_condition['method'] == 'all_loess_pool' or span_condition['method'] == 'all_loess_sample'</filter>
         </data>
-	</outputs>
+    </outputs>
 
   <tests>
     <test>
@@ -119,9 +119,8 @@
       <output name="dataMatrix_out" file="output-batchcorrection-dataMatrix.tsv"/>
     </test>
   </tests>
-	
-	
-	<help>
+
+    <help>
 
 .. class:: infomark
 
@@ -394,8 +393,8 @@ Modifications of the **all_loess_wrapper** file to handle the recent **ropls** p
             publisher = {Chapman et Hall: London},
             chapter = {8}
         }</citation>
-	<citation type="doi">10.1021/acs.jproteome.5b00354</citation>
+    <citation type="doi">10.1021/acs.jproteome.5b00354</citation>
     </citations>
-	
+
 
 </tool>
