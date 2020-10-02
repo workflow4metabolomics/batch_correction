@@ -1,4 +1,4 @@
-<tool id="Determine_BC" name="Determine_batch_correction" version="2.2.3">
+<tool id="Determine_BC" name="Determine_batch_correction" version="3.0.0">
   <description>to choose between linear, lowess and loess methods</description>
   
   <macros>
@@ -69,18 +69,18 @@
 .. class:: infomark
 
 **Authors**
-  | Jean-Francois Martin - PF MetaToul-AXIOM ; INRA ; MetaboHUB (for original version of this tool and overall development of the R script)
+  | Jean-Francois Martin - PF MetaToul-AXIOM ; INRAE ; MetaboHUB (for original version of this tool and overall development of the R script)
 
 .. class:: infomark
 
 **Contributors**
-  | Melanie Petera - PFEM ; INRA ; MetaboHUB (for R wrapper and R script improvement)
+  | Melanie Petera - PFEM ; INRAE ; MetaboHUB (for R wrapper and R script improvement)
 
 .. class:: infomark
 
 **Wrapping**
-  | Marion Landi - FLAME ; PFEM ; INRA ; MetaboHUB (for xml interface and R wrapper)
-  | Franck Giacomoni - PFEM ; INRA ; MetaboHUB (for xml interface and R wrapper)
+  | Marion Landi - FLAME ; PFEM (for original xml interface and R wrapper)
+  | Franck Giacomoni - PFEM ; INRAE ; MetaboHUB (for original xml interface and R wrapper)
 
 ---------------------------------------------------
 
@@ -121,7 +121,7 @@ Workflow position
 -----------------
 
 .. image:: determine_batch_correction.png
-        :width: 800
+        :width: 600
 
 
 -----------

@@ -1,4 +1,4 @@
-<tool id="Batch_correction" name="Batch_correction" version="2.2.4">
+<tool id="Batch_correction" name="Batch_correction" version="3.0.0">
   <description>Corrects intensities for signal drift and batch-effects</description>
   
   <macros>
@@ -125,10 +125,10 @@
 .. class:: infomark
 
 **Authors**
-  | Jean-Francois Martin - PF MetaToul-AXIOM ; INRA ; MetaboHUB (for original version of this tool and overall development of the R script)
-  | Melanie Petera - PFEM ; INRA ; MetaboHUB (for R wrapper and R script improvement)
-  | Marion Landi - FLAME ; PFEM ; INRA ; MetaboHUB (for xml interface and R wrapper)
-  | Franck Giacomoni - PFEM ; INRA ; MetaboHUB (for xml interface and R wrapper)
+  | Jean-Francois Martin - PF MetaToul-AXIOM ; INRAE ; MetaboHUB (for original version of this tool and overall development of the R script)
+  | Melanie Petera - PFEM ; INRAE ; MetaboHUB (for R wrapper and R script improvement regarding "linear/lowess/loess" methods)
+  | Marion Landi - FLAME ; PFEM (for original xml interface and R wrapper)
+  | Franck Giacomoni - PFEM ; INRAE ; MetaboHUB (for original xml interface and R wrapper)
   | Etienne Thevenot - LIST/LADIS ; CEA ; MetaboHUB (for R script and wrapper regarding "all loess pool" and "all loess sample" methods)
 
 ---------------------------------------------------
