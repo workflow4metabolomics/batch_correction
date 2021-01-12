@@ -60,8 +60,9 @@ Status: [![Build Status](https://travis-ci.org/workflow4metabolomics/batch_corre
 
 ### Tests
 
-The code in the batch_correction_wrapper can be tested by running the `runit/batchcorrection_runtests.R` R file  
+Some functional tests are provided in Galaxy format (see XML wrapper and test-data folder).
 
+WIP: The code in the batch_correction_wrapper can be tested by running the `test/batchcorrection_runtests.R` R file  
 You will need to install **RUnit** package in order to make it run:
 ```r
 install.packages('RUnit', dependencies = TRUE)
