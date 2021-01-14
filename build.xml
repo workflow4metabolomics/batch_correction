@@ -30,7 +30,7 @@
 	~ PLANEMO TEST ~
 	~~~~~~~~~~~~~-->
 
-	<target name="planemo.test" depends="planemo.conda.install">
+	<target name="planemo.test">
 		<exec executable="planemo" failonerror="true">
 			<arg value="test"/>
 			<arg value="--conda_prefix"/>

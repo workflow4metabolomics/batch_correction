@@ -1,6 +1,10 @@
-<tool id="Determine_BC" name="Determine_batch_correction" version="2.1.2">
+<tool id="Determine_BC" name="Determine_batch_correction" version="3.0.0">
   <description>to choose between linear, lowess and loess methods</description>
-
+  
+  <macros>
+    <import>macros.xml</import>
+  </macros>
+  
   <requirements>
     <requirement type="package" version="1.1_4">r-batch</requirement>
     <requirement type="package" version="1.7_8">r-ade4</requirement>
@@ -12,7 +16,7 @@
   </stdio>
  
   <command><![CDATA[
-    Rscript $__tool_directory__/batch_correction_wrapper.R
+    Rscript $__tool_directory__/batch_correction_3Lwrapper.R
       analyse "determine_bc"
       sampleMetadata "$sampleMetadata"
       dataMatrix "$dataMatrix"
@@ -24,12 +28,14 @@
       #end if
       out_graph_pdf "$out_graph_pdf"
       out_preNormSummary "$out_preNormSummary"
+      @SM_CUSTOM@
   ]]></command>
   
   <inputs>
-    <param name="dataMatrix" type="data" label="Data Matrix file " help="" format="tabular" />
+    <param name="dataMatrix" type="data" label="Data matrix file " help="" format="tabular" />
     <param name="sampleMetadata" type="data" label="Sample metadata file " help="must contain at least the three following columns: 'batch' + 'injectionOrder' + 'sampleType'" format="tabular" />
-    <param name="ref_factor" type="text" label="Factor of interest " help="column name of the factor of interest (often a biological factor); if none, leave 'batch'" value="batch" />
+    <expand macro="sm_customisation"/>
+    <expand macro="foi"/>
     <conditional name="advance">
         <param name="option" type="select" label="Advanced options" help="should only be put at 'show' if you have good understanding of the span parameter and are willing to adjust it">
             <option value="show">show</option>
@@ -57,24 +63,24 @@
       <output name="out_preNormSummary" file="output-determinebc-preNormSummary.txt"/>
     </test>
   </tests>
-	
+
   <help>
 
 .. class:: infomark
 
 **Authors**
-  | Jean-Francois Martin - PF MetaToul-AXIOM ; INRA ; MetaboHUB (for original version of this tool and overall development of the R script)
+  | Jean-Francois Martin - PF MetaToul-AXIOM ; INRAE ; MetaboHUB (for original version of this tool and overall development of the R script)
 
 .. class:: infomark
 
 **Contributors**
-  | Melanie Petera - PFEM ; INRA ; MetaboHUB (for R wrapper and R script improvement)
+  | Melanie Petera - PFEM ; INRAE ; MetaboHUB (for R wrapper and R script improvement)
 
 .. class:: infomark
 
 **Wrapping**
-  | Marion Landi - FLAME ; PFEM ; INRA ; MetaboHUB (for xml interface and R wrapper)
-  | Franck Giacomoni - PFEM ; INRA ; MetaboHUB (for xml interface and R wrapper)
+  | Marion Landi - FLAME ; PFEM (for original xml interface and R wrapper)
+  | Franck Giacomoni - PFEM ; INRAE ; MetaboHUB (for original xml interface and R wrapper)
 
 ---------------------------------------------------
 
@@ -89,26 +95,33 @@
 Determine_batch_correction
 ==========================
 
+| 
+
 -----------
 Description
 -----------
 
-| Allows to choose between linear or non-linear (lowess or loess) functions for batch correction
-| using quality control pooled samples (QC-pools) with correction algorithm as mentioned by Van Der Kloet (J Prot Res 2009).
 | 
-| Warning : this module does *not* deliver which choice should be made in model type;
-| it only provides tools to help users to determine which choice may be appropriate, based on their own expertise.
-| 
-| This tool is meant to be used prior to the Batch_correction tool to help make a choice in parameters,
-| but it is not a requirement and thus can be avoided.
 
+Generates outputs to help to determine what type of regression to use between linear or non-linear (lowess or loess) functions for batch correction
+using quality control pooled samples (QC-pools) with correction algorithm as described by Van Der Kloet (J Prot Res 2009).
+
+
+Warning: this module does *not* deliver which choice should be made in model type;
+it only provides information to help users in determining which choice may be appropriate, based on their own expertise.
+
+
+This tool is meant to be used prior to the Batch_correction tool to help to make a choice in parameters,
+but it is not a requirement and thus can be avoided.
+
+| 
 
 -----------------
 Workflow position
 -----------------
 
 .. image:: determine_batch_correction.png
-        :width: 800
+        :width: 600
 
 
 -----------
@@ -118,48 +131,54 @@ Input files
 +--------------------------+-----------+
 | Parameter : num + label  |   Format  |
 +==========================+===========+
-| 1 : Data Matrix file     |   tabular |
+| 1 : Data matrix file     |   tabular |
 +--------------------------+-----------+
 | 2 : Sample metadata file |   tabular |
 +--------------------------+-----------+
 
+| 
 
-Data Matrix file must contain the intensity values of the variables.
-	| First line must contain all the samples' names
-	| First column must contain all the variables' ID
-	| 
-
-Sample metadata file must contain at least the three following columns: 
-	| "batch" to identify the batches of analyses
-	| "injectionOrder" (integers) defining the injection order of all samples (QC-pools as well as analysed samples)
-	| "sampleType" indicating if a sample ("sample") or a QC-pool ("pool"); each batch needs
-	| at least 3 QC-pools for intra-batch linear adjustment and 8 for lo(w)ess adjustment
+The data matrix file must contain the intensity values of variables.
+ | First line must contain all the samples' names.
+ | First column must contain all the variables' ID.
 
 
-.. class:: warningmark
+The sample metadata file must contain at least the three following columns: 
+ | - a batch column (default to "*batch*") to identify the batches of analyses
+ | - an injection order column (default to "*injectionOrder*") composed of integers defining the injection order of samples
+ | - a sample type column (default to "*sampleType*") indicating if a sample is a biological one ("*sample*"), a QC-pool ("*pool*") or a blank ("*blank*")
+ | *Default values* can be changed according to your data coding using the customisation parameters in the "**Sample metadata file coding parameters**" section.
 
-NO MISSING DATA are allowed
+
+**Notes concerning your design:** 
+ | - the 3 mandatory columns must not contain NA
+ | - your data should contain at least 3 QC-pools in each batch for intra-batch **linear** adjustment and 8 for **lo(w)ess** adjustment
+
 
 
 ----------
 Parameters
 ----------
 
+Sample metadata file coding parameters
+ | Enables to give the names of columns in the sample metadata table that contain the injection order, the batches and the sample types.
+ | Also enables to specify the sample type coding used in the sampletype column. 
+ |
+
 Factor of interest
-	| name of the factor (column header) that will be used as a categorical variable for plots.
-	| (often a biological factor ; if none, leave “batch”).
-	| This factor does not affect correction calculation.
-	|
+ | Name of the factor (column header) that will be used as a categorical variable for design plots (often a biological factor ; if none, put the batch column name).
+ | This factor does not affect correction calculation.
+ |
 
 Advanced options
-	| should only be put at "show" if you have good understanding of the span parameter and are willing to adjust it.
-	|
+ | Should only be put at "show" if you have good understanding of the span parameter and are willing to adjust it.
+ |
 
 Span
-	| - when advanced option is at "hide" (default)
-	| default is 1 for loess regression and is two times the ratio between number of pools and number of samples for lowess regression.
-	| - when advanced option is at "show" : 
-	| filled value is used for lowess and loess regression.
+ | - When advanced option is at "hide" (default):
+ | default is 1 for loess regression and is two times the ratio between number of pools and number of samples for lowess regression.
+ | - When advanced option is at "show": 
+ | filled value is used for lowess and loess regressions.
 
 
 ------------
@@ -167,32 +186,34 @@ Output files
 ------------
 
 Determine_BC_preNormSummary.tabular
-	| tabular output
-	| Meaning of results of diagnosis analysis
-	| 0 : no preliminary-condition problem
-	| 1 : standard deviation of QC-pools or samples = 0
-	| 2 : insufficient number of QC-pools within a batch (n=3 for linear, n=8 for lowess or loess)
-	| 3 : significant difference between QC-pools and samples means
-	| 4 : denominator =0 when on 1 pool per batch non-0
-	| 5 : (linear regression only) the slopes ratio “QC-pools/samples” is lower than -0.2
-	|
+ | tabular output
+ | Meaning of results of diagnosis analysis
+ | 0 - no preliminary-condition problem
+ | 1 - standard deviation of QC-pools or samples = 0
+ | 2 - insufficient number of QC-pools within a batch (n=3 for linear, n=8 for lowess or loess)
+ | 2.5 - less than 2 samples within a batch
+ | 3 - significant difference between QC-pools' and samples' means
+ | 4 - denominator =0 when on 1 pool per batch non-zero
+ | 5 - (linear regression only) the slopes ratio “QC-pools/samples” is lower than -0.2
+ | 6 - (linear regression only) none of the pool or sample could be corrected if negative and infinite values are turned into NA
+ |
 
 Determine_BC_graph.pdf
-	| graphical output
-	| One page per ion. Plots regression curves for all methods allowed and plot.design results regarding the factor of interest. 
+ | graphical output
+ | One page per ion. Plots regression curves for all methods allowed and plot.design results regarding the factor of interest. 
 
-	
+
 ---------------------------------------------------
 
----------------
-Working example
----------------
+----------------------
+Additional information
+----------------------
 
 
 .. class:: warningmark
 
 Refer to the corresponding "W4M HowTo" page:
- | `MS data processing - Filters and normalisation &lt;http://workflow4metabolomics.org/sites/workflow4metabolomics.org/files/files/w4e-2016-data_processing.pdf&gt;`_
+ | `MS data processing - Filters and normalisation &lt;https://download.workflow4metabolomics.org/docs/w4e2018/2018-10_EC_W4E%20-%20Dataprocessing_Filter_and_normalisation.pdf&gt;`_
  |
  |
 
@@ -205,81 +226,6 @@ Refer to the corresponding "W4M HowTo" page:
         <citation type="doi">10.1021/pr900499r</citation>
     </citations>
   
-<!--  
-Input files
-===========
 
-| **These two input files can be used in the purview "URL/Text:" of the tool "Get Data/Upload File",**
-| **by checking the box "Convert spaces to tabs: YES"**
-
-Metadata_samples.txt
-	Model input Sample metadata file::
-
-		samples idLIMS serie factor01 factor02 batch injectionOrder sampleType
-		POOL1 POOL1 pool p pool 01_08_2011 1 p
-		X12588 12588 3 validation 2 01_08_2011 2 s
-		X17736 17736 3 Q1 1 01_08_2011 3 s
-		X15432 15432 3 validation 1 01_08_2011 4 s
-		X17159 17159 3 Q4 1 01_08_2011 5 s
-		X14325 14325 3 validation 2 01_08_2011 6 s
-		X17419 17419 3 Q4 1 01_08_2011 7 s
-		X16437 16437 3 Q4 1 01_08_2011 8 s
-		X16172 16172 3 Q4 2 01_08_2011 9 s
-		X16392 16392 3 Q4 2 01_08_2011 10 s
-		X13875 13875 3 validation 2 01_08_2011 11 s
-		POOL2 POOL2 pool p pool 01_08_2011 12 p
-		X13117 13117 3 Q4 2 01_08_2011 13 s
-		X13341 13341 3 Q1 2 01_08_2011 14 s
-		X16888 16888 3 Q4 1 01_08_2011 15 s
-		X17489 17489 3 Q4 2 01_08_2011 16 s
-		X12718 12718 3 Q1 2 01_08_2011 17 s
-		X16235 16235 3 Q4 2 01_08_2011 18 s
-		X16878 16878 3 Q1 1 01_08_2011 19 s
-		X12701 12701 3 validation 1 01_08_2011 20 s
-		X16220 16220 3 Q4 2 01_08_2011 21 s
-		X15635 15635 3 Q4 1 01_08_2011 22 s
-
-
-Intensity_matrix.txt
-	Model input Matrix Ions file BEFORE IMPLEMENTATION::
-
-		samples POOL1 X12588 X17736 X15432 X17159 X14325 X17419 X16437 X16172 X16392 X13875 POOL2 X13117 X13341 X16888 X17489 X12718 X16235 X16878 X12701 X16220 X15635
-		ion01 188.4140625 219.729126 122.5697632 123.5487671 805.8852539 183.4683838 37.33084106 151.8625488 97.12005615 91.24694824 69.87762451 195.4349365 112.4111938 136.7092285 159.9987793 172.1585693 0 117.5420532 133.6679688 80.05419922 160.0006104 760.0488281
-		ion02 82.02575684 87.11358643 79.82391357 80.33862305 83.08575439 94.27703857 76.02288818 77.04394531 76.97564697 84.17669678 81.04943848 86.44024658 84.11865234 83.71282959 77.75219727 79.15936279 75.98492432 78.2835083 78.98760986 73.98388672 72.20550537 82.16448975
-		ion03 25.31900024 24.2960968 23.29342651 31.54063416 30.3830719 22.42404175 35.44485474 26.38783264 17.1401825 21.27339172 20.25959778 26.33859253 18.17146301 26.32852173 24.30648804 28.34313965 29.37016296 18.23519897 24.48402405 25.38140869 24.35777283 21.31071472
-		ion04 65.87536621 62.68716431 46.60232544 62.77856445 29.53218079 47.59136963 90.13983154 28.35336304 58.74325562 31.39331055 23.32928467 30.39666748 41.43960571 21.27049255 88.1161499 29.36820984 24.30200195 25.00007629 45.60662842 103.293457 37.46994019 87.09295654
-		ion05 0 103.728544 279.5808214 884.2333448 824.5072072 434.6439081 764.82768 799.0972595 398.4002569 382.5370891 74.55342827 0 636.6596277 514.3863309 741.690017 412.3166491 660.8996555 57.36593795 102.2085264 455.6403091 548.6145486 515.8412195
-		ion06 2711.785156 3465.292969 2469.75 3435.259766 2482.3125 2593.654297 1407.915039 1291.253906 2241.734375 1444.189453 3363.683594 2578.642578 2633.181641 3397.763672 3706.855469 3647.212891 3548.410156 3714.640625 1889.213867 2262.707031 2107.417969 2763.21875
-		ion07 164.9023438 192.40625 140.7609863 192.4053955 139.7540283 140.748291 84.60144043 86.1819458 150.762207 89.90411377 207.5949707 164.0512695 149.8706055 186.336792 214.6140137 202.5360107 214.6877441 195.4482422 117.4679565 127.2941895 142.78479 163.0666504
-
-
-Parameters
-==========
-
-Factor analysis  -> **batch**
-
-
-Output files
-============
-
-out_preNormSummary.tabular:
-
-====== ============== ==============
-labion batch.1.linear batch.1.lowess
-====== ============== ==============
-ion01   2              2
-ion02   2              2
-ion03   2              2
-ion04   2              2
-ion05   1              1
-...     ...            ...
-====== ============== ==============
-
-
-out_graph_pdf.pdf
-
-.. image:: ./static/images/metabolomics/pdf_plotsituation.png
-        :width: 800
--->
 
 </tool>

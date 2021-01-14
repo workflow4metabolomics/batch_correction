@@ -29,6 +29,7 @@ if (length(grep('-h', argv.help)) > 0) {
     "\tbatch_col_name {val}: the column name for batch. Default value is \"batch\".\n",
     "\tinjection_order_col_name {val}: the column name for the injection order. Default value is \"injectionOrder\".\n",
     "\tsample_type_col_name {val}: the column name for the sample types. Default value is \"sampleType\".\n",
+    "\tsample_type_tags {val}: the tags used inside the sample type column, defined as key/value pairs separated by commas (example: blank=blank,pool=pool,sample=sample).\n",
     "\n")
   quit(status = 0)
 }
@@ -46,6 +47,16 @@ if ( ! 'injection_order_col_name' %in% names(args))
 	args[['injection_order_col_name']] <- 'injectionOrder'
 if ( ! 'sample_type_col_name' %in% names(args))
 	args[['sample_type_col_name']] <- 'sampleType'
+if ( ! 'sample_type_tags' %in% names(args))
+	args[['sample_type_tags']] <- 'blank=blank,pool=pool,sample=sample'
+
+# Parse sample type tags
+sample.type.tags <- list()
+for (kv in strsplit(strsplit(args$sample_type_tags, ',')[[1]], '='))
+	sample.type.tags[[kv[[1]]]] <- kv[[2]]
+if ( ! all(c('pool', 'blank', 'sample') %in% names(sample.type.tags)))
+	stop("All tags pool, blank and sample must be defined in option sampleTypeTags.")
+args$sample_type_tags <- sample.type.tags
 
 ##------------------------------
 ## init. functions
@@ -105,17 +116,20 @@ cat("\nStart of the '", modNamC, "' Galaxy module call: ",
 
 rawMN <- t(as.matrix(read.table(argVc["dataMatrix"],
                                 header = TRUE,
+                                comment.char = '',
                                 row.names = 1,
                                 sep = "\t")))
 
 samDF <- read.table(argVc["sampleMetadata"],
                     header = TRUE,
+                    comment.char = '',
                     row.names = 1,
                     sep = "\t")
 
 varDF <- read.table(argVc["variableMetadata"],
                     check.names = FALSE,
                     header = TRUE,
+                    comment.char = '',
                     row.names = 1,
                     sep = "\t") ## not used; for compatibility only
 
@@ -126,10 +140,11 @@ spnN <- as.numeric(argVc["span"])
 ## checking
 ##---------
 
-stopifnot(refC %in% c("pool", "sample"))
+stopifnot(refC %in% c('pool', 'sample'))
+refC <- args$sample_type_tags[[refC]]
 
-if(refC == "pool" &&
-   !any("pool" %in% samDF[, args$sample_type_col_name]))
+if(refC == args$sample_type_tags$pool &&
+   !any(args$sample_type_tags$pool %in% samDF[, args$sample_type_col_name]))
     stop("No 'pool' found in the 'sampleType' column; use the samples as normalization reference instead")
 
 refMN <- rawMN[samDF[, args$sample_type_col_name] == refC, ]
@@ -142,7 +157,6 @@ if(sum(refNasZerVl)) {
 
     refNasZerVi <- which(refNasZerVl)
     cat("The following variables have 'NA' or 0 values in all reference samples; they will be removed from the data:\n", sep = "")
-    print(refNasZerVi)
     rawMN <- rawMN[, !refNasZerVl, drop = FALSE]
     varDF <- varDF[!refNasZerVl, , drop = FALSE]
 

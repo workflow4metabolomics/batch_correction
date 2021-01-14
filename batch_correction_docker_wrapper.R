@@ -1,4 +1,4 @@
-#!/usr/bin/Rscript --vanilla --slave --no-site-file
+#!/usr/bin/env Rscript
 
 ################################################################################################
 # batch_correction_main_wrapper                                                                #
@@ -33,7 +33,6 @@ script_bypass <- function(other.script.name) {
   script.name <- sub(file.arg.name, "", initial.options[grep(file.arg.name, initial.options)])
   script.basename <- dirname(script.name)
   other.script.fullpath <- paste(sep="/", script.basename, other.script.name)
-  # print(paste("calling", other.script.fullpath, "from", script.name))
   other.script.cmd <- paste(sep=" ", "Rscript", other.script.fullpath, "-h")
   system(other.script.cmd, wait=TRUE)
 }
@@ -44,7 +43,6 @@ source_wrapper <- function(other.script.name){
   script.name <- sub(file.arg.name, "", initial.options[grep(file.arg.name, initial.options)])
   script.basename <- dirname(script.name)
   other.script.fullpath <- paste(sep="/", script.basename, other.script.name)
-  #print(paste("calling", other.script.fullpath, "from", script.name))
   source(other.script.fullpath)
 }
 
@@ -73,6 +71,6 @@ if (length(grep('-h', argv.wrapper)) > 0) {
 if (length(grep('--loess', argv.wrapper)) > 0) {
   source_wrapper("batch_correction_all_loess_wrapper.R")
 } else {
-  source_wrapper("batch_correction_wrapper.R")
+  source_wrapper("batch_correction_3Lwrapper.R")
 }
 

@@ -86,16 +86,17 @@ plotBatchF <- function(datMN, samDF.arg, spnN.arg) {
 
         batSeqVi <- which(samDF.arg[, args$batch_col_name] == batC)
         batPooVi <- intersect(batSeqVi,
-                              grep("pool", samDF.arg[, args$sample_type_col_name]))
+                              which(samDF.arg[, args$sample_type_col_name] == "pool"))
         batSamVi <- intersect(batSeqVi,
-                              grep("sample", samDF.arg[, args$sample_type_col_name]))
+                              which(samDF.arg[, args$sample_type_col_name] == "sample"))
         if(length(batPooVi))
-            lines(batSeqVi,
-                  loessF(sumVn, batPooVi, batSeqVi, spnN=spnN.arg),
-                  col = colVc["pool"])
-        lines(batSeqVi,
-              loessF(sumVn, batSamVi, batSeqVi, spnN=spnN.arg),
-              col = colVc["samp"])
+          lines(batSeqVi,
+                loessF(sumVn, batPooVi, batSeqVi, spnN=spnN.arg),
+                col = colVc["pool"])
+        if (length(batSamVi))
+          lines(batSeqVi,
+                loessF(sumVn, batSamVi, batSeqVi, spnN=spnN.arg),
+                col = colVc["samp"])
 
     }
 
@@ -231,13 +232,13 @@ shiftBatchCorrectF <- function(rawMN.arg,
 
     ## checking extrapolation: are there pools at the first and last observations of each batch
 
-    if(refC.arg == "pool") {
+    if(refC.arg == args$sample_type_tags$pool) {
         pooExtML <- matrix(FALSE, nrow = 2, ncol = length(batRawLs),
                            dimnames = list(c("first", "last"), names(batRawLs)))
         for(batC in names(batSamLs)) {
             batSamTypVc <- batSamLs[[batC]][, args$sample_type_col_name]
-            pooExtML["first", batC] <- head(batSamTypVc, 1) == "pool"
-            pooExtML["last", batC] <- tail(batSamTypVc, 1) == "pool"
+            pooExtML["first", batC] <- head(batSamTypVc, 1) == args$sample_type_tags$pool
+            pooExtML["last", batC] <- tail(batSamTypVc, 1) == args$sample_type_tags$pool
         }
         if(!all(c(pooExtML))) {
             cat("\nWarning: Pools are missing at the first and/or last position of the following batches:\n")
@@ -264,7 +265,7 @@ shiftBatchCorrectF <- function(rawMN.arg,
 
         batAllVi <- 1:nrow(batRawMN)
 
-        batRefVi <- grep(refC.arg, batSamDF[, args$sample_type_col_name])
+        batRefVi <- which(batSamDF[, args$sample_type_col_name] == refC.arg)
 
         if(length(batRefVi) < 5)
             cat("\nWarning: less than 5 '", refC.arg, "'; linear regression will be performed instead of loess regression for this batch\n", sep="")
