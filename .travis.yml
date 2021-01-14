@@ -1,6 +1,6 @@
 env:
     - PLANEMO=yes
-    - PLANEMO=
+#    - PLANEMO=
     
 sudo: required
 

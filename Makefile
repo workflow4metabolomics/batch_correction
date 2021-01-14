@@ -4,8 +4,8 @@ test:
 	$(MAKE) -C $@
 
 planemo-venv/bin/planemo: planemo-venv
-	. planemo-venv/bin/activate && pip install --upgrade pip setuptools
-	. planemo-venv/bin/activate && pip install planemo
+	. planemo-venv/bin/activate && pip3 install --upgrade pip setuptools
+	. planemo-venv/bin/activate && pip3 install planemo
 
 planemo-venv:
 	virtualenv planemo-venv
